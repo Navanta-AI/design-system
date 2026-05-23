@@ -1,0 +1,176 @@
+/* ─── Button Base ─────────────────────────────────────── */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--font-tracking-tight);
+  line-height: var(--line-height-none);
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
+  outline: none;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ─── Sizes ──────────────────────────────────────────── */
+.sm {
+  height: var(--size-button-height-sm);
+  padding: 0 var(--space-base);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  height: var(--size-button-height-md);
+  padding: 0 var(--space-lg);
+  font-size: var(--font-size-base);
+  border-radius: var(--radius-lg);
+}
+
+.lg {
+  height: var(--size-button-height-lg);
+  padding: 0 var(--space-xl);
+  font-size: var(--font-size-base);
+  border-radius: var(--radius-lg);
+}
+
+/* ─── Primary ────────────────────────────────────────── */
+.primary {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  border-color: var(--color-primary);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-dark, #5635a0);
+  border-color: var(--color-primary-dark, #5635a0);
+  box-shadow: var(--glow-primary);
+}
+
+.primary:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* ─── Secondary ──────────────────────────────────────── */
+.secondary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-border-default);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-strong);
+}
+
+/* ─── Ghost ──────────────────────────────────────────── */
+.ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: transparent;
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+/* ─── Danger ─────────────────────────────────────────── */
+.danger {
+  background: var(--color-error);
+  color: var(--color-text-on-primary);
+  border-color: var(--color-error);
+}
+
+.danger:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: var(--glow-error);
+}
+
+/* ─── Full Width ─────────────────────────────────────── */
+.fullWidth {
+  width: 100%;
+}
+
+/* ─── Content ────────────────────────────────────────── */
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* ─── Loading ────────────────────────────────────────── */
+.loading {
+  pointer-events: none;
+}
+
+.loadingContent {
+  opacity: 0;
+}
+
+.spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinnerIcon {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Icon ───────────────────────────────────────────── */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .icon {
+  width: var(--size-icon-sm);
+  height: var(--size-icon-sm);
+}
+
+.md .icon,
+.lg .icon {
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}

@@ -1,0 +1,16 @@
+{
+  "name": "navanta-design-system",
+  "private": true,
+  "workspaces": [
+    "docs",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w docs",
+    "build": "npm run build -w docs",
+    "tokens:parity": "node scripts/check-token-parity.mjs",
+    "tokens:contrast": "node scripts/check-token-contrast.mjs",
+    "tokens:legacy-gate": "node scripts/check-legacy-token-usage.mjs",
+    "tokens:verify": "npm run tokens:parity && npm run tokens:contrast && npm run tokens:legacy-gate"
+  }
+}

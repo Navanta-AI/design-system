@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build -w packages/design-system && npm run build -w docs",
+  "outputDirectory": "docs/.next",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}

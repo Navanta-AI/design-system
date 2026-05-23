@@ -1,0 +1,242 @@
+.container {
+  display: grid;
+  grid-template-columns: var(--nav-width) minmax(0, 1fr);
+}
+
+.main {
+  color: var(--color-text-primary);
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.textBanner {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-left: var(--space-4xl);
+  padding-top: 32px;
+  width: 60vw;
+}
+
+.textBanner_description {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.resourceLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.resourceLink {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.resourceLink:hover {
+  text-decoration: underline;
+}
+
+.tab_context {
+  padding: var(--space-2xl) var(--space-4xl);
+}
+
+.demo_container {
+  position: relative;
+  width: 100%;
+  margin-bottom: var(--space-2xl);
+  margin-top: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--space-xl);
+}
+
+.checkbox_container {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.errorCheckbox {
+  height: 20px;
+  cursor: pointer;
+}
+
+.disableCheckbox {
+  height: 20px;
+  cursor: pointer;
+}
+
+.inputContainer {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+  padding: var(--space-3xl) 36px;
+  border-radius: var(--radius-container);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-divider);
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.inputContainer > * {
+  max-width: 400px;
+}
+
+.dropdown_menu {
+  font-family: var(--font-primary);
+  color: var(--color-text-primary);
+  border-radius: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0;
+  gap: var(--space-sm);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-sm);
+}
+
+.dropdown_item {
+  padding: var(--space-xs) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-input);
+  color: #101010;
+  cursor: pointer;
+}
+
+.dropdown_item_selected {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-input);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.dropdown_item:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.thumbnail_grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: var(--space-lg);
+  gap: var(--space-2xl);
+  justify-content: flex-start;
+}
+
+.thumbnail_link {
+  flex: 1 1 150px;
+  cursor: pointer;
+  position: relative;
+}
+
+.thumbnail_image {
+  position: relative;
+  top: 0;
+  transition: ease-in-out var(--transition-base);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f5f5f5;
+  border-radius: var(--radius-container);
+}
+
+.thumbnail_image:hover {
+  top: -5px;
+}
+
+.slider {
+  height: 3px;
+  width: 0;
+  transition: ease-in-out var(--transition-base);
+  background: var(--color-primary);
+}
+
+.thumbnail_title {
+  font-family: var(--font-secondary);
+  width: max-content;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--space-base);
+  color: var(--color-text-primary);
+}
+
+.thumbnail_title:hover {
+  color: var(--color-primary);
+}
+
+.thumbnail_title:hover .slider {
+  width: 100%;
+  color: var(--color-primary);
+}
+
+.display_none {
+  display: none;
+}
+
+@media only screen and (max-width: 1181px) {
+  .container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .main {
+    padding-top: 72px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .textBanner {
+    padding-left: var(--space-xl);
+    padding-right: var(--space-xl);
+    width: 100%;
+  }
+
+  .tab_context {
+    padding: var(--space-xl);
+  }
+
+  .demo_container {
+    width: 100%;
+    display: flex;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .main {
+    padding-top: 72px;
+  }
+
+  .textBanner {
+    width: 100%;
+    padding-left: var(--space-base);
+    padding-right: var(--space-base);
+    padding-top: var(--space-lg);
+  }
+
+  .tab_context {
+    padding: var(--space-base);
+  }
+
+  .inputContainer {
+    padding: var(--space-xl) var(--space-base);
+  }
+
+  .thumbnail_grid {
+    gap: var(--space-lg);
+  }
+}

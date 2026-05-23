@@ -1,0 +1,170 @@
+.form_field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-base);
+  width: 100%;
+}
+
+.label_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.required {
+  color: var(--color-error);
+  margin-left: var(--space-2xs);
+}
+
+.optional_text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-placeholder);
+  font-weight: var(--font-weight-regular);
+}
+
+.helper_text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-xs);
+}
+
+.error_text {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  line-height: var(--line-height-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.success_text {
+  font-size: var(--font-size-xs);
+  color: var(--color-success);
+  line-height: var(--line-height-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.char_count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-placeholder);
+  text-align: right;
+  transform: translateY(-26px);
+}
+
+.char_count_error {
+  composes: char_count;
+  color: var(--color-error);
+}
+
+.bottom_row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-base);
+  margin-top: var(--space-2xs);
+  min-height: var(--line-height-xs);
+}
+
+/* Validation Message */
+.validation_message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-base);
+  border-radius: var(--radius-container);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.validation_error {
+  composes: validation_message;
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+}
+
+.validation_success {
+  composes: validation_message;
+  background-color: var(--color-success-light);
+  color: #4a7a3a;
+  border: 1px solid var(--color-success);
+}
+
+.validation_warning {
+  composes: validation_message;
+  background-color: var(--color-warning-light);
+  color: #8a6200;
+  border: 1px solid var(--color-warning);
+}
+
+.validation_info {
+  composes: validation_message;
+  background-color: var(--color-info-light);
+  color: var(--color-info);
+  border: 1px solid var(--color-info);
+}
+
+.validation_icon {
+  font-family: 'Material Icons Outlined';
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Form Error Summary */
+.error_summary {
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-container);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  background-color: var(--color-error-light);
+}
+
+.error_summary_title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-error);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.error_summary_list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.error_summary_item {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  padding: var(--space-xs) 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.error_summary_item:hover {
+  color: var(--color-error);
+}
+
+.error_summary_bullet {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-error);
+  flex-shrink: 0;
+}

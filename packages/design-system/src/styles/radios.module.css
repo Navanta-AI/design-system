@@ -1,0 +1,113 @@
+.radio_wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.radio_wrapper_disabled {
+  composes: radio_wrapper;
+  cursor: not-allowed;
+  color: var(--color-text-disabled);
+}
+
+.radio_input {
+  display: none;
+}
+
+.radio_circle {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  background: var(--color-bg-primary);
+  flex-shrink: 0;
+}
+
+.radio_circle:hover {
+  border-color: var(--color-primary);
+}
+
+.radio_circle_selected {
+  composes: radio_circle;
+  border-color: var(--color-primary);
+}
+
+.radio_circle_error {
+  composes: radio_circle;
+  border-color: var(--color-error);
+}
+
+.radio_circle_error_selected {
+  composes: radio_circle;
+  border-color: var(--color-error);
+}
+
+.radio_circle_disabled {
+  composes: radio_circle;
+  background: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+}
+
+.radio_circle_disabled:hover {
+  border-color: var(--color-border-disabled);
+}
+
+.radio_circle_disabled_selected {
+  composes: radio_circle;
+  border-color: var(--color-disabled-bg);
+}
+
+.radio_dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+}
+
+.radio_dot_error {
+  composes: radio_dot;
+  background: var(--color-error);
+}
+
+.radio_dot_disabled {
+  composes: radio_dot;
+  background: var(--color-disabled-bg);
+}
+
+.radio_label {
+  line-height: var(--line-height-sm);
+}
+
+.radio_group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.radio_group_horizontal {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-lg);
+}
+
+.helper_text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-left: 28px;
+  margin-top: var(--space-2xs);
+}
+
+.helper_text_error {
+  composes: helper_text;
+  color: var(--color-error);
+}

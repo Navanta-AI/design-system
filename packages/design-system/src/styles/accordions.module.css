@@ -1,0 +1,92 @@
+.accordion {
+  border: 1px solid var(--color-border-divider);
+  border-radius: var(--radius-container);
+  overflow: hidden;
+}
+
+.accordion_item {
+  border-bottom: 1px solid var(--color-border-divider);
+}
+
+.accordion_item:last-child {
+  border-bottom: none;
+}
+
+.accordion_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-base) var(--space-lg);
+  cursor: pointer;
+  user-select: none;
+  background-color: var(--color-bg-primary);
+  transition: background var(--transition-fast);
+}
+
+.accordion_header:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.accordion_header_open {
+  composes: accordion_header;
+  background-color: var(--color-bg-secondary);
+}
+
+.accordion_title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.accordion_icon {
+  font-family: 'Material Icons Outlined';
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  transition: transform var(--transition-base);
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+.accordion_icon_open {
+  composes: accordion_icon;
+  transform: rotate(180deg);
+}
+
+.accordion_body {
+  padding: 0 var(--space-lg);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.accordion_body_open {
+  padding: var(--space-base) var(--space-lg) var(--space-lg);
+  max-height: 500px;
+}
+
+.accordion_content {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-sm);
+}
+
+/* Nested accordion */
+.nested_accordion {
+  border: none;
+  border-radius: 0;
+  margin-top: var(--space-sm);
+}
+
+.nested_accordion .accordion_header {
+  padding: var(--space-sm) var(--space-base);
+  border-radius: var(--radius-container);
+}
+
+.nested_accordion .accordion_title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+}
+
+.nested_accordion .accordion_body_open {
+  padding: var(--space-sm) var(--space-base) var(--space-md);
+}

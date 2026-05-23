@@ -1,0 +1,87 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+}
+
+.page_btn {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  user-select: none;
+  font-weight: var(--font-weight-regular);
+}
+
+.page_btn:hover {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.page_btn_active {
+  composes: page_btn;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-medium);
+}
+
+.page_btn_active:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.page_btn_disabled {
+  composes: page_btn;
+  color: var(--color-text-placeholder);
+  cursor: not-allowed;
+}
+
+.page_btn_disabled:hover {
+  background: none;
+  color: var(--color-text-placeholder);
+}
+
+.nav_btn {
+  composes: page_btn;
+  font-family: 'Material Icons Outlined';
+  font-size: 20px;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+.nav_btn_disabled {
+  composes: page_btn_disabled;
+  font-family: 'Material Icons Outlined';
+  font-size: 20px;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page_dots {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-placeholder);
+}
+
+/* Compact pagination */
+.compact_pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.compact_text {
+  min-width: 80px;
+  text-align: center;
+}

@@ -1,0 +1,87 @@
+.card {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-divider);
+  border-radius: var(--radius-container);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base);
+}
+
+.card_header {
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+}
+
+.card_title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.card_subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.card_body {
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-sm);
+}
+
+.card_footer {
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.card_image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  background-color: var(--color-bg-secondary);
+}
+
+.card_image_placeholder {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary-hover) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-size: var(--font-size-xl);
+}
+
+.card_divider {
+  height: 1px;
+  background-color: var(--color-border-divider);
+  margin: 0 var(--space-lg);
+}
+
+.card_action {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.card_action:hover {
+  background-color: var(--color-primary-light);
+}
+
+.material_icons {
+  font-family: 'Material Icons Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,264 @@
+/* ─── Field Wrapper ──────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+/* ─── Label ──────────────────────────────────────────── */
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-none);
+}
+
+.required {
+  color: var(--color-error);
+}
+
+/* ─── Input Wrapper ──────────────────────────────────── */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-default);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.inputWrapper:hover:not(.disabled):not(.error) {
+  border-color: var(--color-border-strong);
+}
+
+.inputWrapper:focus-within:not(.disabled):not(.error) {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--focus-ring);
+  background: var(--color-bg-primary);
+}
+
+.inputWrapper.error {
+  border-color: var(--color-error);
+}
+
+.inputWrapper.error:focus-within {
+  box-shadow: var(--focus-ring-error);
+}
+
+.inputWrapper.disabled {
+  background: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ─── Sizes ──────────────────────────────────────────── */
+.sm {
+  height: var(--size-input-height-sm);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  height: var(--size-input-height-md);
+  border-radius: var(--radius-lg);
+}
+
+.lg {
+  height: var(--size-input-height-lg);
+  border-radius: var(--radius-lg);
+}
+
+/* ─── Native Input ───────────────────────────────────── */
+.input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0 var(--space-md);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  color: var(--color-text-disabled);
+}
+
+.sm .input {
+  font-size: var(--font-size-sm);
+  padding: 0 var(--space-sm);
+}
+
+/* ─── Prefix / Suffix ───────────────────────────────── */
+.prefix,
+.suffix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+.prefix {
+  padding-left: var(--space-md);
+}
+
+.suffix {
+  padding-right: var(--space-md);
+}
+
+.sm .prefix {
+  padding-left: var(--space-sm);
+}
+
+.sm .suffix {
+  padding-right: var(--space-sm);
+}
+
+/* ─── Clear Button ───────────────────────────────────── */
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: var(--space-sm);
+  padding: 0;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-tertiary);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.clearBtn:hover {
+  background: var(--color-bg-active);
+  color: var(--color-text-primary);
+}
+
+/* ─── Password Toggle ────────────────────────────────── */
+.toggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-sm);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.toggleBtn:hover {
+  color: var(--color-text-primary);
+}
+
+/* ─── Helper Text ────────────────────────────────────── */
+.helperText {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  line-height: var(--line-height-snug);
+}
+
+.helperText.errorText {
+  color: var(--color-error);
+}
+
+/* ─── Textarea ───────────────────────────────────────── */
+.textareaWrapper {
+  position: relative;
+  display: flex;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.textareaWrapper:hover:not(.disabled):not(.error) {
+  border-color: var(--color-border-strong);
+}
+
+.textareaWrapper:focus-within:not(.disabled):not(.error) {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--focus-ring);
+  background: var(--color-bg-primary);
+}
+
+.textareaWrapper.error {
+  border-color: var(--color-error);
+}
+
+.textareaWrapper.error:focus-within {
+  box-shadow: var(--focus-ring-error);
+}
+
+.textareaWrapper.disabled {
+  background: var(--color-bg-disabled);
+  border-color: var(--color-border-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 80px;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: vertical;
+  line-height: var(--line-height-base);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.textarea::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.textarea:disabled {
+  cursor: not-allowed;
+  color: var(--color-text-disabled);
+  resize: none;
+}
+
+/* ─── Character Count ────────────────────────────────── */
+.charCount {
+  display: flex;
+  justify-content: flex-end;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.charCount.charCountOver {
+  color: var(--color-error);
+}

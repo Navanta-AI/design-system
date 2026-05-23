@@ -1,0 +1,190 @@
+/* Navanta Design System — Canonical Tokens (Source of Truth) */
+/* Usage: import '@navanta/design-system/styles.css' (preferred) or '@navanta/design-system/tokens.css' */
+
+:root {
+  /* Core semantic tokens (light) */
+  --background: #ffffff;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+
+  --primary: #232122;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #27272a;
+  --muted: #f4f4f5;
+  --muted-foreground: #4b5563;
+  --accent: #f4f4f5;
+  --accent-foreground: #27272a;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --success: #16a34a;
+  --success-foreground: #09090b;
+  --warning: #f59e0b;
+  --warning-foreground: #09090b;
+  --info: #0ea5e9;
+  --info-foreground: #09090b;
+
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #c4c4c8;
+
+  /* Dashboard chart palette (v1) */
+  --chart-1: #232122;
+  --chart-2: #3b82f6;
+  --chart-3: #0ea5e9;
+  --chart-4: #16a34a;
+  --chart-5: #f59e0b;
+  --chart-6: #a855f7;
+
+  /* Semantic chart aliases */
+  --chart-positive: var(--success);
+  --chart-negative: var(--destructive);
+  --chart-neutral: var(--muted-foreground);
+  --chart-warning: var(--warning);
+  --chart-info: var(--info);
+
+  /* Radius */
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Brand accent kept separate from neutral core */
+  --kds-color-brand-accent: #6440b6;
+
+  /* Dual-layer alias tokens (Figma-friendly) */
+  --kds-color-surface-default: var(--background);
+  --kds-color-surface-raised: var(--card);
+  --kds-color-surface-overlay: var(--popover);
+  --kds-color-surface-muted: var(--muted);
+
+  --kds-color-text-primary: var(--foreground);
+  --kds-color-text-secondary: var(--muted-foreground);
+  --kds-color-text-inverse: var(--primary-foreground);
+
+  --kds-color-action-primary: var(--primary);
+  --kds-color-action-primary-foreground: var(--primary-foreground);
+  --kds-color-action-secondary: var(--secondary);
+  --kds-color-action-secondary-foreground: var(--secondary-foreground);
+
+  --kds-color-feedback-success: var(--success);
+  --kds-color-feedback-warning: var(--warning);
+  --kds-color-feedback-danger: var(--destructive);
+  --kds-color-feedback-info: var(--info);
+
+  --kds-color-border-default: var(--border);
+  --kds-color-focus-ring: var(--ring);
+
+  --kds-color-chart-1: var(--chart-1);
+  --kds-color-chart-2: var(--chart-2);
+  --kds-color-chart-3: var(--chart-3);
+  --kds-color-chart-4: var(--chart-4);
+  --kds-color-chart-5: var(--chart-5);
+  --kds-color-chart-6: var(--chart-6);
+  --kds-color-chart-positive: var(--chart-positive);
+  --kds-color-chart-negative: var(--chart-negative);
+  --kds-color-chart-neutral: var(--chart-neutral);
+  --kds-color-chart-warning: var(--chart-warning);
+  --kds-color-chart-info: var(--chart-info);
+
+  /* Legacy compatibility aliases (temporary migration layer) */
+  --brand-primary: var(--kds-color-brand-accent);
+  --brand-purple-deep: #3b0764;
+
+  --surface-base: var(--background);
+  --surface-raised: #f8fafc;
+  --surface-sunken: var(--secondary);
+  --surface-hover: var(--accent);
+  --surface-accent: color-mix(in oklab, var(--kds-color-brand-accent) 10%, var(--background));
+  --surface-info: color-mix(in oklab, var(--info) 10%, var(--background));
+  --surface-success-alt: color-mix(in oklab, var(--success) 12%, var(--background));
+  --surface-danger-alt: color-mix(in oklab, var(--destructive) 10%, var(--background));
+
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --text-neutral: #94a3b8;
+  --text-accent: var(--kds-color-brand-accent);
+  --text-accent-dark: color-mix(in oklab, var(--kds-color-brand-accent) 80%, black);
+  --text-danger-vivid: var(--destructive);
+  --text-inverse-muted: #e2e8f0;
+
+  --border-default: var(--border);
+  --border-strong: var(--border);
+
+  --shadow-menu: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--kds-color-focus-ring) 35%, transparent);
+
+  --btn-primary-bg: var(--primary);
+  --btn-primary-bg-hover: #000000;
+  --btn-primary-text: var(--primary-foreground);
+  --btn-primary-disabled-bg: #e2e8f0;
+  --btn-primary-disabled-text: #94a3b8;
+
+  --btn-secondary-bg: var(--background);
+  --btn-secondary-border: var(--border);
+  --btn-secondary-hover-bg: var(--accent);
+
+  --gradient-brand: linear-gradient(135deg, #6440b6 0%, #3b0764 100%);
+  --gradient-progress-green: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  --gradient-progress-amber: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+  --gradient-progress-red: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  --gradient-progress-blue: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.dark {
+  /* Core semantic tokens (dark) */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+
+  --primary: #fafafa;
+  --primary-foreground: #232122;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+
+  --destructive: #f87171;
+  --destructive-foreground: #09090b;
+  --success: #4ade80;
+  --success-foreground: #09090b;
+  --warning: #fbbf24;
+  --warning-foreground: #09090b;
+  --info: #38bdf8;
+  --info-foreground: #09090b;
+
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #71717a;
+
+  /* Dashboard chart palette (dark) */
+  --chart-1: #fafafa;
+  --chart-2: #60a5fa;
+  --chart-3: #38bdf8;
+  --chart-4: #4ade80;
+  --chart-5: #fbbf24;
+  --chart-6: #c084fc;
+
+  --kds-color-brand-accent: #8c66e3;
+
+  --surface-raised: #18181b;
+  --text-neutral: #94a3b8;
+  --text-inverse-muted: #e2e8f0;
+
+  --btn-primary-bg-hover: #e5e5e5;
+  --btn-primary-disabled-bg: #3f3f46;
+  --btn-primary-disabled-text: #a1a1aa;
+}

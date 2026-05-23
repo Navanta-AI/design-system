@@ -1,0 +1,84 @@
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  touch-action: none;
+  width: 100%;
+}
+
+.root[data-orientation='horizontal'] {
+  height: 20px;
+}
+
+.root[data-orientation='vertical'] {
+  flex-direction: column;
+  width: 20px;
+  height: 100px;
+}
+
+.track {
+  background-color: var(--color-bg-tertiary);
+  position: relative;
+  flex-grow: 1;
+  border-radius: var(--radius-pill);
+}
+
+.root[data-orientation='horizontal'] .track {
+  height: 6px;
+}
+
+.root[data-orientation='vertical'] .track {
+  width: 6px;
+}
+
+.range {
+  position: absolute;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-pill);
+  height: 100%;
+}
+
+.root[data-orientation='vertical'] .range {
+  width: 100%;
+}
+
+.thumb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-bg-primary);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-light);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.thumb:hover {
+  transform: scale(1.1);
+  cursor: grab;
+}
+
+.thumb:active {
+  cursor: grabbing;
+}
+
+.thumb:focus {
+  box-shadow: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-primary);
+}
+
+/* Disabled state */
+.root[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.root[data-disabled] .thumb {
+  cursor: not-allowed;
+  background-color: var(--color-bg-disabled);
+}
+
+.root[data-disabled] .range {
+  background-color: var(--color-text-disabled);
+}

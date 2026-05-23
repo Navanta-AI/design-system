@@ -1,0 +1,105 @@
+.dropField{
+  display: flex;
+  width: 100%;
+  height: var(--input-height);
+  font-size: var(--font-size-sm);
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-input);
+  font-weight: var(--font-weight-regular) !important;
+  padding: 0px var(--space-base);
+  transition: var(--transition-base);
+  cursor: pointer;
+}
+
+.dropField_disabled{
+  display: flex;
+  width: 100%;
+  height: var(--input-height);
+  font-size: var(--font-size-sm);
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-primary);
+  background-color: var(--color-bg-disabled);
+  border-radius: var(--radius-input);
+  font-weight: var(--font-weight-regular) !important;
+  padding: 0px var(--space-base);
+  border: 2px solid var(--color-border-disabled);
+  cursor: not-allowed;
+}
+
+.dropField:hover{
+  box-shadow: var(--shadow-hover);
+}
+
+.drop_pop{
+  display: flex;
+  width: 100%;
+  height: 210px;
+  overflow-x: hidden;
+  position: absolute;
+  top: 86px;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-xs);
+  background-color: var(--color-bg-primary);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-input);
+  z-index: var(--z-dropdown);
+}
+
+.drop_pop_item{
+  padding: var(--space-sm) var(--space-base);
+  cursor: pointer;
+}
+.drop_pop_item:hover{
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-input);
+}
+
+.display_none{
+  display: none;
+}
+
+.text_default_input{
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  font-family: var(--font-primary);
+  width: 100%;
+  max-width: 370px;
+  gap: var(--space-2xs);
+}
+
+.text_input_container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.helper_text{
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.material_icons {
+  font-family: 'Material Icons Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}

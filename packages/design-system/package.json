@@ -1,0 +1,55 @@
+{
+  "name": "@navanta/design-system",
+  "version": "0.2.0",
+  "description": "Navanta Design System — component library for the Navanta client portal",
+  "private": false,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./tokens.css": "./src/tokens.css",
+    "./styles.css": "./src/styles.css"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsdown && cp src/tokens.css dist/tokens.css && cp src/styles.css dist/styles.css",
+    "dev": "tsdown --watch"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "tsdown": "^0.21.4",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.7",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^3.0.0"
+  },
+  "keywords": [
+    "react",
+    "design-system",
+    "components",
+    "ui",
+    "@navanta/design-system",
+    "tailwind"
+  ],
+  "license": "MIT"
+}

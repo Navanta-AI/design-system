@@ -1,0 +1,55 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  overflow: hidden;
+  user-select: none;
+  background-color: var(--color-bg-tertiary);
+  flex-shrink: 0;
+}
+
+/* Shapes */
+.circle {
+  border-radius: var(--radius-full);
+}
+
+.square {
+  border-radius: var(--radius-button);
+}
+
+/* Sizes */
+.sm { width: 32px; height: 32px; }
+.md { width: 48px; height: 48px; }
+.lg { width: 64px; height: 64px; }
+.xl { width: 96px; height: 96px; }
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+}
+
+/* Initials Font Size Scaling */
+.sm .initials { font-size: 12px; }
+.md .initials { font-size: 16px; }
+.lg .initials { font-size: 20px; }
+.xl .initials { font-size: 32px; }
+
+.icon {
+  width: 50%;
+  height: 50%;
+}
