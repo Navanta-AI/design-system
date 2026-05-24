@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button } from '@navanta/design-system'
+import { Button } from '@admin-navanta/design-system'
 import { FeatureCards } from '@/app/components/feature-cards'
 import { GithubLogo } from '@phosphor-icons/react/dist/ssr'
 
@@ -11,7 +11,7 @@ export default function Home() {
           <span className="inline-flex rounded-full border border-border bg-muted/40 px-3 py-1 text-[12px] font-medium text-muted-foreground">
             Navanta Design System
           </span>
-          <Link target="_blank" rel="noreferrer" href="https://github.com/navanta/design-system">
+          <Link target="_blank" rel="noreferrer" href="https://github.com/admin-navanta/design-system">
             <Button variant="ghost" size="md" className="h-9 px-3 gap-2">
               <GithubLogo className="h-4 w-4" />
               GitHub

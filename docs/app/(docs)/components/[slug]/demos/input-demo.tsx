@@ -1,6 +1,6 @@
 'use client'
 
-import { Input } from '@navanta/design-system'
+import { Input } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -45,7 +45,7 @@ export function InputDemo({ meta }: InputDemoProps) {
               />
             </div>
           )}
-          codeTemplate={() => `import { Input } from '@navanta/design-system'\n\nexport default function Example() {\n  return (\n    <Input\n      label="Email address"\n      placeholder="hello@example.com"\n      error="Invalid email format"\n    />\n  )\n}`}
+          codeTemplate={() => `import { Input } from '@admin-navanta/design-system'\n\nexport default function Example() {\n  return (\n    <Input\n      label="Email address"\n      placeholder="hello@example.com"\n      error="Invalid email format"\n    />\n  )\n}`}
         />
       </div>
 
@@ -64,7 +64,7 @@ export function InputDemo({ meta }: InputDemoProps) {
               />
             </div>
           )}
-          codeTemplate={() => `import { Input } from '@navanta/design-system'\n\nexport default function Example() {\n  return (\n    <Input\n      label="Email address"\n      placeholder="hello@example.com"\n      disabled\n    />\n  )\n}`}
+          codeTemplate={() => `import { Input } from '@admin-navanta/design-system'\n\nexport default function Example() {\n  return (\n    <Input\n      label="Email address"\n      placeholder="hello@example.com"\n      disabled\n    />\n  )\n}`}
         />
       </div>
     </div>

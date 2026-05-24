@@ -10,8 +10,8 @@ const packageCss = fs.readFileSync(packageTokensPath, 'utf8');
 
 const requiredImports = [
   '@import "../../packages/design-system/src/styles.css";',
-  '@import "@navanta/design-system/styles.css";',
-  '@import "@navanta/design-system/tokens.css";',
+  '@import "@admin-navanta/design-system/styles.css";',
+  '@import "@admin-navanta/design-system/tokens.css";',
 ];
 
 if (!requiredImports.some((line) => docsCss.includes(line))) {

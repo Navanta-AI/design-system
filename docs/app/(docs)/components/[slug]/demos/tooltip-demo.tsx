@@ -1,6 +1,6 @@
 'use client'
 
-import { Tooltip, Button } from '@navanta/design-system'
+import { Tooltip, Button } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 

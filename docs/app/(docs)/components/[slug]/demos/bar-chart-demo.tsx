@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart, type ChartDatum } from '@navanta/design-system'
+import { BarChart, type ChartDatum } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -37,7 +37,7 @@ export function BarChartDemo({ meta }: { meta: ComponentMeta }) {
         const showYAxisLabels = props.showYAxisLabels !== false
         const showValueLabels = props.showValueLabels === true || accessibilityMode === 'colorblind-safe'
 
-        return `import { BarChart } from '@navanta/design-system'
+        return `import { BarChart } from '@admin-navanta/design-system'
 
 const data = ${JSON.stringify(data, null, 2)}
 

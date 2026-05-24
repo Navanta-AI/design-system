@@ -29,7 +29,7 @@ export default function GettingStartedPage() {
         <p className="text-muted-foreground leading-relaxed">
           Install the package from npm using your preferred package manager.
         </p>
-        <CodeBlock code="npm install @navanta/design-system" lang="bash" />
+        <CodeBlock code="npm install @admin-navanta/design-system" lang="bash" />
       </section>
 
       <section id="setup" className="scroll-mt-24 space-y-4 border-t border-border pt-6">
@@ -37,7 +37,7 @@ export default function GettingStartedPage() {
         <p className="text-muted-foreground leading-relaxed">
           Import the styles in your root layout or global CSS file:
         </p>
-        <CodeBlock code={`import '@navanta/design-system/styles.css'`} lang="typescript" />
+        <CodeBlock code={`import '@admin-navanta/design-system/styles.css'`} lang="typescript" />
       </section>
 
       <section id="first-component" className="scroll-mt-24 space-y-4 border-t border-border pt-6">
@@ -46,7 +46,7 @@ export default function GettingStartedPage() {
           Import and use components directly — no additional configuration required.
         </p>
         <CodeBlock
-          code={`import { Button } from '@navanta/design-system'
+          code={`import { Button } from '@admin-navanta/design-system'
 
 export default function App() {
   return (

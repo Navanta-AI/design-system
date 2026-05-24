@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { cn } from '@navanta/design-system'
+import { cn } from '@admin-navanta/design-system'
 
 interface CopyButtonProps {
   code: string

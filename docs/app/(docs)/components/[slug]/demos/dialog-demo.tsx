@@ -22,7 +22,7 @@ import {
   dropzoneUid,
   Progress,
   type DropzoneFile,
-} from '@navanta/design-system'
+} from '@admin-navanta/design-system'
 import {
   Info,
   ShareNetwork,
@@ -104,7 +104,7 @@ export function DialogDemo({ meta }: { meta: ComponentMeta }) {
   SelectItem,
   Textarea,
   Button,
-} from '@navanta/design-system'
+} from '@admin-navanta/design-system'
 import * as React from 'react'
 
 export function Example() {
@@ -143,7 +143,7 @@ export function Example() {
 }`
           }
 
-          return `import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogIcon, DialogFooter, Button } from '@navanta/design-system'
+          return `import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogIcon, DialogFooter, Button } from '@admin-navanta/design-system'
 import { ShareNetwork } from '@phosphor-icons/react'
 import * as React from 'react'
 

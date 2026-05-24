@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Checkbox, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@navanta/design-system'
+import { Button, Checkbox, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@admin-navanta/design-system'
 import { ArrowRight, Envelope, Check, X } from '@phosphor-icons/react'
 import { DynamicCodeBlock } from '@/app/components/dynamic-code-block'
 import type { ComponentMeta } from '@/lib/component-registry'
@@ -95,7 +95,7 @@ export function ButtonDemo({ meta: _ }: ButtonDemoProps) {
 
   // ── Dynamic code ──────────────────────────────────────
   function getCode() {
-    const lines: string[] = [`import { Button } from '@navanta/design-system'`]
+    const lines: string[] = [`import { Button } from '@admin-navanta/design-system'`]
 
     if (icon === 'prefix-icon' || icon === 'icon-only') lines.push(`import { Envelope } from '@phosphor-icons/react'`)
     if (icon === 'suffix-icon') lines.push(`import { ArrowRight } from '@phosphor-icons/react'`)

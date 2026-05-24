@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@navanta/design-system'
+} from '@admin-navanta/design-system'
 import type { KnobDef } from '@/lib/component-registry'
 
 interface KnobPanelProps {

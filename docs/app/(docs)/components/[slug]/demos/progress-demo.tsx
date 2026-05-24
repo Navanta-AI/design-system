@@ -1,6 +1,6 @@
 'use client'
 
-import { Progress, CircularProgress } from '@navanta/design-system'
+import { Progress, CircularProgress } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 import { useState, useEffect } from 'react'

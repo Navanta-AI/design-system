@@ -1,6 +1,6 @@
 'use client'
 
-import { LineChart, type ChartDatum } from '@navanta/design-system'
+import { LineChart, type ChartDatum } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -37,7 +37,7 @@ export function LineChartDemo({ meta }: { meta: ComponentMeta }) {
         const smooth = props.smooth !== false
         const showPoints = props.showPoints !== false
 
-        return `import { LineChart } from '@navanta/design-system'
+        return `import { LineChart } from '@admin-navanta/design-system'
 
 const data = ${JSON.stringify(data, null, 2)}
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { StackedBarChart, type StackedChartDatum } from '@navanta/design-system'
+import { StackedBarChart, type StackedChartDatum } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -71,7 +71,7 @@ export function StackedBarChartDemo({ meta }: { meta: ComponentMeta }) {
         const showGrid = props.showGrid !== false
         const accessibilityMode = ((props.accessibilityMode as string) || 'default') as 'default' | 'colorblind-safe'
 
-        return `import { StackedBarChart } from '@navanta/design-system'
+        return `import { StackedBarChart } from '@admin-navanta/design-system'
 
 const data = ${JSON.stringify(data, null, 2)}
 

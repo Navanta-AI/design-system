@@ -1,6 +1,6 @@
 'use client'
 
-import { Radio } from '@navanta/design-system'
+import { Radio } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Tabs, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@navanta/design-system'
+import { Tabs, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@admin-navanta/design-system'
 
 type ViewportKey = 'desktop' | 'tablet' | 'mobile'
 type MarginValue = 'fluid' | '16' | '32' | '48'

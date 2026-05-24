@@ -12,7 +12,7 @@ A modern, highly-accessible React component library for the Navanta client porta
 ## Installation
 
 ```bash
-npm install @navanta/design-system @phosphor-icons/react
+npm install @admin-navanta/design-system @phosphor-icons/react
 ```
 
 ## Setup (Next.js Application)
@@ -26,7 +26,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 // 1. Import your standard global styles (including standard Tailwind)
 import "./globals.css";
 // 2. Import the Navanta design system tokens
-import "@navanta/design-system/tokens.css"; 
+import "@admin-navanta/design-system/tokens.css"; 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -47,7 +47,7 @@ Navanta exposes modular components from its main entry point seamlessly.
 ```tsx
 "use client"
 import { useState } from "react";
-import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@navanta/design-system";
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter } from "@admin-navanta/design-system";
 
 export default function App() {
   const [open, setOpen] = useState(false);

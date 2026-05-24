@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 }
 
 const QUICK_START_CODE = `// app/layout.tsx
-import '@navanta/design-system/styles.css'
+import '@admin-navanta/design-system/styles.css'
 `
 
 const THEME_PROVIDER_CODE = `import { ThemeProvider } from 'next-themes'

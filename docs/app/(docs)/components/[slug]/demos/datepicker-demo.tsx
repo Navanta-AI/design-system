@@ -1,6 +1,6 @@
 'use client'
 
-import { DatePicker } from '@navanta/design-system'
+import { DatePicker } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 import { useState } from 'react'

@@ -43,7 +43,7 @@ export const componentRegistry: ComponentMeta[] = [
       'Displays a button or a component that looks like a button. Supports multiple visual variants, sizes, and icon placements.',
     category: 'Forms',
     importName: 'Button',
-    usageExample: `import { Button } from '@navanta/design-system'
+    usageExample: `import { Button } from '@admin-navanta/design-system'
 
 export default function Example() {
   return <Button>Click me</Button>
@@ -419,7 +419,7 @@ export default function Example() {
     description: 'A categorical bar graph for comparing values across labels.',
     category: 'Data Display',
     importName: 'BarChart',
-    usageExample: `import { BarChart } from '@navanta/design-system'
+    usageExample: `import { BarChart } from '@admin-navanta/design-system'
 
 const data = [
   { label: 'Mon', value: 24 },
@@ -456,7 +456,7 @@ export default function Example() {
     description: 'A trend line graph for visualizing changes over time.',
     category: 'Data Display',
     importName: 'LineChart',
-    usageExample: `import { LineChart } from '@navanta/design-system'
+    usageExample: `import { LineChart } from '@admin-navanta/design-system'
 
 const data = [
   { label: 'Jan', value: 18 },
@@ -493,7 +493,7 @@ export default function Example() {
     description: 'A segmented bar graph to show part-to-whole composition inside each category.',
     category: 'Data Display',
     importName: 'StackedBarChart',
-    usageExample: `import { StackedBarChart } from '@navanta/design-system'
+    usageExample: `import { StackedBarChart } from '@admin-navanta/design-system'
 
 const data = [
   {
@@ -656,7 +656,7 @@ export default function Example() {
     category: 'Data Display',
     importName: 'KpiStatCard',
     usageExample: `import { Info } from '@phosphor-icons/react'
-import { KpiGrid, KpiProgressCard, KpiStatCard, Tooltip } from '@navanta/design-system'
+import { KpiGrid, KpiProgressCard, KpiStatCard, Tooltip } from '@admin-navanta/design-system'
 
 const infoIcon = (
   <Tooltip content="More info">

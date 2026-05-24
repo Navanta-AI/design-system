@@ -1,6 +1,6 @@
 'use client'
 
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem, SelectSeparator } from '@navanta/design-system'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem, SelectSeparator } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -47,7 +47,7 @@ export function SelectDemo({ meta }: SelectDemoProps) {
   SelectGroup,
   SelectLabel,
   SelectItem,
-} from '@navanta/design-system'
+} from '@admin-navanta/design-system'
 
 <Select>
   <SelectTrigger className="w-full sm:w-[180px]">

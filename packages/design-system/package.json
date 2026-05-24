@@ -1,6 +1,6 @@
 {
-  "name": "@navanta/design-system",
-  "version": "0.2.0",
+  "name": "@admin-navanta/design-system",
+  "version": "0.2.1",
   "description": "Navanta Design System — component library for the Navanta client portal",
   "private": false,
   "publishConfig": {
@@ -48,7 +48,7 @@
     "design-system",
     "components",
     "ui",
-    "@navanta/design-system",
+    "@admin-navanta/design-system",
     "tailwind"
   ],
   "license": "MIT"

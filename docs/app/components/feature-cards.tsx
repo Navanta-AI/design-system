@@ -82,7 +82,7 @@ function InstallCard() {
   const [copied, setCopied] = useState(false)
 
   function copy() {
-    navigator.clipboard.writeText('npm install @navanta/design-system')
+    navigator.clipboard.writeText('npm install @admin-navanta/design-system')
     setCopied(true)
     setTimeout(() => setCopied(false), 1800)
   }
@@ -94,7 +94,7 @@ function InstallCard() {
         className="mt-4 w-full rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-left font-mono text-[12px] text-foreground hover:bg-muted/60 transition-colors"
       >
         <span className="text-muted-foreground select-none">$ </span>
-        npm install @navanta/design-system
+        npm install @admin-navanta/design-system
       </button>
       <p className="mt-2 text-[11px] text-muted-foreground">
         {copied ? '✓ Copied!' : 'Click to copy'}

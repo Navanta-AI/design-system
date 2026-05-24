@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { componentRegistry, CATEGORIES } from '@/lib/component-registry'
 import { SidebarLink } from './sidebar-link'
-import { cn } from '@navanta/design-system'
+import { cn } from '@admin-navanta/design-system'
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)

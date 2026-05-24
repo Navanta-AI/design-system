@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar } from '@navanta/design-system'
+import { Avatar } from '@admin-navanta/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 

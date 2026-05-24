@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { MainNav } from "./main-nav"
 import { ThemeToggle } from "./theme-toggle"
-import { Button } from "@navanta/design-system"
+import { Button } from "@admin-navanta/design-system"
 import { GithubLogo, TwitterLogo } from "@phosphor-icons/react/dist/ssr"
 
 export function SiteHeader() {

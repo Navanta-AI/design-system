@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { componentRegistry } from '@/lib/component-registry'
-import { Input } from '@navanta/design-system'
+import { Input } from '@admin-navanta/design-system'
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false)

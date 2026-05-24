@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Tabs } from '@navanta/design-system'
+import { Tabs } from '@admin-navanta/design-system'
 import type { ComponentMeta } from '@/lib/component-registry'
 import { CodeTabs } from './code-tabs'
 import { DynamicCodeBlock } from './dynamic-code-block'
@@ -50,12 +50,12 @@ export function ComponentTabs({ component, children }: ComponentTabsProps) {
               tabs={[
                 {
                   label: 'CLI',
-                  code: `npx @navanta/design-system add ${component.slug}`,
+                  code: `npx @admin-navanta/design-system add ${component.slug}`,
                   lang: 'bash',
                 },
                 {
                   label: 'Manual',
-                  code: `// Ensure you have configured @navanta/design-system in your project first.\n// Copy the component code from the repository into your project:\n// components/ui/${component.slug}.tsx`,
+                  code: `// Ensure you have configured @admin-navanta/design-system in your project first.\n// Copy the component code from the repository into your project:\n// components/ui/${component.slug}.tsx`,
                   lang: 'tsx',
                 },
               ]}
@@ -69,7 +69,7 @@ export function ComponentTabs({ component, children }: ComponentTabsProps) {
             <DynamicCodeBlock
               code={
                 component.usageExample ??
-                `import { ${component.importName} } from '@navanta/design-system'\n\nexport default function Example() {\n  return <${component.importName} />\n}`
+                `import { ${component.importName} } from '@admin-navanta/design-system'\n\nexport default function Example() {\n  return <${component.importName} />\n}`
               }
             />
           </div>
