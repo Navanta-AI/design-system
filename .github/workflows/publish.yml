@@ -29,10 +29,11 @@ jobs:
             exit 1
           fi
 
-      # Using `npm install` (not `npm ci`) so missing platform-specific
-      # optional native bindings (e.g. rolldown linux-x64) are resolved
-      # when the lockfile was generated on macOS. See npm/cli#4828.
-      - run: npm install --include=optional --no-audit --no-fund
+      # The lockfile is generated on macOS and only resolves the darwin
+      # rolldown native binding. Removing it forces npm to fully resolve
+      # deps on the Linux runner so it can install the linux-x64 binding.
+      # See npm/cli#4828.
+      - run: rm -f package-lock.json && npm install --include=optional --no-audit --no-fund
 
       - run: npm run build -w packages/design-system
 
