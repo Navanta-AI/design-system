@@ -29,7 +29,10 @@ jobs:
             exit 1
           fi
 
-      - run: npm ci
+      # Using `npm install` (not `npm ci`) so missing platform-specific
+      # optional native bindings (e.g. rolldown linux-x64) are resolved
+      # when the lockfile was generated on macOS. See npm/cli#4828.
+      - run: npm install --include=optional --no-audit --no-fund
 
       - run: npm run build -w packages/design-system
 

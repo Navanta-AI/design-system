@@ -1,6 +1,6 @@
 {
   "name": "@admin-navanta/design-system",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Navanta Design System — component library for the Navanta client portal",
   "private": false,
   "publishConfig": {
