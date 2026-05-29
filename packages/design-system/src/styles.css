@@ -1,2 +1,72 @@
-/* Public styles entrypoint for consumers */
+/* ──────────────────────────────────────────────────────────────────────────
+   Navanta Design System — public styles entrypoint.
+
+   This file is the INPUT to a Tailwind build step (see package.json "build").
+   It is compiled to `dist/styles.css`, which is what consumers import:
+
+       import "@admin-navanta/design-system/styles.css";
+
+   The compiled output is self-contained — it ships:
+     • the design tokens (light + dark),
+     • the Tailwind default theme (spacing / radius / type scales),
+     • an @theme mapping so semantic utilities (bg-primary, text-foreground…)
+       resolve to the DS tokens, and
+     • every utility class actually used by the DS components (scanned from the
+       compiled bundle via @source).
+
+   Only the theme + utilities layers are included (NO preflight), so importing
+   this file will not reset or clobber the consuming app's base styles.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* Design tokens (raw CSS variables) — inlined into the compiled output. */
 @import "./tokens.css";
+
+/* Scan the compiled component bundle so Tailwind generates the utility classes
+   the components reference (bg-primary, h-8, rounded-lg, inline-flex, …). */
+@source "../dist/index.mjs";
+
+/* Map Tailwind's semantic color theme onto the DS tokens. `inline` makes the
+   generated utilities reference the DS variables directly (e.g.
+   `.bg-primary { background-color: var(--primary) }`). */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+}
