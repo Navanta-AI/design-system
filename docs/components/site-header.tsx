@@ -2,7 +2,7 @@ import Link from "next/link"
 import { MainNav } from "./main-nav"
 import { ThemeToggle } from "./theme-toggle"
 import { Button } from "@admin-navanta/design-system"
-import { GithubLogo, TwitterLogo } from "@phosphor-icons/react/dist/ssr"
+import { GithubLogo } from "@phosphor-icons/react/dist/ssr"
 
 export function SiteHeader() {
   return (
@@ -22,24 +22,13 @@ export function SiteHeader() {
           </div>
           <nav className="flex items-center space-x-1">
             <Link
-              href="https://github.com/shadcn-ui/ui"
+              href="https://github.com/admin-navanta/design-system"
               target="_blank"
               rel="noreferrer"
             >
               <Button variant="ghost" size="icon" className="h-8 w-8 px-0">
                 <GithubLogo className="size-4" />
                 <span className="sr-only">GitHub</span>
-              </Button>
-            </Link>
-            <Link
-              href="https://twitter.com/shadcn"
-              target="_blank"
-              rel="noreferrer"
-              className="hidden sm:inline-flex"
-            >
-              <Button variant="ghost" size="icon" className="h-8 w-8 px-0">
-                <TwitterLogo className="size-4" />
-                <span className="sr-only">Twitter</span>
               </Button>
             </Link>
             <ThemeToggle />
