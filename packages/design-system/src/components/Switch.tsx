@@ -65,18 +65,24 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
           disabled={disabled}
           onClick={handleClick}
           className={cn(
-            'peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border transition-colors',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            // HMTX Portal "Toggle - Switch" (Figma 535:20294 / 535:20313, Apple HIG):
+            // a flat, fully-rounded track with a 2px inset (p-0.5) and a wide white pill
+            // knob that travels edge-to-edge. On = info blue, off = translucent label gray.
+            // Scaled down from the Figma master (64×28) to a 44×20 track / 26×16 knob,
+            // preserving the wide-pill knob ratio (≈1.6:1).
+            'peer inline-flex h-5 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            isChecked ? 'border-primary bg-primary' : 'border-input bg-input',
+            isChecked ? 'bg-[var(--switch-on)]' : 'bg-[var(--switch-off)]',
             className
           )}
           {...props}
         >
           <span
             className={cn(
-              'pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform',
-              isChecked ? 'translate-x-4' : 'translate-x-0'
+              'pointer-events-none block h-4 w-[26px] rounded-full bg-[var(--switch-knob)] ring-0 transition-transform duration-200 ease-in-out',
+              'shadow-[0_1px_2px_0_rgba(0,0,0,0.2)]',
+              isChecked ? 'translate-x-[14px]' : 'translate-x-0'
             )}
           />
         </button>

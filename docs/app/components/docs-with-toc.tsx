@@ -5,9 +5,15 @@ interface DocsWithTocProps {
   children: ReactNode
   links: OnThisPageLink[]
   contentClassName?: string
+  /** Drop the "On this page" rail and let content span the full column (e.g. wide tables). */
+  hideOnThisPage?: boolean
 }
 
-export function DocsWithToc({ children, links, contentClassName = 'space-y-8' }: DocsWithTocProps) {
+export function DocsWithToc({ children, links, contentClassName = 'space-y-8', hideOnThisPage = false }: DocsWithTocProps) {
+  if (hideOnThisPage) {
+    return <div className={`min-w-0 ${contentClassName}`}>{children}</div>
+  }
+
   return (
     <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_220px]">
       <div className={`min-w-0 ${contentClassName}`}>{children}</div>

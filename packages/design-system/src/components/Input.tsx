@@ -114,7 +114,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={hasError || undefined}
             aria-describedby={displayHelper ? helperId : undefined}
             className={cn(
-              'flex w-full min-w-0 rounded-md border border-input bg-background py-1 text-foreground shadow-xs transition-[border-color,color,box-shadow] outline-none',
+              'flex w-full min-w-0 rounded-md border border-input bg-background py-1 text-foreground transition-[border-color,color,box-shadow] outline-none',
               sizeClass,
               'file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground',
               'placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground',

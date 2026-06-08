@@ -93,15 +93,9 @@ html {
   background: var(--gradient-brand);
 }
 
-.christy-btn-primary {
-  background: var(--gradient-brand);
-  color: white;
-  transition: opacity 0.2s ease;
-}
-
-.christy-btn-primary:hover:not(:disabled) {
-  opacity: 0.9;
-}
+/* .christy-btn-primary is defined once in the package's styles.css
+   (uses --gradient-christy / --gradient-christy-hover from Figma).
+   Do not redefine it here — a local copy would override the package. */
 
 @keyframes christy-fade-up {
   from {

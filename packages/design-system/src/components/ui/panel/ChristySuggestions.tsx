@@ -2,8 +2,9 @@
 
 import { type ReactNode } from "react";
 import { CheckCircle, CircleNotch } from "@phosphor-icons/react";
-import { RadioCard } from "../RadioCard";
-import { ChristyButton } from "../Button";
+import { Radio } from "../../Radio";
+import { Button } from "../../Button";
+import { AiStar } from "../AiStar";
 
 /* ─────────────────────────────────────────────
  *  Christy Suggestions — 3 states
@@ -69,7 +70,7 @@ export function ChristySuggestions(props: ChristySuggestionsProps) {
     >
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[#f0f2f5]">
-        <img src="/AI-star-small.svg" alt="" className="w-[18px] h-[19px] shrink-0" />
+        <AiStar size={18} className="shrink-0" />
         <span className="text-[14px] font-medium text-[#3b0764] leading-[1.5]">Christy Suggestions</span>
       </div>
 
@@ -107,16 +108,16 @@ function SelectionBody({ options, selectedIdx, onSelect, confirmLabel = "Confirm
         <p className="text-[13px] text-[var(--text-secondary)] leading-[1.4]">{summary}</p>
       )}
 
-      {/* Option cards */}
+      {/* Option cards — design-system Radio (card variant) */}
       {options.map((opt, idx) => (
-        <RadioCard
+        <Radio
           key={idx}
-          variant="christy"
-          selected={selectedIdx === idx}
+          card
+          name="christy-suggestion"
           label={opt.label}
-          detail={opt.detail}
-          onClick={() => onSelect(idx)}
-          className="w-full"
+          helperText={opt.detail}
+          checked={selectedIdx === idx}
+          onChange={() => onSelect(idx)}
           badge={opt.credit ? (
             <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded" style={{ color: opt.creditColor ?? "#333", background: `${opt.creditColor ?? "#333"}15` }}>
               {opt.credit}
@@ -127,7 +128,7 @@ function SelectionBody({ options, selectedIdx, onSelect, confirmLabel = "Confirm
 
       {/* Reasoning */}
       {reasoning && reasoning.length > 0 && selectedIdx >= 0 && (
-        <div className="flex flex-col gap-2 rounded-[12px] px-3 py-2.5" style={{ backgroundColor: "var(--surface-info)" }}>
+        <div className="flex flex-col gap-2 rounded-[12px] px-3 py-2.5" style={{ backgroundColor: "var(--surface-accent)" }}>
           {reasoning.map((r, i) => (
             <div key={i} className="flex items-start gap-1">
               <div className="flex items-center py-0.5 shrink-0">
@@ -140,7 +141,8 @@ function SelectionBody({ options, selectedIdx, onSelect, confirmLabel = "Confirm
       )}
 
       {/* Confirm button */}
-      <ChristyButton
+      <Button
+        variant="christy"
         onClick={onConfirm}
         disabled={selectedIdx < 0 || isConfirming}
         fullWidth
@@ -153,7 +155,7 @@ function SelectionBody({ options, selectedIdx, onSelect, confirmLabel = "Confirm
         ) : (
           confirmLabel
         )}
-      </ChristyButton>
+      </Button>
     </>
   );
 }
@@ -167,7 +169,7 @@ function StaticBody({ children, reasoning, summary }: StaticProps) {
       )}
       {children}
       {reasoning && reasoning.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-[12px] px-3 py-2.5" style={{ backgroundColor: "var(--surface-info)" }}>
+        <div className="flex flex-col gap-2 rounded-[12px] px-3 py-2.5" style={{ backgroundColor: "var(--surface-accent)" }}>
           {reasoning.map((r, i) => (
             <div key={i} className="flex items-start gap-1">
               <div className="flex items-center py-0.5 shrink-0">

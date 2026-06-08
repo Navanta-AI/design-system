@@ -1,63 +1,54 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
 import { componentRegistry, getComponentBySlug } from '@/lib/component-registry'
 import type { ComponentMeta } from '@/lib/component-registry'
 import { ComponentTabs } from '@/app/components/component-tabs'
 import { DocsWithToc } from '@/app/components/docs-with-toc'
-import { ButtonDemo } from './demos/button-demo'
-import { InputDemo } from './demos/input-demo'
-import { CardDemo } from './demos/card-demo'
-import { TextareaDemo } from './demos/textarea-demo'
-import { CheckboxDemo } from './demos/checkbox-demo'
-import { RadioDemo } from './demos/radio-demo'
-import { SwitchDemo } from './demos/switch-demo'
-import { SelectDemo } from './demos/select-demo'
-import { DialogDemo } from './demos/dialog-demo'
-import { ToastDemo } from './demos/toast-demo'
-import { AccordionDemo } from './demos/accordion-demo'
-import { TabsDemo } from './demos/tabs-demo'
-import { TableDemo } from './demos/table-demo'
-import { BreadcrumbsDemo } from './demos/breadcrumbs-demo'
-import { TooltipDemo } from './demos/tooltip-demo'
-import { AvatarDemo } from './demos/avatar-demo'
-import { SkeletonDemo } from './demos/skeleton-demo'
-import { ProgressDemo } from './demos/progress-demo'
-import { PaginationDemo } from './demos/pagination-demo'
-import { KpiDemo } from './demos/kpi-demo'
-import { SliderDemo } from './demos/slider-demo'
-import { DatePickerDemo } from './demos/datepicker-demo'
-import { DropzoneDemo } from './demos/dropzone-demo'
-import { BarChartDemo } from './demos/bar-chart-demo'
-import { LineChartDemo } from './demos/line-chart-demo'
-import { StackedBarChartDemo } from './demos/stacked-bar-chart-demo'
 
-const demoMap: Record<string, React.ComponentType<{ meta: ComponentMeta }>> = {
-  button: ButtonDemo,
-  input: InputDemo,
-  card: CardDemo,
-  textarea: TextareaDemo,
-  checkbox: CheckboxDemo,
-  radio: RadioDemo,
-  switch: SwitchDemo,
-  select: SelectDemo,
-  dialog: DialogDemo,
-  toast: ToastDemo,
-  accordion: AccordionDemo,
-  tabs: TabsDemo,
-  table: TableDemo,
-  breadcrumbs: BreadcrumbsDemo,
-  tooltip: TooltipDemo,
-  avatar: AvatarDemo,
-  skeleton: SkeletonDemo,
-  progress: ProgressDemo,
-  pagination: PaginationDemo,
-  kpi: KpiDemo,
-  slider: SliderDemo,
-  datepicker: DatePickerDemo,
-  dropzone: DropzoneDemo,
-  'bar-chart': BarChartDemo,
-  'line-chart': LineChartDemo,
-  'stacked-bar-chart': StackedBarChartDemo,
+/**
+ * Each demo is loaded lazily via next/dynamic so a given component page only
+ * pulls in its own demo chunk — not all ~33 demos (and their heavy deps like
+ * charts / shiki). This keeps per-page bundles small and, in dev, makes
+ * Turbopack compile only the visited demo instead of the whole set.
+ */
+type DemoComponent = React.ComponentType<{ meta: ComponentMeta }>
+
+const demoMap: Record<string, DemoComponent> = {
+  button: dynamic(() => import('./demos/button-demo').then((m) => m.ButtonDemo)),
+  input: dynamic(() => import('./demos/input-demo').then((m) => m.InputDemo)),
+  card: dynamic(() => import('./demos/card-demo').then((m) => m.CardDemo)),
+  textarea: dynamic(() => import('./demos/textarea-demo').then((m) => m.TextareaDemo)),
+  checkbox: dynamic(() => import('./demos/checkbox-demo').then((m) => m.CheckboxDemo)),
+  radio: dynamic(() => import('./demos/radio-demo').then((m) => m.RadioDemo)),
+  switch: dynamic(() => import('./demos/switch-demo').then((m) => m.SwitchDemo)),
+  select: dynamic(() => import('./demos/select-demo').then((m) => m.SelectDemo)),
+  dialog: dynamic(() => import('./demos/dialog-demo').then((m) => m.DialogDemo)),
+  toast: dynamic(() => import('./demos/toast-demo').then((m) => m.ToastDemo)),
+  accordion: dynamic(() => import('./demos/accordion-demo').then((m) => m.AccordionDemo)),
+  tabs: dynamic(() => import('./demos/tabs-demo').then((m) => m.TabsDemo)),
+  table: dynamic(() => import('./demos/table-demo').then((m) => m.TableDemo)),
+  breadcrumbs: dynamic(() => import('./demos/breadcrumbs-demo').then((m) => m.BreadcrumbsDemo)),
+  tooltip: dynamic(() => import('./demos/tooltip-demo').then((m) => m.TooltipDemo)),
+  avatar: dynamic(() => import('./demos/avatar-demo').then((m) => m.AvatarDemo)),
+  skeleton: dynamic(() => import('./demos/skeleton-demo').then((m) => m.SkeletonDemo)),
+  progress: dynamic(() => import('./demos/progress-demo').then((m) => m.ProgressDemo)),
+  pagination: dynamic(() => import('./demos/pagination-demo').then((m) => m.PaginationDemo)),
+  kpi: dynamic(() => import('./demos/kpi-demo').then((m) => m.KpiDemo)),
+  slider: dynamic(() => import('./demos/slider-demo').then((m) => m.SliderDemo)),
+  datepicker: dynamic(() => import('./demos/datepicker-demo').then((m) => m.DatePickerDemo)),
+  dropzone: dynamic(() => import('./demos/dropzone-demo').then((m) => m.DropzoneDemo)),
+  'bar-chart': dynamic(() => import('./demos/bar-chart-demo').then((m) => m.BarChartDemo)),
+  'line-chart': dynamic(() => import('./demos/line-chart-demo').then((m) => m.LineChartDemo)),
+  'stacked-bar-chart': dynamic(() => import('./demos/stacked-bar-chart-demo').then((m) => m.StackedBarChartDemo)),
+  'page-heading': dynamic(() => import('./demos/page-heading-demo').then((m) => m.PageHeadingDemo)),
+  'table-shell': dynamic(() => import('./demos/table-shell-demo').then((m) => m.TableShellDemo)),
+  'detail-panel': dynamic(() => import('./demos/detail-panel-demo').then((m) => m.DetailPanelDemo)),
+  'christy-suggestions': dynamic(() => import('./demos/christy-suggestions-demo').then((m) => m.ChristySuggestionsDemo)),
+  'panel-alert': dynamic(() => import('./demos/panel-alert-demo').then((m) => m.PanelAlertDemo)),
+  'panel-info-grid': dynamic(() => import('./demos/panel-info-grid-demo').then((m) => m.PanelInfoGridDemo)),
+  'panel-timeline': dynamic(() => import('./demos/panel-timeline-demo').then((m) => m.PanelTimelineDemo)),
+  'empty-state': dynamic(() => import('./demos/empty-state-demo').then((m) => m.EmptyStateDemo)),
 }
 
 export function generateStaticParams() {
@@ -81,6 +72,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
 
   const DemoComponent = demoMap[component.slug]
 
+  // Wide data tables read better edge-to-edge: this page opts into the full-width
+  // docs layout (see DocsContentColumn) and drops the "On this page" rail.
+  const fullWidth = component.slug === 'table-shell'
+
   const demoContent = DemoComponent ? (
     <DemoComponent meta={component} />
   ) : (
@@ -96,6 +91,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
         { id: 'component-docs', label: 'Component Docs' },
       ]}
       contentClassName="space-y-6"
+      hideOnThisPage={fullWidth}
     >
       <section id="overview" className="scroll-mt-24">
         <h1 className="text-[20px] font-semibold text-[#161616] dark:text-foreground">{component.name}</h1>

@@ -113,9 +113,23 @@
   --text-accent-dark: color-mix(in oklab, var(--kds-color-brand-accent) 80%, black);
   --text-danger-vivid: var(--destructive);
   --text-inverse-muted: #e2e8f0;
+  /* Link text — clickable IDs/links only (e.g. the HD PO # cell). Non-link IDs
+     like the Halstead order # render neutral (--text-primary). */
+  --text-link: #005b89;
+
+  /* Switch / toggle (Figma: HMTX Portal "Toggle - Switch", Apple HIG).
+     On = Color/Info/600 blue, off = translucent Labels/Tertiary, knob = white. */
+  --switch-on: #0087ce;
+  --switch-off: rgba(60, 60, 67, 0.3);
+  --switch-knob: #ffffff;
 
   --border-default: var(--border);
-  --border-strong: var(--border);
+  --border-light: #f1f3f5;
+  --border-strong: #71717b;
+
+  /* Strong info surfaces — table ID badge fill and avatar/initials background */
+  --info-strong: #004b71;
+  --info-subtle: #f0f9ff;
 
   --shadow-menu: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
@@ -133,6 +147,9 @@
   --btn-secondary-hover-bg: var(--accent);
 
   --gradient-brand: linear-gradient(135deg, #6440b6 0%, #3b0764 100%);
+  /* Christy CTA gradient (Figma: Iris-Shareable) — blue → purple */
+  --gradient-christy: linear-gradient(154.42deg, #1d4a86 1.66%, #3d348b 83.4%);
+  --gradient-christy-hover: linear-gradient(154.42deg, #153664 1.66%, #2b2566 83.4%);
   --gradient-progress-green: linear-gradient(90deg, #10b981 0%, #059669 100%);
   --gradient-progress-amber: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
   --gradient-progress-red: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
@@ -183,6 +200,17 @@
   --surface-raised: #18181b;
   --text-neutral: #94a3b8;
   --text-inverse-muted: #e2e8f0;
+
+  /* Link / strong-info surfaces (dark) */
+  --text-link: #38bdf8;
+  --info-strong: #0c4a6e;
+  --info-subtle: #082f49;
+
+  /* Switch / toggle (dark): keep the info blue; off uses a lighter translucent
+     fill so the track stays visible on dark surfaces. */
+  --switch-on: #0087ce;
+  --switch-off: rgba(120, 120, 128, 0.4);
+  --switch-knob: #ffffff;
 
   --btn-primary-bg-hover: #e5e5e5;
   --btn-primary-disabled-bg: #3f3f46;

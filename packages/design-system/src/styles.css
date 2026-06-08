@@ -70,3 +70,33 @@
   --color-chart-5: var(--chart-5);
   --color-chart-6: var(--chart-6);
 }
+
+/* Default border color. Tailwind v4's bare `border` / `border-b` utilities set
+   only width + style (color falls back to `currentColor`), so DS components that
+   use a colorless `border` would draw a hard near-black edge in any app that
+   doesn't define a default. We scope only `border-color` here (no preflight, no
+   layout reset), matching the docs app, so dividers and card/popover edges
+   resolve to the subtle `--border` token everywhere. Any explicit border-color
+   utility (e.g. `border-border`, `border-transparent`) still overrides this. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+}
+
+/* Component classes the DS components reference but that aren't Tailwind
+   utilities. Shipped here so consumers don't have to redefine them. */
+@layer components {
+  /* Gradient CTA used by Button variant="christy" (and ChristySuggestions).
+     Gradients sourced from Figma (Iris-Shareable). */
+  .christy-btn-primary {
+    background-image: var(--gradient-christy);
+    color: white;
+    transition: background-image 0.2s ease, filter 0.2s ease;
+  }
+  .christy-btn-primary:hover:not(:disabled) {
+    background-image: var(--gradient-christy-hover);
+  }
+}

@@ -1,0 +1,10 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="christy-star" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6" />
+      <stop offset="1" stop-color="#6D28D9" />
+    </linearGradient>
+  </defs>
+  <path d="M20 3.5c.7 5.9 2.2 9.6 4.7 12.1 2.5 2.5 6.2 4 12.1 4.7-5.9.7-9.6 2.2-12.1 4.7-2.5 2.5-4 6.2-4.7 12.1-.7-5.9-2.2-9.6-4.7-12.1-2.5-2.5-6.2-4-12.1-4.7 5.9-.7 9.6-2.2 12.1-4.7 2.5-2.5 4-6.2 4.7-12.1Z" fill="url(#christy-star)" />
+  <path d="M32.5 5c.3 2.3.9 3.7 1.9 4.7 1 1 2.4 1.6 4.6 1.9-2.2.3-3.6.9-4.6 1.9-1 1-1.6 2.4-1.9 4.6-.3-2.2-.9-3.6-1.9-4.6-1-1-2.4-1.6-4.6-1.9 2.2-.3 3.6-.9 4.6-1.9 1-1 1.6-2.4 1.9-4.7Z" fill="url(#christy-star)" opacity="0.7" />
+</svg>

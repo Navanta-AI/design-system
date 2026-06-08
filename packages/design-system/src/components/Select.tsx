@@ -150,7 +150,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         data-placeholder={!value ? '' : undefined}
         disabled={disabled || props.disabled}
         className={cn(
-          'flex w-full items-center justify-between rounded-md border border-input bg-background shadow-xs transition-[border-color,color,box-shadow] outline-none',
+          'flex w-full items-center justify-between rounded-md border border-input bg-background transition-[border-color,color,box-shadow] outline-none',
           size === 'sm'
             ? 'h-7 px-2 text-xs'
             : size === 'lg'

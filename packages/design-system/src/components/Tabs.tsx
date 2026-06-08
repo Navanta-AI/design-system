@@ -108,10 +108,10 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
           onKeyDown={handleKeyDown}
           className={cn(
             'relative flex items-center',
-            variant !== 'pills' && 'gap-1',
+            variant === 'underline' && 'gap-4',
+            variant === 'bordered' && 'gap-1',
             fullWidth && 'w-full',
             variant === 'pills' && 'inline-flex justify-center rounded-md bg-muted p-1 text-muted-foreground',
-            variant === 'underline' && 'border-b border-border',
             variant === 'bordered' && 'border-b border-border'
           )}
         >
@@ -131,13 +131,18 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                 disabled={tab.disabled}
                 onClick={() => handleClick(tab.id)}
                 className={cn(
-                  'relative inline-flex items-center gap-2 font-medium bg-transparent cursor-pointer whitespace-nowrap transition-colors outline-none select-none disabled:opacity-40 disabled:cursor-not-allowed focus-visible:ring-1 focus-visible:ring-ring focus-visible:rounded-md',
-                  tabSizes[size],
+                  'relative inline-flex items-center bg-transparent cursor-pointer whitespace-nowrap transition-colors outline-none select-none disabled:opacity-40 disabled:cursor-not-allowed focus-visible:ring-1 focus-visible:ring-ring focus-visible:rounded-md',
+                  variant === 'underline' ? 'py-3' : tabSizes[size],
                   fullWidth && 'flex-1 justify-center',
-                  
-                  // Base state logic
-                  !isActive && 'text-muted-foreground hover:text-foreground',
-                  isActive && 'text-foreground',
+
+                  // Underline variant — text color handled on inner pill
+                  variant === 'underline' && !isActive && 'text-[var(--text-secondary)]',
+                  variant === 'underline' && isActive && 'text-[var(--text-primary)]',
+
+                  // Non-underline base state
+                  variant !== 'underline' && 'font-medium gap-2',
+                  variant !== 'underline' && !isActive && 'text-muted-foreground hover:text-foreground',
+                  variant !== 'underline' && isActive && 'text-foreground',
 
                   // Pills variant
                   variant === 'pills' && 'rounded-md ring-offset-background transition-all focus-visible:ring-1 focus-visible:ring-offset-2',
@@ -149,21 +154,40 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                   variant === 'bordered' && isActive && 'border-border bg-muted/20'
                 )}
               >
-                {tab.label}
-                {tab.badge !== undefined && (
+                {variant === 'underline' ? (
                   <span className={cn(
-                    'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold leading-none',
-                    isActive ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/20 text-muted-foreground'
+                    'inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm leading-[22px] transition-colors',
+                    isActive ? 'bg-[var(--surface-hover)] font-medium' : 'font-normal hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]'
                   )}>
-                    {tab.badge}
+                    {tab.label}
+                    {tab.badge !== undefined && (
+                      <span className={cn(
+                        'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold leading-none',
+                        isActive ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/20 text-muted-foreground'
+                      )}>
+                        {tab.badge}
+                      </span>
+                    )}
                   </span>
+                ) : (
+                  <>
+                    {tab.label}
+                    {tab.badge !== undefined && (
+                      <span className={cn(
+                        'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold leading-none',
+                        isActive ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/20 text-muted-foreground'
+                      )}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </>
                 )}
               </button>
             );
           })}
           {variant === 'underline' && (
             <span
-              className="absolute bottom-[-1px] h-[2px] bg-primary rounded-full transition-all duration-200 ease-out"
+              className="absolute bottom-0 h-[2px] bg-[var(--text-primary)] transition-all duration-200 ease-out"
               style={indicatorStyle}
             />
           )}

@@ -21,6 +21,19 @@ export interface DialogProps {
   showCloseButton?: boolean
   /** Additional CSS classes for the dialog panel */
   className?: string
+  /**
+   * Convenience header title. When set, Dialog renders its own header
+   * (icon + title + subtitle), wraps `children` in a body, and renders
+   * `footer` below — the ergonomic "Modal" API. Omit to use the compound
+   * DialogHeader / DialogBody / DialogFooter children directly.
+   */
+  title?: React.ReactNode
+  /** Subtitle shown below the title (convenience header mode) */
+  subtitle?: React.ReactNode
+  /** Icon shown beside the title (convenience header mode) */
+  icon?: React.ReactNode
+  /** Footer content rendered below the body (convenience header mode) */
+  footer?: React.ReactNode
 }
 
 const DialogSizeContext = React.createContext<DialogProps['size']>('md')
@@ -158,6 +171,10 @@ const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
       closeOnEscape = true,
       showCloseButton = true,
       className,
+      title,
+      subtitle,
+      icon,
+      footer,
     },
     ref
   ) => {
@@ -165,7 +182,39 @@ const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
     const previousFocus = React.useRef<HTMLElement | null>(null)
     const [rendered, setRendered] = React.useState(Boolean(open))
     const [visible, setVisible] = React.useState(false)
-    const hasBody = React.useMemo(() => hasDialogBodyChild(children), [children])
+
+    // Convenience "Modal" mode — `title` set means Dialog builds its own
+    // header/body/footer rather than expecting compound children.
+    const convenience = title != null
+    const content = convenience ? (
+      <>
+        <DialogHeader>
+          {icon ? (
+            <div className="flex items-start gap-3">
+              <DialogIcon tone="secondary">{icon}</DialogIcon>
+              <div className="flex flex-col gap-1.5">
+                <DialogTitle>{title}</DialogTitle>
+                {subtitle && <DialogDescription>{subtitle}</DialogDescription>}
+              </div>
+            </div>
+          ) : (
+            <>
+              <DialogTitle>{title}</DialogTitle>
+              {subtitle && <DialogDescription>{subtitle}</DialogDescription>}
+            </>
+          )}
+        </DialogHeader>
+        <DialogBody>{children}</DialogBody>
+        {footer && <DialogFooter>{footer}</DialogFooter>}
+      </>
+    ) : (
+      children
+    )
+
+    const hasBody = React.useMemo(
+      () => (convenience ? true : hasDialogBodyChild(children)),
+      [convenience, children]
+    )
 
     const handleEscape = React.useCallback(
       (e: KeyboardEvent) => {
@@ -280,7 +329,7 @@ const Dialog = React.forwardRef<HTMLDivElement, DialogProps>(
         >
           <DialogSizeContext.Provider value={size}>
             <DialogHasBodyContext.Provider value={hasBody}>
-              {children}
+              {content}
             </DialogHasBodyContext.Provider>
           </DialogSizeContext.Provider>
           {showCloseButton && onClose && (

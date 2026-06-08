@@ -1,5 +1,6 @@
 import { DocsHeader } from '@/app/components/docs-header'
 import { MobileNav } from '@/app/components/mobile-nav'
+import { DocsContentColumn } from '@/app/components/docs-content-column'
 
 export default function DocsLayout({
   children,
@@ -12,12 +13,12 @@ export default function DocsLayout({
         <MobileNav />
         <span className="font-medium text-sm">Documentation</span>
       </div>
-      <div className="mx-auto flex w-full min-w-0 max-w-[1000px] flex-1 flex-col px-4 sm:px-6 md:px-8">
+      <DocsContentColumn>
         <DocsHeader />
         <main className="min-w-0 flex-1 pt-6 pb-10 md:pt-[53px]">
           {children}
         </main>
-      </div>
+      </DocsContentColumn>
     </div>
   )
 }

@@ -7,7 +7,7 @@ import { DynamicCodeBlock } from '@/app/components/dynamic-code-block'
 import type { ComponentMeta } from '@/lib/component-registry'
 
 // ─── Types ────────────────────────────────────────────────
-type Variant      = 'primary' | 'secondary' | 'ghost' | 'outline' | 'destructive' | 'link'
+type Variant      = 'primary' | 'secondary' | 'ghost' | 'outline' | 'destructive' | 'link' | 'christy'
 type IconOption   = 'none' | 'prefix-icon' | 'suffix-icon' | 'icon-only'
 type SizeOption   = 'default' | 'sm' | 'lg'
 
@@ -61,6 +61,7 @@ export function ButtonDemo({ meta: _ }: ButtonDemoProps) {
     { label: 'Outline',     value: 'outline'     },
     { label: 'Destructive', value: 'destructive' },
     { label: 'Link',        value: 'link'        },
+    { label: 'Christy',     value: 'christy'     },
   ]
 
   const SIZES: { label: string; value: SizeOption }[] = [

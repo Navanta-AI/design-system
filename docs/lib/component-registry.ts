@@ -51,9 +51,9 @@ export default function Example() {
     props: [
       {
         name: 'variant',
-        type: "'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link'",
+        type: "'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link' | 'christy'",
         default: "'primary'",
-        description: 'Controls the visual style of the button.',
+        description: 'Controls the visual style of the button. Use "christy" for the gradient Christy CTA.',
       },
       {
         name: 'size',
@@ -98,7 +98,7 @@ export default function Example() {
       {
         name: 'variant',
         type: 'select',
-        options: ['primary', 'secondary', 'outline', 'ghost', 'destructive', 'link'],
+        options: ['primary', 'secondary', 'outline', 'ghost', 'destructive', 'link', 'christy'],
         default: 'primary',
       },
       {
@@ -270,13 +270,14 @@ export default function Example() {
     category: 'Forms',
     importName: 'Radio',
     props: [
-      { name: 'label', type: 'string', description: 'Label rendered next to the radio.' },
-      { name: 'helperText', type: 'string', description: 'Supplementary text below the label.' },
+      { name: 'label', type: 'string', description: 'Label rendered next to the radio (text).' },
+      { name: 'helperText', type: 'string', description: 'Supplementary subtext below the label.' },
+      { name: 'card', type: 'boolean', default: 'false', description: 'Render as a selectable card with text + subtext and a neutral tinted selected state.' },
+      { name: 'badge', type: 'ReactNode', description: 'Optional badge rendered inline next to the label (card variant).' },
       { name: 'error', type: 'string | boolean', description: 'Error state message or styling.' },
       { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents interaction.' },
     ],
     knobs: [
-      { name: 'label', type: 'text', default: 'Option 1' },
       { name: 'error', type: 'text', default: '' },
       { name: 'disabled', type: 'boolean', default: false },
     ],
@@ -284,15 +285,31 @@ export default function Example() {
   {
     slug: 'switch',
     name: 'Switch',
-    description: 'A control that allows the user to toggle between on and off.',
+    description: 'A control that toggles a single setting on or off — a flat, fully-rounded track with a wide white pill knob (HMTX Portal / Apple HIG). On = info blue, off = neutral translucent gray. Use for instant on/off settings (for a form value that submits, prefer a Checkbox).',
     category: 'Forms',
     importName: 'Switch',
+    usageExample: `import { Switch } from '@admin-navanta/design-system'
+import * as React from 'react'
+
+export default function Example() {
+  const [on, setOn] = React.useState(true)
+  return (
+    <Switch
+      label="Email notifications"
+      helperText="Get notified when an order ships."
+      checked={on}
+      onCheckedChange={setOn}
+    />
+  )
+}`,
     props: [
       { name: 'label', type: 'string', description: 'Label rendered next to the switch.' },
       { name: 'helperText', type: 'string', description: 'Supplementary text below the label.' },
       { name: 'error', type: 'string | boolean', description: 'Error state message or styling.' },
       { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents interaction.' },
       { name: 'checked', type: 'boolean', description: 'Controlled checked state of the switch.' },
+      { name: 'defaultChecked', type: 'boolean', default: 'false', description: 'Initial checked state when uncontrolled.' },
+      { name: 'onCheckedChange', type: '(checked: boolean) => void', description: 'Called when the switch is toggled.' },
     ],
     knobs: [
       { name: 'label', type: 'text', default: 'Enable notifications' },
@@ -398,7 +415,8 @@ export default function Example() {
   {
     slug: 'table',
     name: 'Table',
-    description: 'A responsive table component for displaying tabular data.',
+    description:
+      'A responsive table for tabular data. Table.Cell supports standardized content variants — id (badge + copy), party (avatar + title/subtitle), status (progress dots + label), date (auto relative subtext), and input (inline editable) — plus plain text/number by default.',
     category: 'Data Display',
     importName: 'Table',
     props: [
@@ -406,6 +424,15 @@ export default function Example() {
       { name: 'hoverable', type: 'boolean', default: 'false', description: 'Highlight rows on hover.' },
       { name: 'compact', type: 'boolean', default: 'false', description: 'Reduces padding inside cells.' },
       { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Fixes header at the top when scrolling.' },
+      { name: 'Cell variant', type: "'id' | 'party' | 'status' | 'date' | 'input'", description: 'Standardized cell content. Omit for plain text/number (use mono / align as usual).' },
+      { name: 'Cell (id)', type: 'value, icon?, badge?, href?, copyable?', description: 'ID/SKU. With an icon it shows a circle badge; copy button is on by default. Omit icon for the plain (Halstead) style.' },
+      { name: 'Cell (party)', type: 'avatar?: {src|initials}, title, subtitle?', description: 'Avatar (image or initials) with a title and optional subtext — e.g. a "Ship to" column.' },
+      { name: 'Cell (status)', type: "status?: TableStatusKey, steps?, completed?, tone?, label?", description: 'Progress dots + label. Pass a registry status key, or set steps/completed/tone/label manually. tone (success/warning/danger/neutral) overrides the dot color.' },
+      { name: 'Cell (date)', type: 'date: Date|string|number, relative?, subtext?, now?', description: 'Formats the date (e.g. "Mar 03, 2026") with an auto relative subtext ("5 mins ago" / "in 2 days"). Pass subtext to override.' },
+      { name: 'Cell (input)', type: 'value, onValueChange, placeholder?, inputType?', description: 'Inline editable cell built on the base Input (compact size, 120px min-width).' },
+      { name: 'HeadCell sortable / ai', type: 'sortable?, sortDirection?, onSort?, ai?', description: 'Per-column sorting UI; set sortable for the caret/clicks. ai renders the Christy AI star before a neutral column label.' },
+      { name: 'Table.Empty', type: 'colSpan?, minHeight?', description: 'Full-width centered empty row — keeps column headers visible and centers an <EmptyState> when there are no rows.' },
+      { name: 'useTableSort()', type: '(data, getValue, initial?) => { sorted, getHeadProps }', description: 'Hook that makes sorting functional: returns sorted rows and getHeadProps(key, enabled?) to spread onto each HeadCell. Pass an initial { key } for default sorting.' },
     ],
     knobs: [
       { name: 'striped', type: 'boolean', default: false },
@@ -781,6 +808,274 @@ export default function Example() {
       { name: 'multiple', type: 'boolean', default: true },
       { name: 'disabled', type: 'boolean', default: false },
     ],
+  },
+  {
+    slug: 'page-heading',
+    name: 'Page Heading',
+    description:
+      'A page header with the Christy AI star icon, a gradient title, and a subtitle. Used at the top of a view.',
+    category: 'Layout',
+    importName: 'PageHeading',
+    usageExample: `import { PageHeading } from '@admin-navanta/design-system'
+
+export default function Example() {
+  return <PageHeading title="Order Dashboard" subtitle="Track shipments and resolve claims in one place" />
+}`,
+    props: [
+      { name: 'title', type: 'string', description: 'Gradient page title.' },
+      { name: 'subtitle', type: 'string', description: 'Purple subtitle below the title.' },
+    ],
+    knobs: [
+      { name: 'title', type: 'text', default: 'Order Dashboard' },
+      { name: 'subtitle', type: 'text', default: 'Track shipments and resolve claims in one place' },
+    ],
+  },
+  {
+    slug: 'table-shell',
+    name: 'Table Shell',
+    description:
+      'Reusable table chrome — a titled container with a header slot (search/filters), a table body, and a footer with item count, pagination, and page-size controls.',
+    category: 'Data Display',
+    importName: 'TableShell',
+    usageExample: `import { TableShell, Table, Input } from '@admin-navanta/design-system'
+import { Package } from '@phosphor-icons/react'
+import * as React from 'react'
+
+export default function Example() {
+  const [page, setPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(10)
+  return (
+    <TableShell
+      title="Open Orders"
+      icon={Package}
+      totalItems={orders.length}
+      currentPage={page}
+      onPageChange={setPage}
+      pageSize={pageSize}
+      onPageSizeChange={setPageSize}
+    >
+      <Table>{/* ...rows */}</Table>
+    </TableShell>
+  )
+}`,
+    props: [
+      { name: 'title', type: 'string', description: 'Table title shown in the header.' },
+      { name: 'icon', type: 'Icon', description: 'Phosphor icon rendered next to the title.' },
+      { name: 'totalItems', type: 'number', description: 'Total filtered item count (drives pagination).' },
+      { name: 'currentPage', type: 'number', description: 'Current page (1-based).' },
+      { name: 'onPageChange', type: '(page: number) => void', description: 'Page change handler.' },
+      { name: 'pageSize', type: 'number', description: 'Items per page.' },
+      { name: 'onPageSizeChange', type: '(size: number) => void', description: 'Page size change handler.' },
+      { name: 'pageSizeOptions', type: 'number[]', default: '[10, 25, 50]', description: 'Available page size options.' },
+      { name: 'searchValue / onSearchChange', type: 'string / (v) => void', description: 'Providing onSearchChange renders the built-in toolbar search (consumer owns filtering).' },
+      { name: 'searchPlaceholder', type: 'string', default: "'Search'", description: 'Placeholder for the built-in search field.' },
+      { name: 'filters', type: 'ReactNode', description: 'Filter controls at the right of the toolbar (e.g. Select dropdowns).' },
+      { name: 'activeFilters', type: 'ActiveFilter[]', description: 'Active filters displayed as removable pills below the toolbar. Each item has key, label, value, and onRemove.' },
+      { name: 'onClearAllFilters', type: '() => void', description: 'Called when "Clear all" is clicked. Shown when 2+ active filters are present.' },
+      { name: 'tabs / activeTab / onTabChange', type: 'TabItem[] / string / (id) => void', description: 'Optional tab row for quick filtering, with count badges (TabItem.badge).' },
+      { name: 'onCustomize / customizeLabel', type: '() => void / string', description: 'Renders a "Customize" action (gear) in the heading — wire it to column customization.' },
+      { name: 'header', type: 'ReactNode', description: 'Extra header slot above the body (filter chips, banners).' },
+      { name: 'children', type: 'ReactNode', description: 'The table. For empty/no-results, render <Table.Empty><EmptyState …/></Table.Empty> in the body — headers + footer stay, content centers.' },
+    ],
+    knobs: [],
+  },
+  {
+    slug: 'empty-state',
+    name: 'Empty State',
+    description:
+      'A centered "nothing here" screen with an optional nested-ring icon, title, description, an optional inline link, and an action. Use it for first-time/empty states (offer a primary CTA) and no-results states (offer a way to clear). TableShell renders it automatically when a table is empty.',
+    category: 'Feedback',
+    importName: 'EmptyState',
+    usageExample: `import { EmptyState, Button } from '@admin-navanta/design-system'
+import { Package } from '@phosphor-icons/react'
+
+export default function Example() {
+  return (
+    <EmptyState
+      icon={<Package />}
+      title="No orders yet"
+      description="When orders come in, they'll appear here."
+      action={<Button size="sm">New order</Button>}
+    />
+  )
+}`,
+    props: [
+      { name: 'icon', type: 'ReactNode', description: 'Optional icon shown inside concentric rings (pass a sized node, e.g. <Star weight="duotone" />). Rendered at 32px.' },
+      { name: 'title', type: 'string', description: 'Headline (18px semibold).' },
+      { name: 'description', type: 'ReactNode', description: 'Supporting line(s) below the title (14px).' },
+      { name: 'link', type: '{ label: string; onClick?: () => void; href?: string }', description: 'A text link rendered directly under the description (medium, underlined, --text-link). Use for "search instead" affordances; for a Button CTA use action.' },
+      { name: 'action', type: 'ReactNode', description: 'Optional separated action area below — typically a Button (primary CTA or "Clear filters").' },
+      { name: 'size', type: "'sm' | 'md'", default: "'md'", description: 'Vertical padding scale.' },
+    ],
+    knobs: [],
+  },
+  {
+    slug: 'detail-panel',
+    name: 'Detail Panel',
+    description:
+      'A slide-out right-side panel (drawer) with a header, optional actions and status row, scrollable content, and a sticky footer. Compose panel parts inside it.',
+    category: 'Layout',
+    importName: 'DetailPanelShell',
+    usageExample: `import { DetailPanelShell, PanelInfoGrid, Button } from '@admin-navanta/design-system'
+import * as React from 'react'
+
+export default function Example() {
+  const [open, setOpen] = React.useState(false)
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>View order</Button>
+      <DetailPanelShell
+        open={open}
+        onClose={() => setOpen(false)}
+        title="ORD-1847"
+        subtitle="Delivery Tracking · $4,980.00"
+      >
+        <PanelInfoGrid title="Order details" rows={[{ label: 'Carrier', value: 'FedEx' }]} />
+      </DetailPanelShell>
+    </>
+  )
+}`,
+    props: [
+      { name: 'open', type: 'boolean', description: 'Controls panel visibility.' },
+      { name: 'onClose', type: '() => void', description: 'Called on close button or backdrop click.' },
+      { name: 'title', type: 'string', description: 'Panel header title.' },
+      { name: 'subtitle', type: 'string', description: 'Subtitle line below the title.' },
+      { name: 'externalHref', type: 'string', description: 'Shows an external-link icon in the header.' },
+      { name: 'width', type: 'number', default: '400', description: 'Panel width in px.' },
+      { name: 'actions', type: 'ReactNode', description: 'Action buttons rendered below the header.' },
+      { name: 'statusRow', type: 'ReactNode', description: 'Compact status row below the actions.' },
+      { name: 'children', type: 'ReactNode', description: 'Main scrollable content.' },
+      { name: 'footer', type: 'ReactNode', description: 'Sticky footer (e.g. a confirm button).' },
+    ],
+    knobs: [
+      { name: 'width', type: 'select', options: ['360', '400', '480'], default: '400' },
+    ],
+  },
+  {
+    slug: 'christy-suggestions',
+    name: 'Christy Suggestions',
+    description:
+      'An AI recommendation card branded with Christy. Supports selection (radio cards), static, and confirmed states, with optional reasoning and summary.',
+    category: 'Feedback',
+    importName: 'ChristySuggestions',
+    usageExample: `import { ChristySuggestions } from '@admin-navanta/design-system'
+import * as React from 'react'
+
+export default function Example() {
+  const [selectedIdx, setSelectedIdx] = React.useState(0)
+  return (
+    <ChristySuggestions
+      mode="selection"
+      summary="Christy recommends expediting through the secondary vendor."
+      options={[
+        { label: 'Expedite via Globex', detail: '+$120 freight · arrives Fri', credit: 'Recommended' },
+        { label: 'Wait for primary vendor', detail: 'No added cost · arrives next Wed' },
+      ]}
+      recommendedIdx={0}
+      selectedIdx={selectedIdx}
+      onSelect={setSelectedIdx}
+      onConfirm={() => {}}
+    />
+  )
+}`,
+    props: [
+      { name: 'mode', type: "'selection' | 'static' | 'confirmed'", description: 'Which state the card renders.' },
+      { name: 'options', type: 'SuggestionOption[]', description: 'Selectable options (selection mode).' },
+      { name: 'selectedIdx', type: 'number', description: 'Currently selected option index (selection mode).' },
+      { name: 'onSelect', type: '(idx: number) => void', description: 'Called when an option is selected.' },
+      { name: 'onConfirm', type: '() => void', description: 'Called when the confirm button is pressed.' },
+      { name: 'recommendedIdx', type: 'number', description: 'Index of the recommended option (highlighted).' },
+      { name: 'confirmLabel', type: 'string', default: "'Confirm Selection'", description: 'Confirm button label.' },
+      { name: 'phase', type: "'idle' | 'confirming' | 'confirmed'", default: "'idle'", description: 'Confirmation phase for loading/success states.' },
+      { name: 'reasoning', type: 'string[]', description: 'Reasoning lines shown below the recommendation.' },
+      { name: 'summary', type: 'string', description: 'Summary text describing the recommendation.' },
+      { name: 'confirmedLabel', type: 'string', description: 'What was confirmed (confirmed mode).' },
+    ],
+    knobs: [],
+  },
+  {
+    slug: 'panel-alert',
+    name: 'Panel Alert',
+    description:
+      'A colour-coded alert block for detail panels, with an icon, title, optional badge, description, and detail lines.',
+    category: 'Feedback',
+    importName: 'PanelAlert',
+    usageExample: `import { PanelAlert } from '@admin-navanta/design-system'
+
+export default function Example() {
+  return (
+    <PanelAlert
+      type="warning"
+      title="Shipment delayed"
+      badge="2 days"
+      description="Carrier reported a weather hold in transit."
+    />
+  )
+}`,
+    props: [
+      { name: 'type', type: "'danger' | 'warning' | 'info' | 'success' | 'cancelled'", description: 'Severity, which drives colour and icon.' },
+      { name: 'title', type: 'string', description: 'Alert title.' },
+      { name: 'badge', type: 'string', description: 'Optional badge shown at the end of the title row.' },
+      { name: 'description', type: 'string', description: 'Description text below the title.' },
+      { name: 'details', type: 'string[]', description: 'Additional detail lines.' },
+    ],
+    knobs: [
+      { name: 'type', type: 'select', options: ['danger', 'warning', 'info', 'success', 'cancelled'], default: 'warning' },
+      { name: 'badge', type: 'boolean', default: true },
+    ],
+  },
+  {
+    slug: 'panel-info-grid',
+    name: 'Panel Info Grid',
+    description:
+      'A label-value grid for detail panels, with optional leading icons and clickable link values.',
+    category: 'Data Display',
+    importName: 'PanelInfoGrid',
+    usageExample: `import { PanelInfoGrid } from '@admin-navanta/design-system'
+import { Package, Truck } from '@phosphor-icons/react'
+
+export default function Example() {
+  return (
+    <PanelInfoGrid
+      title="Order details"
+      rows={[
+        { label: 'Order', value: 'ORD-1847', icon: Package },
+        { label: 'Carrier', value: 'FedEx', icon: Truck },
+        { label: 'Tracking', value: 'Open', link: true, href: '#' },
+      ]}
+    />
+  )
+}`,
+    props: [
+      { name: 'title', type: 'string', description: 'Section title above the grid.' },
+      { name: 'rows', type: 'InfoRow[]', description: 'Rows with label, value, optional icon, and optional link/href.' },
+    ],
+    knobs: [],
+  },
+  {
+    slug: 'panel-timeline',
+    name: 'Panel Timeline',
+    description:
+      'A vertical status timeline for detail panels, with colour-coded milestone dots, connectors, dates, and event notes.',
+    category: 'Data Display',
+    importName: 'PanelTimeline',
+    usageExample: `import { PanelTimeline } from '@admin-navanta/design-system'
+
+const milestones = [
+  { id: 'ordered', label: 'Ordered', status: 'completed', date: 'May 3', events: [{ type: 'PO issued', date: 'May 3', severity: 'info' }] },
+  { id: 'shipped', label: 'Shipped', status: 'active', date: 'May 7', events: [{ type: 'In transit', date: 'May 7', severity: 'warning', note: 'Weather delay' }] },
+  { id: 'delivered', label: 'Delivered', status: 'pending', events: [] },
+]
+
+export default function Example() {
+  return <PanelTimeline title="Delivery progress" milestones={milestones} />
+}`,
+    props: [
+      { name: 'title', type: 'string', default: "'Delivery Status'", description: 'Section title above the timeline.' },
+      { name: 'milestones', type: 'TimelineMilestone[]', description: 'Ordered milestones with status, date, and events.' },
+      { name: 'idPrefix', type: 'string', default: "'ptl'", description: 'Unique prefix for SVG gradient ids to avoid collisions.' },
+    ],
+    knobs: [],
   },
 ]
 

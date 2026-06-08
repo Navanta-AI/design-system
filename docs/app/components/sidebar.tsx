@@ -38,6 +38,11 @@ import {
   Palette,
   ChartBar,
   ChartLineUp,
+  Sparkle,
+  Article,
+  Sidebar as SidebarIcon,
+  Warning,
+  Tray,
 } from '@phosphor-icons/react'
 import { componentRegistry } from '@/lib/component-registry'
 
@@ -97,6 +102,14 @@ const componentIconMap: Record<string, NavIcon> = {
   'bar-chart': ChartBar,
   'line-chart': ChartLineUp,
   'stacked-bar-chart': ChartBar,
+  'page-heading': Article,
+  'table-shell': Table,
+  'detail-panel': SidebarIcon,
+  'christy-suggestions': Sparkle,
+  'panel-alert': Warning,
+  'panel-info-grid': GridFour,
+  'panel-timeline': Clock,
+  'empty-state': Tray,
 }
 
 export function Sidebar() {
