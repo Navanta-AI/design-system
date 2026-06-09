@@ -205,7 +205,7 @@ npx figma connect publish
 4. You should see real React code:
 
 ```jsx
-import { TextInput } from '@admin-navanta/design-system';
+import { TextInput } from '@navanta-ai/design-system';
 
 <TextInput label="Full Name" />
 ```

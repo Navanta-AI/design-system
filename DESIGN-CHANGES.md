@@ -1,10 +1,287 @@
 # Design System — Change Log & Decisions
 
-A running record of changes made to `@admin-navanta/design-system`, paired with the
+A running record of changes made to `@navanta-ai/design-system`, paired with the
 user guidance / suggestions that drove each one. Newest session at the top.
 
 > Convention: every entry notes **what changed**, **why** (the suggestion), and **where**
 > (file). Standards distilled from these are promoted into [CLAUDE.md](./CLAUDE.md).
+
+---
+
+## 2026-06-08
+
+### 1. Pill — new status-tag component (semantic variants × 3 sizes)
+**Suggestion:** "we don't have a pill component… that has all semantic variations with
+blue, red, amber and grey. [Figma: Iris-Shareable, node 546-3031, small example]. You
+can have pill size of all three sizes — small, medium and large."
+
+- New `Pill` component: `cva`-based, four semantic variants — `info` (blue), `danger`
+  (red), `warning` (amber), `neutral` (grey) — across `sm` / `md` / `lg`. Optional
+  leading `icon` prop (scales per size), label as children. `span` + `forwardRef`,
+  matching the `Button` pattern.
+- **Sourced from Figma:** the small/`danger` pill is the exact spec — `Destructive/50`
+  background `#fff1f2` + `Destructive/800` text/icon `#a7000f`, `px-8 py-2`, `gap-4`,
+  `rounded-4`, 12px Geist Medium, 12px icon. info/warning/neutral follow the same
+  **50 bg / 800 fg** tonal system.
+- **Tokens (per standards — no raw hex in components):** added `--pill-{info,danger,
+  warning,neutral}-{bg,fg}` to `tokens.css` (light + dark).
+- Kept brand color out of it (neutral grey variant, not brand) per the color standard —
+  brand stays reserved for Christy chrome.
+- Files: `src/components/Pill.tsx`, `src/index.ts`, `src/tokens.css`; docs:
+  `demos/pill-demo.tsx`, `component-registry.ts` (slug `pill`, Data Display),
+  `[slug]/page.tsx` demoMap, `sidebar.tsx` (Tag icon).
+
+### 2. Pill — directional/route layout + neutral color reconciled to Figma
+**Suggestion:** "we will need one design for pill like this as well" [Figma: Iris-Shareable,
+node 546-3127 — a neutral `🚚 → HOU` route pill].
+
+- **Multi-icon support:** dropped the forced single-size icon wrapper; icons now render
+  inline and size to the text (`1em`, = Phosphor's default = 12px at `sm`, matching the
+  Figma spec). This lets a leading group compose a glyph + a smaller directional arrow,
+  e.g. `icon={<><Truck weight="fill" /><ArrowRight size={8} weight="bold" /></>}` →
+  `🚚 → HOU`. No `!important` overrides; matches the `Button` icon-passing philosophy.
+- **Neutral color reconciled:** Figma confirms the neutral pill = `Color/Neutral/100`
+  bg `#f4f4f5` (already correct) + `Color/Neutral/900` text `#18181b` — bumped
+  `--pill-neutral-fg` from `#3f3f46` → `#18181b` to be exact.
+- Docs: added a "Directional / route" example (sm/md/lg) to `pill-demo.tsx`.
+- Files: `src/components/Pill.tsx`, `src/tokens.css`, `demos/pill-demo.tsx`.
+
+### 3. Pill — icon weight (outline → duotone)
+**Suggestions:** "the icons we are using in pill should always be outline phosphor icons"
+→ then "the outline width should match in the font width there" → resolved to **duotone**.
+
+- Phosphor icons are filled vector paths (not CSS-strokable), so "outline width" is only
+  the discrete `weight` prop (`thin`/`light`/`regular`/`bold`); there's no `medium` to
+  match Geist Medium text. After weighing `regular` vs `bold`, the call was **`duotone`**.
+- Set every pill icon to `weight="duotone"` — demo, generated snippet, registry
+  `usageExample`, component JSDoc, and the TableShell Priority column.
+- Standard in [CLAUDE.md](./CLAUDE.md) updated: *Icons in `Pill` use the Phosphor
+  `duotone` weight.*
+- Files: `demos/pill-demo.tsx`, `component-registry.ts`, `src/components/Pill.tsx`.
+
+### 4. TableShell — `pill` cell variant + Priority column; heading → body-medium
+**Suggestions:** "add the pill style column in the table shell" + "the table shell heading
+should be of body medium size."
+
+- **`pill` cell variant:** `Table.Cell variant="pill"` renders a semantic `Pill`
+  (`pillVariant` = blue/red/amber/grey, `pillSize`, `label`, optional duotone `icon`).
+  `Table` composes the DS `Pill` rather than hand-rolling.
+- **Demo:** added a sortable **Priority** column to the TableShell playground
+  (Critical/On Track/On Hold/Standard → danger/info/warning/neutral pills), wired into
+  column customize + visibility.
+- **Heading:** title dropped from `16px font-semibold` → **`14px font-medium`** (body-medium
+  type style); the title icon resized `18px` → **`14px` (1:1)** to match.
+- Files: `src/components/Table.tsx`, `src/components/ui/TableShell.tsx`;
+  docs: `table-shell-playground.tsx`, `component-registry.ts`.
+
+### 5. TableShell — open filter chips (`filterChips`)
+**Suggestion:** "in the table shell we need … chips that will be based on the pills in the
+table … like open filters rather than having the dropdown option … based on priority for
+now, but … user can decide what should they be used for."
+
+- New `filterChips?: FilterChip[]` + `filterChipsLabel?` props on `TableShell` — a row of
+  **pill-style toggle chips** below the toolbar, an always-visible alternative to a filter
+  dropdown. Active chip = matching Pill tonal color (reuses the `--pill-*` tokens);
+  inactive = neutral outline. `<button aria-pressed>` for accessibility.
+- **Generic by design:** each chip is `{ key, label, variant?, icon?, count?, active,
+  onToggle }` — the consumer decides the filter dimension. Exported `FilterChip` type.
+- **Demo:** the TableShell playground now derives chips from the Priority pill presets
+  (with counts), filters the table on toggle, and adds a "Priority chips" chrome control.
+- Files: `src/components/ui/TableShell.tsx`, `src/components/ui/index.ts`;
+  docs: `table-shell-playground.tsx`, `component-registry.ts`.
+
+### 6. TableShell — unified filter bar (`facets` model)
+**Suggestion:** "three sections on top … we should not have more than 2. Can we mix the
+search, dropdown and priority filters … filters could be based on insights like high demand,
+this week … the user [should] have the liberty to filter based on the top ways."
+
+- **Designed via a judge-panel workflow** (4 concepts → 3 independent judges → synthesis;
+  unanimous winner: promoted quick-filter chips + a "More filters" overflow). Then a
+  4-lens **adversarial review workflow** on the diff surfaced 5 real bugs, all fixed
+  before finalizing.
+- **One unified filter band** replaces the old toolbar + chips + active-pills bands
+  (3 → ≤2 sections). Per the user's choices: dropdowns are **promoted inline**; saved-view
+  **Tabs stay a standalone band** (a separate scope axis).
+- **`FilterFacet` model** (`src/components/ui/facets.ts`) — a discriminated union on `kind`:
+  `select` (single-select, reuses DS `Select` unmodified via a `null`↔sentinel bridge),
+  `toggle-group` (multi-select, reuses the `aria-pressed` chips), and `toggle` — a
+  **boolean insight** (High demand, This week, …), the extensibility primitive. The
+  consumer declares their "top" filters as data (`promoted` + array order); the rest
+  auto-demote into a **"More filters"** popover, sectioned by `group`. An arbitrary insight
+  — even a Christy-recommended one — is one more object, zero component changes.
+- New internal **`Popover`** primitive (focus-on-open, focus trap, Escape returns focus,
+  outside-click) — made portal-aware so a nested `Select` doesn't tear it down.
+- **Additive / backward compatible:** new `facets` / `maxInlineChips` / `moreFiltersLabel`
+  props; legacy `filters` / `filterChips` / `activeFilters` still work and are ignored when
+  `facets` is set (documented precedence: facets wins). Exported `FilterFacet`,
+  `SelectFacet`, `ToggleGroupFacet`, `ToggleFacet`, `FacetOption`, `Popover`.
+- Review fixes: cleared select showed a blank trigger (sentinel + `placeholder` on
+  `SelectValue`); popover collapsed when picking a nested-select option / on Escape
+  (portal-aware guards); inline `toggle-group` had no group label (added `role="group"`);
+  legacy search width preserved at 480px.
+- Files: `src/components/ui/facets.ts` (new), `src/components/ui/Popover.tsx` (new),
+  `src/components/ui/TableShell.tsx`, `src/components/ui/index.ts`;
+  docs: `table-shell-playground.tsx`, `component-registry.ts`.
+
+---
+
+### 7. Product Catalog — full-page TEMPLATE (composition showcase)
+**Suggestion:** "consider this as a template for your design" [Figma: Iris-Shareable, node
+449-4163 — a "Product Catalog" screen].
+
+- Built a real screen composed **entirely from DS components** at
+  `/playground/product-catalog` — validates the whole system end-to-end: the unified
+  `TableShell` filter bar (search + Critical/High/Transfers toggle facets + an "All time"
+  select), saved-view tabs (Review/On Hold/Rejected/Approved with count badges), and an
+  11-column table using the `id` cell (SKU + subtitle), `pill` cells (Source neutral
+  route-pill / info "CT", Exception danger/warning), a `Branch · Class` micro-pill cell, a
+  2-line Order Insight (urgent subtext in `--destructive`), and a brand-tinted **Iris (AI)**
+  insight column (`--text-accent`, the one place brand is allowed).
+- **Component additions (both backward compatible, additive):**
+  - `Table.Cell variant="id"` gained an optional **`subtitle`** (SKU + product-name pattern).
+  - `Checkbox` gained **`indeterminate`** (DOM-prop via ref + a dash glyph + `aria-checked="mixed"`)
+    for the select-all control. Wired into the checkbox demo + registry.
+- **Reviewed via an adversarial workflow** (fidelity / correctness-a11y / compat → verify);
+  fixes applied: made the "All time" select actually filter (age window), added the
+  select-all indeterminate state, documented the `id` subtitle + `Checkbox` indeterminate
+  in the registry. Tab badges match Figma exactly (7/1/0/5); kept the Review count at 7
+  (the badge) rather than the mock footer's contradictory "1-4 of 4".
+- Files: `docs/app/components/product-catalog-template.tsx` (new),
+  `docs/app/playground/product-catalog/page.tsx` (new),
+  `packages/design-system/src/components/Table.tsx` (id subtitle),
+  `packages/design-system/src/components/Checkbox.tsx` (indeterminate);
+  docs: `table-shell-demo.tsx` (link), `checkbox-demo.tsx`, `component-registry.ts`.
+
+### 8. TableShell — search section restyled to Figma spec
+**Suggestion:** "for the search section lets follow the design like this only" [Figma:
+Iris-Shareable, node 449-4173].
+
+- Restyled the unified-bar search (`FacetSearch`) to the Figma spec: **fixed 320px** box on
+  sm+ (was a flex-grow field), **`rounded-[8px]`**, **regular-weight** trailing magnifier
+  (was bold), and a **light neutral placeholder** (`--text-neutral`, ~Color/Neutral/400).
+- **Layout to match Figma:** search sits left, all filters (promoted facets + "More" +
+  "Clear all") are grouped and **right-aligned** (`sm:ml-auto`) — previously the flex-grow
+  search was incidentally right-clustering them. Applies consistently to the Product Catalog
+  template and the TableShell playground (shared render path).
+- Border kept token-driven (`--input` #e4e4e7 ≈ Figma Border/Strong #d4d6d8 — imperceptible).
+- Files: `packages/design-system/src/components/ui/TableShell.tsx`.
+
+### 9. TableShell — removed the facet-bar "Clear all"
+**Suggestion:** "clear all should not be an option on select of any filter. deselect should
+do that."
+
+- Dropped the auto-appearing **"Clear all"** link from the unified filter bar. Clearing a
+  filter is now done by **deselecting** it directly — toggling an active chip off, or
+  choosing the "All …" entry in a select. Removed the now-unused `handleClearAll` /
+  `totalActive` / `resetFacet` usage in the band (the `resetFacet`/`facetActiveCount`
+  helpers stay exported for consumers). The legacy `activeFilters` + `onClearAllFilters`
+  path is unchanged.
+- Files: `packages/design-system/src/components/ui/TableShell.tsx`.
+
+### 10. Docs — Templates section (Table Shell design set)
+**Suggestion:** "lets have this design set for type of table shell designs."
+
+- Added a **Templates** docs section — a gallery of full-screen reference designs composed
+  from DS components, grouped by design family. The first family is **Table Shell**, with
+  **Product Catalog** as the first template (card with a real preview thumbnail, description,
+  and DS-feature tags, linking to the live full-page view at `/playground/product-catalog`).
+- Data-driven via a new `template-registry.ts` (`TemplateMeta` + `TEMPLATE_CATEGORIES`) so a
+  new template is one registry entry + a playground page. Sidebar gained a "Templates" nav item.
+- Files: `docs/lib/template-registry.ts` (new), `docs/app/(docs)/templates/page.tsx` (new),
+  `docs/public/templates/product-catalog.png` (thumbnail), `docs/app/components/sidebar.tsx`
+  (nav), `docs/app/playground/product-catalog/page.tsx` (back-link → /templates).
+
+### 11. TableShell — empty / no-results made integral
+**Suggestion:** "for no products or no search result, we need to make sure that is integral
+part of the table shell."
+
+- Empty handling is now **built into TableShell**: new `emptyState` (no data) and
+  `noResultsState` (with `isFiltered`) props. When `totalItems === 0`, TableShell paints the
+  screen **centered in the body with the column headers still visible** — the consumer just
+  renders the header + rows (no rows ⇒ the empty screen shows), no hand-rolled
+  `<Table.Empty>` needed. The lower-level `Table.Empty` stays available for custom bodies.
+- Migrated the playground and the Product Catalog template to the integral props (each
+  passes `emptyState` / `noResultsState` / `isFiltered` and just maps rows). Registry updated.
+- Backward compatible: consumers that pass neither prop are unchanged.
+- Files: `packages/design-system/src/components/ui/TableShell.tsx`; docs:
+  `table-shell-playground.tsx`, `product-catalog-template.tsx`, `component-registry.ts`.
+
+### 12. Checkbox — indeterminate state now gets the dark selected border
+**Suggestion:** "on selected checkbox the border should be black. right now it is showing a
+border color default."
+
+- The `indeterminate` state (partial select-all) had a dark fill but no border rule, so it
+  rendered with the light default border. Added `indeterminate:border-primary` alongside the
+  existing `checked:border-primary` — both selected states now show the dark primary
+  (`#232122`) border matching the fill.
+- Files: `packages/design-system/src/components/Checkbox.tsx`.
+
+### 13. Docs — fix unlayered `*` border reset that broke border-color utilities
+**Why:** the selected-checkbox border (and entry #12's fix) still showed the default light
+color. Root cause: `docs/app/globals.css` had an **unlayered** `* { border-color: var(--border) }`
+reset. In CSS cascade layers, unlayered rules beat ALL `@layer` rules, so it silently
+overrode every Tailwind border-color utility (`checked:border-primary`, `border-destructive`,
+focus `border-black`, …). It was invisible everywhere those utilities happened to also be
+`--border`-colored — only distinct ones (the checked checkbox's `#232122`) exposed it.
+
+- Wrapped the reset in `@layer base` so utilities (in `@layer utilities`) override it again.
+  The package's `styles.css` already provides this reset layered; the docs' unlayered copy was
+  the culprit. Verified the served CSS now has the universal reset at layer depth 1 and no
+  unlayered copy — so `checked:`/`indeterminate:border-primary` resolve to `--primary` (#232122).
+- Files: `docs/app/globals.css`.
+
+### 14. TableShell — filter cap, colored chip icons, integral Customize, unified borders
+**Suggestion:** "5 max filters, rest in a dropdown; chips should have colored icons to
+distinguish them; standardize Customize and make it integral (visible by default, omittable);
+all borders same as the line-item borders."
+
+- **Max 5 inline filter CONTROLS:** `maxInlineChips` default 6 → **5**, and the cap now counts
+  individual controls — a multi-select group counts one slot **per option** (4 priority chips =
+  4 slots), not one per facet. The rest auto-demote into the "More filters" dropdown.
+  (Demoted the 4-chip Priority group in the Orders demo so it shows ≤5 controls inline.)
+- **Colored chip icons:** the filter chip's leading glyph is now tinted by its semantic
+  variant (`--pill-{danger,warning,info,neutral}-fg`) in BOTH states, so chips are
+  distinguishable even when inactive.
+- **Customize is integral:** new `customize?: boolean` (default **true**) — the GearSix
+  Customize button is part of the heading and shown by default; pass `customize={false}` to
+  omit. Standardized as a ghost `sm` Button (GearSix + label) everywhere. `onCustomize` is now
+  just the handler.
+- **Unified borders:** every TableShell divider/outline (tabs, "More filters", active-filter
+  pills, inactive chips) now uses `--border-light` — the same token as the table row
+  (line-item) borders.
+- Files: `src/components/ui/TableShell.tsx`; docs: `table-shell-playground.tsx`
+  (Customize wiring), `component-registry.ts`.
+
+### 15. TableShell filter bar — dropdowns after chips; "More filters" as a dropdown
+**Suggestion:** "the position of dropdowns should be after the chips ui, and More filters
+should have dropdown ui."
+
+- **Order:** inline facets now render **chips (toggle / toggle-group) first, then dropdowns
+  (selects)** via a stable sort, regardless of the consumer's array order.
+- **"More filters" dropdown UI:** restyled from a pill button to a dropdown trigger that
+  matches the Select controls — `rounded-md border border-input`, `h-8`, a leading Funnel,
+  the active-count badge, and a trailing `CaretDown` that rotates when open.
+- Files: `src/components/ui/TableShell.tsx`.
+
+### 16. TableShell — built-in Customize (column show/hide + reorder), standard everywhere
+**Suggestion:** "the customize button is not working on the Product Catalog template; make sure
+all is part of standard table shell (heading, icon, search, filters, tabs, pagination)."
+
+- Customize was inert on the Product Catalog (it passed a no-op `onCustomize`); only the
+  playground hand-rolled a working popover. Made column customization an **integral, standard**
+  TableShell feature so it works the same everywhere.
+- New `columns?: TableColumn[]` + `onColumnsChange?` props. When provided, the Customize button
+  opens a **built-in popover** (per-column show/hide via Switch + drag-to-reorder via the
+  Popover primitive); the consumer reflects the order + `hidden` flags when rendering the
+  header/cells. `onCustomize` remains the fallback when `columns` is absent (backward compatible).
+  Exported `TableColumn`.
+- **Product Catalog template** converted to column-driven rendering + wired `columns`/
+  `onColumnsChange` → Customize now works there.
+- **Playground** migrated off its hand-rolled popover (+ FLIP) to the built-in one, so the
+  experience is standard. (heading, icon, search, filters, tabs, pagination were already
+  standard TableShell props.)
+- Files: `src/components/ui/TableShell.tsx`, `src/components/ui/index.ts`; docs:
+  `product-catalog-template.tsx`, `table-shell-playground.tsx`, `component-registry.ts`.
 
 ---
 

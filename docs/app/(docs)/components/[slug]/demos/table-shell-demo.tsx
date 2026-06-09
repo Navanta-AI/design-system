@@ -8,7 +8,14 @@ import type { ComponentMeta } from '@/lib/component-registry'
 export function TableShellDemo({ meta: _ }: { meta: ComponentMeta }) {
   return (
     <div className="space-y-3">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-4">
+        <Link
+          href="/playground/product-catalog"
+          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-link)] hover:underline"
+        >
+          Product Catalog template
+          <ArrowSquareOut size={14} weight="bold" />
+        </Link>
         <Link
           href="/playground/table-shell"
           className="inline-flex items-center gap-1 text-sm font-medium text-[var(--text-link)] hover:underline"

@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { ChristySuggestions, type SuggestionOption } from '@admin-navanta/design-system'
+import { ChristySuggestions, type SuggestionOption } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -25,7 +25,7 @@ export function ChristySuggestionsDemo({ meta }: { meta: ComponentMeta }) {
     <ComponentPreview
       meta={meta}
       hideKnobs
-      codeTemplate={() => `import { ChristySuggestions } from '@admin-navanta/design-system'
+      codeTemplate={() => `import { ChristySuggestions } from '@navanta-ai/design-system'
 import * as React from 'react'
 
 const options = [

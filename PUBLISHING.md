@@ -1,7 +1,7 @@
-# Publishing & Consuming `@admin-navanta/design-system`
+# Publishing & Consuming `@navanta-ai/design-system`
 
 The package is published privately to **GitHub Packages** under the
-`admin-navanta` org. Tag-driven CI handles the actual publish — no manual
+`Navanta-AI` org. Tag-driven CI handles the actual publish — no manual
 `npm publish` should be needed.
 
 ---
@@ -28,7 +28,7 @@ git tag v0.2.4
 git push origin main --tags
 ```
 
-Watch the run at <https://github.com/admin-navanta/design-system/actions>.
+Watch the run at <https://github.com/Navanta-AI/design-system/actions>.
 Workflow steps:
 
 1. **Verify tag matches package version** — fails fast if the tag and the
@@ -37,10 +37,10 @@ Workflow steps:
    resolves the matching native bindings (see *Gotchas* below).
 3. **Build the package** — runs `tsdown` to emit ESM + CJS + types.
 4. **Publish** — runs `npm publish --access restricted` using the built-in
-   `GITHUB_TOKEN`. The package stays private to the `admin-navanta` org.
+   `GITHUB_TOKEN`. The package stays private to the `Navanta-AI` org.
 
 When the run is green, the new version shows up at
-<https://github.com/admin-navanta/design-system/pkgs/npm/design-system>.
+<https://github.com/Navanta-AI/design-system/pkgs/npm/design-system>.
 
 ---
 
@@ -62,7 +62,7 @@ export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
 Create a `.npmrc` at the project root:
 
 ```
-@admin-navanta:registry=https://npm.pkg.github.com
+@navanta-ai:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
@@ -73,15 +73,15 @@ commit.
 ### Install and use
 
 ```bash
-npm install @admin-navanta/design-system
+npm install @navanta-ai/design-system
 ```
 
 ```tsx
 // app/layout.tsx
-import '@admin-navanta/design-system/styles.css'
+import '@navanta-ai/design-system/styles.css'
 
 // any client component
-import { Button, Dialog } from '@admin-navanta/design-system'
+import { Button, Dialog } from '@navanta-ai/design-system'
 ```
 
 ### Installing in CI
@@ -93,7 +93,7 @@ GitHub Actions runners can use the workflow's built-in `GITHUB_TOKEN`:
   with:
     node-version: '20'
     registry-url: 'https://npm.pkg.github.com'
-    scope: '@admin-navanta'
+    scope: '@navanta-ai'
 - run: npm install
   env:
     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -110,8 +110,8 @@ For non-GitHub CI (Vercel, Netlify, etc.), set a `GITHUB_TOKEN` (or
 ### Scope must match the repo owner
 
 GitHub Packages only accepts packages whose npm scope matches the owner of
-the hosting repo. Because the repo lives under `admin-navanta`, the package
-name has to be `@admin-navanta/design-system`. Renaming the repo or moving
+the hosting repo. Because the repo lives under `Navanta-AI`, the package
+name has to be `@navanta-ai/design-system`. Renaming the repo or moving
 it to a different org/user requires a coordinated package rename across all
 imports in the codebase.
 
@@ -143,7 +143,7 @@ version** — don't try to retag.
 GitHub Packages npm visibility inherits from the source repo's visibility.
 If you make the repo public, the package becomes publicly installable.
 Manage explicit access at
-<https://github.com/orgs/admin-navanta/packages/npm/design-system/settings>.
+<https://github.com/orgs/Navanta-AI/packages/npm/design-system/settings>.
 
 ---
 
@@ -152,7 +152,7 @@ Manage explicit access at
 | Action                                                  | Command / Link                                                                                |
 | ------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | Cut release `vX.Y.Z`                                    | `cd packages/design-system && npm version <bump> && cd ../.. && git tag vX.Y.Z && git push --tags` |
-| Watch workflow runs                                     | <https://github.com/admin-navanta/design-system/actions>                                      |
-| Browse published versions                               | <https://github.com/admin-navanta/design-system/pkgs/npm/design-system>                       |
-| Manage who can install                                  | <https://github.com/orgs/admin-navanta/packages/npm/design-system/settings>                   |
+| Watch workflow runs                                     | <https://github.com/Navanta-AI/design-system/actions>                                      |
+| Browse published versions                               | <https://github.com/Navanta-AI/design-system/pkgs/npm/design-system>                       |
+| Manage who can install                                  | <https://github.com/orgs/Navanta-AI/packages/npm/design-system/settings>                   |
 | Generate a `read:packages` PAT (for consumers)          | <https://github.com/settings/tokens/new?scopes=read:packages>                                 |

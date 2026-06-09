@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { MainNav } from "./main-nav"
 import { ThemeToggle } from "./theme-toggle"
-import { Button } from "@admin-navanta/design-system"
+import { Button } from "@navanta-ai/design-system"
 import { GithubLogo } from "@phosphor-icons/react/dist/ssr"
 
 export function SiteHeader() {
@@ -22,7 +22,7 @@ export function SiteHeader() {
           </div>
           <nav className="flex items-center space-x-1">
             <Link
-              href="https://github.com/admin-navanta/design-system"
+              href="https://github.com/Navanta-AI/design-system"
               target="_blank"
               rel="noreferrer"
             >

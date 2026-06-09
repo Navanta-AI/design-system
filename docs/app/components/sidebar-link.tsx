@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@admin-navanta/design-system'
+import { cn } from '@navanta-ai/design-system'
 
 type SidebarLinkProps = {
   href: string

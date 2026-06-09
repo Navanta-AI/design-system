@@ -127,7 +127,7 @@ export default function ChangelogPage() {
               <h3 className="text-sm font-semibold mb-2 text-foreground">Fixes</h3>
               <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                 <li><code className="text-xs bg-muted px-1 py-0.5 rounded">dist/styles.css</code> is now a self-contained compiled stylesheet (Tailwind theme, the utilities the components use, and a <code className="text-xs bg-muted px-1 py-0.5 rounded">@theme inline</code> token mapping — no preflight). Earlier versions shipped only raw tokens, so components imported from the package rendered as unstyled text.</li>
-                <li>Consumers now only need <code className="text-xs bg-muted px-1 py-0.5 rounded">@import &quot;@admin-navanta/design-system/styles.css&quot;;</code> — the previous <code className="text-xs bg-muted px-1 py-0.5 rounded">@source</code>/<code className="text-xs bg-muted px-1 py-0.5 rounded">@theme</code> workaround is no longer required.</li>
+                <li>Consumers now only need <code className="text-xs bg-muted px-1 py-0.5 rounded">@import &quot;@navanta-ai/design-system/styles.css&quot;;</code> — the previous <code className="text-xs bg-muted px-1 py-0.5 rounded">@source</code>/<code className="text-xs bg-muted px-1 py-0.5 rounded">@theme</code> workaround is no longer required.</li>
               </ul>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default function ChangelogPage() {
             <div>
               <h3 className="text-sm font-semibold mb-2 text-foreground">Changes</h3>
               <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Renamed the package to <code className="text-xs bg-muted px-1 py-0.5 rounded">@admin-navanta/design-system</code>.</li>
+                <li>Renamed the package to <code className="text-xs bg-muted px-1 py-0.5 rounded">@navanta-ai/design-system</code>.</li>
                 <li>Added a tag-driven GitHub Actions workflow that publishes the package on version-tag push.</li>
                 <li>Cross-platform CI build fixes (rolldown native bindings / lockfile handling on Linux).</li>
               </ul>

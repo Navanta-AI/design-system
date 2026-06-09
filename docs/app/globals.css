@@ -78,8 +78,13 @@ html {
   overflow-x: hidden;
 }
 
-* {
-  border-color: var(--border);
+/* Default border color reset — MUST be layered so Tailwind border-color
+   utilities (e.g. checked:border-primary, border-destructive) can override it.
+   An unlayered `*` rule beats all @layer utilities and silently breaks them. */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 .gradient-text {

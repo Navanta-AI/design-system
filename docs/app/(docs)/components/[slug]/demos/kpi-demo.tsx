@@ -1,7 +1,7 @@
 'use client'
 
 import { Info } from '@phosphor-icons/react'
-import { KpiProgressCard, KpiStatCard, Tooltip } from '@admin-navanta/design-system'
+import { KpiProgressCard, KpiStatCard, Tooltip } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -59,11 +59,11 @@ export function KpiDemo({ meta }: { meta: ComponentMeta }) {
         const changeLabel =
           trend === 'down' ? '-3 vs last month' : trend === 'neutral' ? '0 vs last month' : '+3 vs last month'
         const progressComponentImport = showInfo
-          ? "import { KpiProgressCard, Tooltip } from '@admin-navanta/design-system'"
-          : "import { KpiProgressCard } from '@admin-navanta/design-system'"
+          ? "import { KpiProgressCard, Tooltip } from '@navanta-ai/design-system'"
+          : "import { KpiProgressCard } from '@navanta-ai/design-system'"
         const statComponentImport = showInfo
-          ? "import { KpiStatCard, Tooltip } from '@admin-navanta/design-system'"
-          : "import { KpiStatCard } from '@admin-navanta/design-system'"
+          ? "import { KpiStatCard, Tooltip } from '@navanta-ai/design-system'"
+          : "import { KpiStatCard } from '@navanta-ai/design-system'"
         const infoImport = showInfo ? "\nimport { Info } from '@phosphor-icons/react'" : ''
         const infoConst = showInfo
           ? 'const infoIcon = (\n  <Tooltip content="More info">\n    <Info size={14} weight="regular" />\n  </Tooltip>\n)\n'

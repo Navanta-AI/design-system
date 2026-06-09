@@ -105,7 +105,7 @@ export function DocsHeader() {
       {/* Actions */}
       <div className="flex shrink-0 items-center gap-[12px] lg:gap-[16px]">
         <Link
-          href="https://github.com/admin-navanta/design-system"
+          href="https://github.com/Navanta-AI/design-system"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[14px] font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"

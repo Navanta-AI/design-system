@@ -43,6 +43,8 @@ import {
   Sidebar as SidebarIcon,
   Warning,
   Tray,
+  Tag,
+  Browsers,
 } from '@phosphor-icons/react'
 import { componentRegistry } from '@/lib/component-registry'
 
@@ -80,6 +82,7 @@ const componentIconMap: Record<string, NavIcon> = {
   avatar:     User,
   breadcrumbs: CaretRight,
   button:     Cursor,
+  pill:       Tag,
   card:       IdentificationCard,
   checkbox:   CheckSquare,
   datepicker: CalendarBlank,
@@ -147,6 +150,7 @@ export function Sidebar() {
         <NavItem href="/about-navanta" label="Portal Design System" icon={Info} />
         <NavItem href="/getting-started" label="Getting Started" icon={Lightning} />
         <NavItem href="/resources" label="Resources" icon={DownloadSimple} />
+        <NavItem href="/templates" label="Templates" icon={Browsers} />
         <NavItem href="/theme" label="Theme" icon={Palette} />
         <NavItem href="/changelog" label="Changelog" icon={Clock} />
       </nav>

@@ -7,7 +7,7 @@ import {
   PanelTimeline,
   PanelAlert,
   Button,
-} from '@admin-navanta/design-system'
+} from '@navanta-ai/design-system'
 import { Package, Truck, MapPin, CurrencyDollar } from '@phosphor-icons/react'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
@@ -26,7 +26,7 @@ export function DetailPanelDemo({ meta }: { meta: ComponentMeta }) {
       meta={meta}
       codeTemplate={(props) => {
         const width = ((props.width as string) || '400').trim() || '400'
-        return `import { DetailPanelShell, PanelInfoGrid, PanelTimeline, Button } from '@admin-navanta/design-system'
+        return `import { DetailPanelShell, PanelInfoGrid, PanelTimeline, Button } from '@navanta-ai/design-system'
 import { Package, Truck } from '@phosphor-icons/react'
 import * as React from 'react'
 

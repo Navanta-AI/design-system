@@ -51,7 +51,7 @@ export function ComponentPreview({
       ? `<${meta.importName} ${propsStr}>`
       : `<${meta.importName}>`
 
-    return `import { ${meta.importName} } from '@admin-navanta/design-system'\n\n${openTag}${defaultChildren}</${meta.importName}>`
+    return `import { ${meta.importName} } from '@navanta-ai/design-system'\n\n${openTag}${defaultChildren}</${meta.importName}>`
   }, [knobValues, meta, defaultChildren, codeTemplate])
 
   const showKnobs = !hideKnobs && meta.knobs.length > 0

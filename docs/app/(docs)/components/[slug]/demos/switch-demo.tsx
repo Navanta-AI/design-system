@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Switch } from '@admin-navanta/design-system'
+import { Switch } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -78,7 +78,7 @@ export function SwitchDemo({ meta }: SwitchDemoProps) {
         />
       )}
       codeTemplate={() =>
-        `import { Switch } from '@admin-navanta/design-system'
+        `import { Switch } from '@navanta-ai/design-system'
 import * as React from 'react'
 
 // Uncontrolled

@@ -16,6 +16,7 @@ type DemoComponent = React.ComponentType<{ meta: ComponentMeta }>
 
 const demoMap: Record<string, DemoComponent> = {
   button: dynamic(() => import('./demos/button-demo').then((m) => m.ButtonDemo)),
+  pill: dynamic(() => import('./demos/pill-demo').then((m) => m.PillDemo)),
   input: dynamic(() => import('./demos/input-demo').then((m) => m.InputDemo)),
   card: dynamic(() => import('./demos/card-demo').then((m) => m.CardDemo)),
   textarea: dynamic(() => import('./demos/textarea-demo').then((m) => m.TextareaDemo)),

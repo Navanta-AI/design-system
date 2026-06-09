@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Radio } from '@admin-navanta/design-system'
+import { Radio } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -85,7 +85,7 @@ export function RadioDemo({ meta }: RadioDemoProps) {
         />
       )}
       codeTemplate={() =>
-        `import { Radio } from '@admin-navanta/design-system'
+        `import { Radio } from '@navanta-ai/design-system'
 
 // Default
 <Radio name="plan" label="Option 1" checked onChange={...} />

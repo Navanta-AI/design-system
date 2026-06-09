@@ -1,6 +1,6 @@
 'use client'
 
-import { Textarea } from '@admin-navanta/design-system'
+import { Textarea } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 

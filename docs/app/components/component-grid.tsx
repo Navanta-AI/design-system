@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { componentRegistry } from '@/lib/component-registry'
-import { cn, Input } from '@admin-navanta/design-system'
+import { cn, Input } from '@navanta-ai/design-system'
 
 export function ComponentGrid() {
   const [query, setQuery] = useState('')

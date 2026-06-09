@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Button, useToast, type ToastType } from '@admin-navanta/design-system'
+import { Button, useToast, type ToastType } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -37,7 +37,7 @@ export function ToastDemo({ meta }: { meta: ComponentMeta }) {
           Show Toast
         </Button>
       )}
-      codeTemplate={(props) => `import { useToast, Button } from '@admin-navanta/design-system'
+      codeTemplate={(props) => `import { useToast, Button } from '@navanta-ai/design-system'
 
 export function Example() {
   const { addToast } = useToast()

@@ -1,6 +1,6 @@
 'use client'
 
-import { PanelTimeline } from '@admin-navanta/design-system'
+import { PanelTimeline } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -39,7 +39,7 @@ export function PanelTimelineDemo({ meta }: { meta: ComponentMeta }) {
     <ComponentPreview
       meta={meta}
       hideKnobs
-      codeTemplate={() => `import { PanelTimeline } from '@admin-navanta/design-system'
+      codeTemplate={() => `import { PanelTimeline } from '@navanta-ai/design-system'
 
 const milestones = [
   { id: 'ordered', label: 'Ordered', status: 'completed', date: 'May 3', events: [{ type: 'PO issued', date: 'May 3', severity: 'info' }] },

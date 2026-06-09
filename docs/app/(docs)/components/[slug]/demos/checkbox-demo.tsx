@@ -1,6 +1,6 @@
 'use client'
 
-import { Checkbox } from '@admin-navanta/design-system'
+import { Checkbox } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -17,6 +17,7 @@ export function CheckboxDemo({ meta }: CheckboxDemoProps) {
         <Checkbox
           label={(props.label as string) || undefined}
           error={(props.error as string) || undefined}
+          indeterminate={props.indeterminate as boolean | undefined}
           disabled={props.disabled as boolean | undefined}
         />
       )}

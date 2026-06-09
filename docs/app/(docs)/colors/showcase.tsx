@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Tabs } from '@admin-navanta/design-system'
+import { Tabs } from '@navanta-ai/design-system'
 import { Check, CopySimple } from '@phosphor-icons/react'
 
 type ColorMode = 'light' | 'dark'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Tabs, TabPanel } from '@admin-navanta/design-system'
+import { Tabs, TabPanel } from '@navanta-ai/design-system'
 
 type ViewportKey = 'desktop' | 'tablet' | 'mobile'
 

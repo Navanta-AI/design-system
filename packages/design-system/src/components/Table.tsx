@@ -3,6 +3,7 @@ import React, { forwardRef, createContext, useContext, useState } from 'react';
 import { CaretUp, CaretDown, CaretUpDown, Copy, Check } from '@phosphor-icons/react';
 import { cn } from '../utils/cn';
 import { Input } from './Input';
+import { Pill, type PillProps } from './Pill';
 import { AiStar } from './ui/AiStar';
 import {
   TABLE_STATUSES,
@@ -190,7 +191,7 @@ const TableHeadCell = forwardRef<HTMLTableCellElement, TableHeadCellProps>(
 TableHeadCell.displayName = 'TableHeadCell';
 
 /** Standardized cell content types (matches the HMTX Portal table design). */
-export type TableCellVariant = 'id' | 'party' | 'status' | 'date' | 'input';
+export type TableCellVariant = 'id' | 'party' | 'status' | 'date' | 'input' | 'pill';
 
 export interface TableCellProps extends Omit<React.TdHTMLAttributes<HTMLTableCellElement>, 'onChange'> {
   align?: 'left' | 'center' | 'right';
@@ -219,6 +220,11 @@ export interface TableCellProps extends Omit<React.TdHTMLAttributes<HTMLTableCel
   completed?: number;
   tone?: TableStatusTone;
   label?: React.ReactNode;
+
+  /* variant="pill" — a status Pill (semantic color + optional outline icon).
+     Uses `label` for the text and `icon` for the leading glyph. */
+  pillVariant?: PillProps['variant'];
+  pillSize?: PillProps['size'];
 
   /* variant="date" — formatted date + relative subtext */
   date?: Date | string | number;
@@ -265,7 +271,7 @@ function renderVariant(props: TableCellProps): React.ReactNode {
           {props.value}
         </span>
       );
-      return (
+      const idRow = (
         <span className="inline-flex items-center gap-2">
           {showBadge && props.icon && (
             <span
@@ -285,6 +291,18 @@ function renderVariant(props: TableCellProps): React.ReactNode {
           </span>
         </span>
       );
+      // Optional product/description subtitle below the ID (e.g. SKU + product name).
+      if (props.subtitle != null) {
+        return (
+          <span className="flex flex-col">
+            {idRow}
+            <span className="text-[12px] leading-[18px] text-[var(--text-secondary)] whitespace-nowrap">
+              {props.subtitle}
+            </span>
+          </span>
+        );
+      }
+      return idRow;
     }
     case 'party': {
       const a = props.avatar;
@@ -352,6 +370,12 @@ function renderVariant(props: TableCellProps): React.ReactNode {
           />
         </div>
       );
+    case 'pill':
+      return (
+        <Pill variant={props.pillVariant} size={props.pillSize ?? 'sm'} icon={props.icon}>
+          {props.label}
+        </Pill>
+      );
     default:
       return null;
   }
@@ -370,6 +394,7 @@ const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>((props, ref) 
     value, icon, badge, href, copyable,
     title, subtitle, avatar,
     status, steps, completed, tone, label,
+    pillVariant, pillSize,
     date, relative, subtext, now,
     onValueChange, placeholder, inputType, inputDisabled,
     ...rest

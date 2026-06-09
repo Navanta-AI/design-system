@@ -1,6 +1,6 @@
 'use client'
 
-import { Slider } from '@admin-navanta/design-system'
+import { Slider } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 import { useState } from 'react'
@@ -20,7 +20,7 @@ export function SliderDemo({ meta }: { meta: ComponentMeta }) {
         const disabled = props.disabled === true
 
         const lines: string[] = [
-          `import { Slider } from '@admin-navanta/design-system'`,
+          `import { Slider } from '@navanta-ai/design-system'`,
           '',
           'export default function Example() {',
           '  return (',

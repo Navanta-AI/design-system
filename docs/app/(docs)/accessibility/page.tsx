@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Button, Checkbox, Input, Textarea } from '@admin-navanta/design-system'
+import { Button, Checkbox, Input, Textarea } from '@navanta-ai/design-system'
 import { DocsWithToc } from '@/app/components/docs-with-toc'
 
 export const metadata: Metadata = {

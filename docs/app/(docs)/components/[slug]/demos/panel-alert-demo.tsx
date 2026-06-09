@@ -1,6 +1,6 @@
 'use client'
 
-import { PanelAlert } from '@admin-navanta/design-system'
+import { PanelAlert } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -43,7 +43,7 @@ export function PanelAlertDemo({ meta }: { meta: ComponentMeta }) {
         const detailsAttr = c.details
           ? `\n      details={${JSON.stringify(c.details)}}`
           : ''
-        return `import { PanelAlert } from '@admin-navanta/design-system'
+        return `import { PanelAlert } from '@navanta-ai/design-system'
 
 export default function Example() {
   return (

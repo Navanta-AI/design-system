@@ -43,7 +43,7 @@ export const componentRegistry: ComponentMeta[] = [
       'Displays a button or a component that looks like a button. Supports multiple visual variants, sizes, and icon placements.',
     category: 'Forms',
     importName: 'Button',
-    usageExample: `import { Button } from '@admin-navanta/design-system'
+    usageExample: `import { Button } from '@navanta-ai/design-system'
 
 export default function Example() {
   return <Button>Click me</Button>
@@ -112,6 +112,37 @@ export default function Example() {
         type: 'boolean',
         default: false,
       },
+    ],
+  },
+  {
+    slug: 'pill',
+    name: 'Pill',
+    description:
+      'A compact status tag — soft tinted background with strong tonal text and an optional leading icon. Four semantic variants (info=blue, danger=red, warning=amber, neutral=grey) across three sizes. Each variant is a 50/800 tonal pair; the danger pair is the exact Figma spec (Iris-Shareable "Stable Table Cell"). Use for status, counts, and labels — keep brand color reserved for Christy (AI) chrome.',
+    category: 'Data Display',
+    importName: 'Pill',
+    usageExample: `import { Pill } from '@navanta-ai/design-system'
+// Pill icons use the Phosphor duotone weight.
+import { WarningCircle } from '@phosphor-icons/react'
+
+export default function Example() {
+  return (
+    <Pill variant="danger" size="sm" icon={<WarningCircle weight="duotone" />}>
+      Critical
+    </Pill>
+  )
+}`,
+    props: [
+      { name: 'variant', type: `'info' | 'danger' | 'warning' | 'neutral'`, default: 'neutral', description: 'Semantic tone — blue / red / amber / grey.' },
+      { name: 'size', type: `'sm' | 'md' | 'lg'`, default: 'sm', description: 'Pill size. Small matches the Figma table-cell spec.' },
+      { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon (SVG/Phosphor glyph); scales to the pill size.' },
+      { name: 'children', type: 'React.ReactNode', description: 'The pill label.' },
+    ],
+    knobs: [
+      { name: 'variant', type: 'select', options: ['info', 'danger', 'warning', 'neutral'], default: 'danger' },
+      { name: 'size', type: 'select', options: ['sm', 'md', 'lg'], default: 'sm' },
+      { name: 'label', type: 'text', default: 'Critical' },
+      { name: 'icon', type: 'boolean', default: true },
     ],
   },
   {
@@ -255,10 +286,12 @@ export default function Example() {
       { name: 'label', type: 'string', description: 'Label rendered next to the checkbox.' },
       { name: 'helperText', type: 'string', description: 'Supplementary text below the label.' },
       { name: 'error', type: 'string | boolean', description: 'Error state message or styling.' },
+      { name: 'indeterminate', type: 'boolean', default: 'false', description: 'Mixed/partial state — e.g. a "select all" when only some rows are selected. Shows a dash and announces aria-checked="mixed".' },
       { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents interaction.' },
     ],
     knobs: [
       { name: 'label', type: 'text', default: 'Accept terms and conditions' },
+      { name: 'indeterminate', type: 'boolean', default: false },
       { name: 'error', type: 'text', default: '' },
       { name: 'disabled', type: 'boolean', default: false },
     ],
@@ -288,7 +321,7 @@ export default function Example() {
     description: 'A control that toggles a single setting on or off — a flat, fully-rounded track with a wide white pill knob (HMTX Portal / Apple HIG). On = info blue, off = neutral translucent gray. Use for instant on/off settings (for a form value that submits, prefer a Checkbox).',
     category: 'Forms',
     importName: 'Switch',
-    usageExample: `import { Switch } from '@admin-navanta/design-system'
+    usageExample: `import { Switch } from '@navanta-ai/design-system'
 import * as React from 'react'
 
 export default function Example() {
@@ -416,7 +449,7 @@ export default function Example() {
     slug: 'table',
     name: 'Table',
     description:
-      'A responsive table for tabular data. Table.Cell supports standardized content variants — id (badge + copy), party (avatar + title/subtitle), status (progress dots + label), date (auto relative subtext), and input (inline editable) — plus plain text/number by default.',
+      'A responsive table for tabular data. Table.Cell supports standardized content variants — id (badge + copy), party (avatar + title/subtitle), status (progress dots + label), pill (semantic status Pill), date (auto relative subtext), and input (inline editable) — plus plain text/number by default.',
     category: 'Data Display',
     importName: 'Table',
     props: [
@@ -424,10 +457,11 @@ export default function Example() {
       { name: 'hoverable', type: 'boolean', default: 'false', description: 'Highlight rows on hover.' },
       { name: 'compact', type: 'boolean', default: 'false', description: 'Reduces padding inside cells.' },
       { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Fixes header at the top when scrolling.' },
-      { name: 'Cell variant', type: "'id' | 'party' | 'status' | 'date' | 'input'", description: 'Standardized cell content. Omit for plain text/number (use mono / align as usual).' },
-      { name: 'Cell (id)', type: 'value, icon?, badge?, href?, copyable?', description: 'ID/SKU. With an icon it shows a circle badge; copy button is on by default. Omit icon for the plain (Halstead) style.' },
+      { name: 'Cell variant', type: "'id' | 'party' | 'status' | 'pill' | 'date' | 'input'", description: 'Standardized cell content. Omit for plain text/number (use mono / align as usual).' },
+      { name: 'Cell (id)', type: 'value, icon?, badge?, href?, copyable?, subtitle?', description: 'ID/SKU. With an icon it shows a circle badge; copy button is on by default. Omit icon for the plain (Halstead) style. Pass subtitle for a muted product/description line below the ID (e.g. SKU + product name).' },
       { name: 'Cell (party)', type: 'avatar?: {src|initials}, title, subtitle?', description: 'Avatar (image or initials) with a title and optional subtext — e.g. a "Ship to" column.' },
       { name: 'Cell (status)', type: "status?: TableStatusKey, steps?, completed?, tone?, label?", description: 'Progress dots + label. Pass a registry status key, or set steps/completed/tone/label manually. tone (success/warning/danger/neutral) overrides the dot color.' },
+      { name: 'Cell (pill)', type: "pillVariant?: 'info'|'danger'|'warning'|'neutral', pillSize?, label, icon?", description: 'Renders a status Pill. Uses label for the text and icon for an optional outline glyph. pillVariant = blue/red/amber/grey.' },
       { name: 'Cell (date)', type: 'date: Date|string|number, relative?, subtext?, now?', description: 'Formats the date (e.g. "Mar 03, 2026") with an auto relative subtext ("5 mins ago" / "in 2 days"). Pass subtext to override.' },
       { name: 'Cell (input)', type: 'value, onValueChange, placeholder?, inputType?', description: 'Inline editable cell built on the base Input (compact size, 120px min-width).' },
       { name: 'HeadCell sortable / ai', type: 'sortable?, sortDirection?, onSort?, ai?', description: 'Per-column sorting UI; set sortable for the caret/clicks. ai renders the Christy AI star before a neutral column label.' },
@@ -446,7 +480,7 @@ export default function Example() {
     description: 'A categorical bar graph for comparing values across labels.',
     category: 'Data Display',
     importName: 'BarChart',
-    usageExample: `import { BarChart } from '@admin-navanta/design-system'
+    usageExample: `import { BarChart } from '@navanta-ai/design-system'
 
 const data = [
   { label: 'Mon', value: 24 },
@@ -483,7 +517,7 @@ export default function Example() {
     description: 'A trend line graph for visualizing changes over time.',
     category: 'Data Display',
     importName: 'LineChart',
-    usageExample: `import { LineChart } from '@admin-navanta/design-system'
+    usageExample: `import { LineChart } from '@navanta-ai/design-system'
 
 const data = [
   { label: 'Jan', value: 18 },
@@ -520,7 +554,7 @@ export default function Example() {
     description: 'A segmented bar graph to show part-to-whole composition inside each category.',
     category: 'Data Display',
     importName: 'StackedBarChart',
-    usageExample: `import { StackedBarChart } from '@admin-navanta/design-system'
+    usageExample: `import { StackedBarChart } from '@navanta-ai/design-system'
 
 const data = [
   {
@@ -683,7 +717,7 @@ export default function Example() {
     category: 'Data Display',
     importName: 'KpiStatCard',
     usageExample: `import { Info } from '@phosphor-icons/react'
-import { KpiGrid, KpiProgressCard, KpiStatCard, Tooltip } from '@admin-navanta/design-system'
+import { KpiGrid, KpiProgressCard, KpiStatCard, Tooltip } from '@navanta-ai/design-system'
 
 const infoIcon = (
   <Tooltip content="More info">
@@ -816,7 +850,7 @@ export default function Example() {
       'A page header with the Christy AI star icon, a gradient title, and a subtitle. Used at the top of a view.',
     category: 'Layout',
     importName: 'PageHeading',
-    usageExample: `import { PageHeading } from '@admin-navanta/design-system'
+    usageExample: `import { PageHeading } from '@navanta-ai/design-system'
 
 export default function Example() {
   return <PageHeading title="Order Dashboard" subtitle="Track shipments and resolve claims in one place" />
@@ -834,10 +868,10 @@ export default function Example() {
     slug: 'table-shell',
     name: 'Table Shell',
     description:
-      'Reusable table chrome — a titled container with a header slot (search/filters), a table body, and a footer with item count, pagination, and page-size controls.',
+      'Reusable table chrome — a titled container with a unified filter bar (search + dropdowns + chips + insight filters via the `facets` model), a table body, and a footer with item count, pagination, and page-size controls. Saved-view tabs stay a separate axis.',
     category: 'Data Display',
     importName: 'TableShell',
-    usageExample: `import { TableShell, Table, Input } from '@admin-navanta/design-system'
+    usageExample: `import { TableShell, Table, Input } from '@navanta-ai/design-system'
 import { Package } from '@phosphor-icons/react'
 import * as React from 'react'
 
@@ -869,13 +903,22 @@ export default function Example() {
       { name: 'pageSizeOptions', type: 'number[]', default: '[10, 25, 50]', description: 'Available page size options.' },
       { name: 'searchValue / onSearchChange', type: 'string / (v) => void', description: 'Providing onSearchChange renders the built-in toolbar search (consumer owns filtering).' },
       { name: 'searchPlaceholder', type: 'string', default: "'Search'", description: 'Placeholder for the built-in search field.' },
-      { name: 'filters', type: 'ReactNode', description: 'Filter controls at the right of the toolbar (e.g. Select dropdowns).' },
-      { name: 'activeFilters', type: 'ActiveFilter[]', description: 'Active filters displayed as removable pills below the toolbar. Each item has key, label, value, and onRemove.' },
-      { name: 'onClearAllFilters', type: '() => void', description: 'Called when "Clear all" is clicked. Shown when 2+ active filters are present.' },
+      { name: 'facets', type: 'FilterFacet[]', description: 'UNIFIED filter bar (recommended) — search + dropdowns + chips + insight filters as ONE band. A FilterFacet is kind:"select" (single-select, reuses Select), kind:"toggle-group" (multi-select chips), or kind:"toggle" (a boolean insight like "High demand"/"This week"). promoted shows inline; the rest auto-collapse into a "More filters" popover. Array order = layout order; group sections the popover. Consumer-declared insight facets need zero component changes. When set, the legacy filters/filterChips/activeFilters props are ignored.' },
+      { name: 'maxInlineChips', type: 'number', default: '5', description: 'Max inline filter CONTROLS before the rest demote into the "More filters" dropdown — a multi-select group counts one control per option.' },
+      { name: 'moreFiltersLabel', type: 'ReactNode', default: "'More filters'", description: 'Trigger label for the overflow popover.' },
+      { name: 'filters', type: 'ReactNode', description: 'DEPRECATED (prefer facets). Filter controls at the right of the toolbar (e.g. Select dropdowns).' },
+      { name: 'activeFilters', type: 'ActiveFilter[]', description: 'DEPRECATED (prefer facets). Active filters as removable pills. Each item has key, label, value, onRemove.' },
+      { name: 'onClearAllFilters', type: '() => void', description: 'Called when "Clear all" is clicked (also fired for facets after each facet is reset).' },
+      { name: 'filterChips', type: 'FilterChip[]', description: 'DEPRECATED (prefer a facets toggle-group). Open pill-style toggle chips. Each chip has key, label, variant?, icon?, count?, active, onToggle.' },
+      { name: 'filterChipsLabel', type: 'ReactNode', description: 'DEPRECATED. Optional leading label for the legacy filter chip row.' },
       { name: 'tabs / activeTab / onTabChange', type: 'TabItem[] / string / (id) => void', description: 'Optional tab row for quick filtering, with count badges (TabItem.badge).' },
-      { name: 'onCustomize / customizeLabel', type: '() => void / string', description: 'Renders a "Customize" action (gear) in the heading — wire it to column customization.' },
+      { name: 'customize', type: 'boolean', default: 'true', description: 'The Customize action (gear) is integral to the heading and shown by default. Set false to omit it.' },
+      { name: 'columns / onColumnsChange', type: 'TableColumn[] / (cols) => void', description: 'Provide columns to get the BUILT-IN Customize popover (per-column show/hide + drag-reorder). TableColumn = { key, label, hideable?, hidden? }. Reflect the resulting order + hidden flags when you render the table header + cells. When set, the Customize button opens this popover instead of calling onCustomize.' },
+      { name: 'onCustomize / customizeLabel', type: '() => void / string', description: 'customizeLabel sets the button text. onCustomize is the fallback handler used only when columns is NOT provided.' },
       { name: 'header', type: 'ReactNode', description: 'Extra header slot above the body (filter chips, banners).' },
-      { name: 'children', type: 'ReactNode', description: 'The table. For empty/no-results, render <Table.Empty><EmptyState …/></Table.Empty> in the body — headers + footer stay, content centers.' },
+      { name: 'emptyState / noResultsState', type: 'ReactNode', description: 'INTEGRAL empty handling. When totalItems === 0, TableShell paints the screen centered with column headers still visible — emptyState for no data, noResultsState when isFiltered. Pass an <EmptyState>; render just the header (no rows) in children.' },
+      { name: 'isFiltered', type: 'boolean', description: 'Whether search/filters are active — selects noResultsState over emptyState.' },
+      { name: 'children', type: 'ReactNode', description: 'The table — a <Table> with header + rows. When totalItems === 0, render just the header; TableShell shows emptyState/noResultsState. (Table.Empty still works for fully custom bodies.)' },
     ],
     knobs: [],
   },
@@ -886,7 +929,7 @@ export default function Example() {
       'A centered "nothing here" screen with an optional nested-ring icon, title, description, an optional inline link, and an action. Use it for first-time/empty states (offer a primary CTA) and no-results states (offer a way to clear). TableShell renders it automatically when a table is empty.',
     category: 'Feedback',
     importName: 'EmptyState',
-    usageExample: `import { EmptyState, Button } from '@admin-navanta/design-system'
+    usageExample: `import { EmptyState, Button } from '@navanta-ai/design-system'
 import { Package } from '@phosphor-icons/react'
 
 export default function Example() {
@@ -916,7 +959,7 @@ export default function Example() {
       'A slide-out right-side panel (drawer) with a header, optional actions and status row, scrollable content, and a sticky footer. Compose panel parts inside it.',
     category: 'Layout',
     importName: 'DetailPanelShell',
-    usageExample: `import { DetailPanelShell, PanelInfoGrid, Button } from '@admin-navanta/design-system'
+    usageExample: `import { DetailPanelShell, PanelInfoGrid, Button } from '@navanta-ai/design-system'
 import * as React from 'react'
 
 export default function Example() {
@@ -958,7 +1001,7 @@ export default function Example() {
       'An AI recommendation card branded with Christy. Supports selection (radio cards), static, and confirmed states, with optional reasoning and summary.',
     category: 'Feedback',
     importName: 'ChristySuggestions',
-    usageExample: `import { ChristySuggestions } from '@admin-navanta/design-system'
+    usageExample: `import { ChristySuggestions } from '@navanta-ai/design-system'
 import * as React from 'react'
 
 export default function Example() {
@@ -1000,7 +1043,7 @@ export default function Example() {
       'A colour-coded alert block for detail panels, with an icon, title, optional badge, description, and detail lines.',
     category: 'Feedback',
     importName: 'PanelAlert',
-    usageExample: `import { PanelAlert } from '@admin-navanta/design-system'
+    usageExample: `import { PanelAlert } from '@navanta-ai/design-system'
 
 export default function Example() {
   return (
@@ -1031,7 +1074,7 @@ export default function Example() {
       'A label-value grid for detail panels, with optional leading icons and clickable link values.',
     category: 'Data Display',
     importName: 'PanelInfoGrid',
-    usageExample: `import { PanelInfoGrid } from '@admin-navanta/design-system'
+    usageExample: `import { PanelInfoGrid } from '@navanta-ai/design-system'
 import { Package, Truck } from '@phosphor-icons/react'
 
 export default function Example() {
@@ -1059,7 +1102,7 @@ export default function Example() {
       'A vertical status timeline for detail panels, with colour-coded milestone dots, connectors, dates, and event notes.',
     category: 'Data Display',
     importName: 'PanelTimeline',
-    usageExample: `import { PanelTimeline } from '@admin-navanta/design-system'
+    usageExample: `import { PanelTimeline } from '@navanta-ai/design-system'
 
 const milestones = [
   { id: 'ordered', label: 'Ordered', status: 'completed', date: 'May 3', events: [{ type: 'PO issued', date: 'May 3', severity: 'info' }] },

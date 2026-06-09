@@ -1,6 +1,6 @@
 'use client'
 
-import { PanelInfoGrid } from '@admin-navanta/design-system'
+import { PanelInfoGrid } from '@navanta-ai/design-system'
 import { Package, Truck, MapPin, CurrencyDollar } from '@phosphor-icons/react'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
@@ -10,7 +10,7 @@ export function PanelInfoGridDemo({ meta }: { meta: ComponentMeta }) {
     <ComponentPreview
       meta={meta}
       hideKnobs
-      codeTemplate={() => `import { PanelInfoGrid } from '@admin-navanta/design-system'
+      codeTemplate={() => `import { PanelInfoGrid } from '@navanta-ai/design-system'
 import { Package, Truck, MapPin, CurrencyDollar } from '@phosphor-icons/react'
 
 export default function Example() {

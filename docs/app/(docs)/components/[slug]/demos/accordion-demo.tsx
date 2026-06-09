@@ -1,6 +1,6 @@
 'use client'
 
-import { Accordion } from '@admin-navanta/design-system'
+import { Accordion } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 

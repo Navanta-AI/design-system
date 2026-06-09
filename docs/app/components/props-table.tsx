@@ -1,4 +1,4 @@
-import { Table } from '@admin-navanta/design-system'
+import { Table } from '@navanta-ai/design-system'
 import type { PropDef } from '@/lib/component-registry'
 
 interface PropsTableProps {

@@ -4,7 +4,7 @@
    This file is the INPUT to a Tailwind build step (see package.json "build").
    It is compiled to `dist/styles.css`, which is what consumers import:
 
-       import "@admin-navanta/design-system/styles.css";
+       import "@navanta-ai/design-system/styles.css";
 
    The compiled output is self-contained — it ships:
      • the design tokens (light + dark),

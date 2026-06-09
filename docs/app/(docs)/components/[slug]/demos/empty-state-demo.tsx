@@ -1,6 +1,6 @@
 'use client'
 
-import { EmptyState, Button } from '@admin-navanta/design-system'
+import { EmptyState, Button } from '@navanta-ai/design-system'
 import { Package, MagnifyingGlass, Star } from '@phosphor-icons/react'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
@@ -10,7 +10,7 @@ export function EmptyStateDemo({ meta }: { meta: ComponentMeta }) {
     <ComponentPreview
       meta={meta}
       hideKnobs
-      codeTemplate={() => `import { EmptyState, Button } from '@admin-navanta/design-system'
+      codeTemplate={() => `import { EmptyState, Button } from '@navanta-ai/design-system'
 import { Package, Star } from '@phosphor-icons/react'
 
 // First-time / empty — offer a primary action

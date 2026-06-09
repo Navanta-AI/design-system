@@ -1,6 +1,6 @@
 'use client'
 
-import { Tabs, TabPanel } from '@admin-navanta/design-system'
+import { Tabs, TabPanel } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 import { useState } from 'react'

@@ -11,8 +11,8 @@ import {
   SelectItem,
   useTableSort,
   TABLE_STATUSES,
-} from '@admin-navanta/design-system'
-import type { TableStatusKey } from '@admin-navanta/design-system'
+} from '@navanta-ai/design-system'
+import type { TableStatusKey } from '@navanta-ai/design-system'
 import { Package } from '@phosphor-icons/react'
 import { DynamicCodeBlock } from '@/app/components/dynamic-code-block'
 import type { ComponentMeta } from '@/lib/component-registry'
@@ -95,7 +95,7 @@ function ControlLabel({ children }: { children: React.ReactNode }) {
   return <span className="text-xs font-medium text-[#71717a] dark:text-muted-foreground">{children}</span>
 }
 
-const CODE = `import { Table, useTableSort } from '@admin-navanta/design-system'
+const CODE = `import { Table, useTableSort } from '@navanta-ai/design-system'
 import { Package } from '@phosphor-icons/react'
 
 const { sorted, getHeadProps } = useTableSort(orders, (o, key) => {

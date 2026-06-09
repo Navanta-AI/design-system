@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input } from '@admin-navanta/design-system'
+import { Button, Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -66,7 +66,7 @@ export function CardDemo({ meta }: CardDemoProps) {
         const hoverableAttr = props.hoverable ? ' hoverable' : ''
 
         if (view === 'media') {
-          return `import { Button, Card, CardContent, CardDescription, CardTitle } from '@admin-navanta/design-system'
+          return `import { Button, Card, CardContent, CardDescription, CardTitle } from '@navanta-ai/design-system'
 
 <Card${hoverableAttr} className="max-w-[340px] gap-0 overflow-hidden py-0">
   <CardContent className="space-y-4 px-0 pt-0 pb-6">
@@ -80,7 +80,7 @@ export function CardDemo({ meta }: CardDemoProps) {
 </Card>`
         }
 
-        return `import { Button, Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input } from '@admin-navanta/design-system'
+        return `import { Button, Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Input } from '@navanta-ai/design-system'
 
 <Card${hoverableAttr}>
   <CardHeader>
