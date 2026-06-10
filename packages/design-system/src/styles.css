@@ -99,4 +99,15 @@
   .christy-btn-primary:hover:not(:disabled) {
     background-image: var(--gradient-christy-hover);
   }
+
+  /* Hide the scrollbar while keeping scroll behavior. Referenced by DataTable's
+     x-scroll container and by DetailPanelShell; shipped here so consumers don't
+     have to define it themselves. */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

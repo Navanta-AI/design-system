@@ -37,6 +37,26 @@ export { Avatar, type AvatarProps, type AvatarGroupProps } from './components/Av
 export { Skeleton, type SkeletonProps } from './components/Skeleton'
 export { Progress, CircularProgress, type ProgressProps, type CircularProgressProps } from './components/Progress'
 export { Pagination, type PaginationProps } from './components/Pagination'
+// Declarative DataTable (columns[] + data[], appearance props, grouping).
+// Coexists with the compound `Table`; types are prefixed to avoid clashes
+// (e.g. the existing `SortDirection` from use-table-sort).
+export {
+  DataTable,
+  CELL_LAYOUTS as DATA_TABLE_CELL_LAYOUTS,
+  DEFAULT_CELL_LAYOUT as DATA_TABLE_DEFAULT_CELL_LAYOUT,
+  DATA_TABLE_DEFAULTS,
+} from './components/data-table'
+export type {
+  DataTableProps,
+  Column as DataTableColumn,
+  SlotColumn as DataTableSlotColumn,
+  SelectionConfig as DataTableSelection,
+  SortState as DataTableSortState,
+  CellContext as DataTableCellContext,
+  GroupConfig as DataTableGroup,
+  DataTableAppearance,
+  CellLayout as DataTableCellLayout,
+} from './components/data-table'
 export { KpiGrid, KpiTrendBadge, KpiStatCard, KpiProgressCard, KpiComparisonCard, type KpiGridProps, type KpiTrendBadgeProps, type KpiStatCardProps, type KpiProgressCardProps, type KpiComparisonCardProps, type KpiTrendDirection, type KpiCardLayout } from './components/KPI'
 export {
   BarChart,

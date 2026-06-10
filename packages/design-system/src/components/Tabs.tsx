@@ -2,20 +2,39 @@
 import React, { forwardRef, useState, useRef, useEffect, useCallback, useId } from 'react';
 import { cn } from '../utils/cn';
 
+/** Minimal structural type for a Phosphor-style icon component. */
+type TabIconComponent = React.ComponentType<{
+  size?: number;
+  weight?: 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone';
+  color?: string;
+  className?: string;
+}>;
+
 export interface TabItem {
   id: string;
   label: string;
   disabled?: boolean;
   badge?: string | number;
+  /** Leading icon (used by the `underline-pill` variant). */
+  icon?: TabIconComponent;
+  /** `critical` tints the leading icon red (urgency cue) — `underline-pill` only. */
+  tone?: 'critical';
 }
 
 export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   tabs: TabItem[];
   activeTab?: string;
   onChange?: (id: string) => void;
-  variant?: 'underline' | 'pills' | 'bordered';
+  /**
+   * `underline-pill` is the wb-fe / IRIS tab bar: a bottom-divided row of
+   * underline tabs whose label sits in a soft active pill, with optional
+   * leading icon, count badge, and a right-aligned `rightSlot`.
+   */
+  variant?: 'underline' | 'pills' | 'bordered' | 'underline-pill';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
+  /** Right-aligned content (e.g. a filter/severity-chip group). `underline-pill` only. */
+  rightSlot?: React.ReactNode;
 }
 
 const tabSizes = {
@@ -33,6 +52,7 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       variant = 'underline',
       size = 'md',
       fullWidth = false,
+      rightSlot,
       className,
       ...props
     },
@@ -99,6 +119,88 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
         tabRefs.current.get(nextTab.id)?.focus();
       }
     };
+
+    // wb-fe / IRIS tab bar: bottom-divided row, soft active pill, optional
+    // leading icon + count badge, right-aligned slot. Static border-b-2 per
+    // tab (no sliding indicator).
+    if (variant === 'underline-pill') {
+      return (
+        <div
+          ref={ref}
+          className={cn(
+            'flex items-center justify-between border-b border-[var(--surface-sunken)]',
+            className,
+          )}
+          {...props}
+        >
+          <div
+            role="tablist"
+            onKeyDown={handleKeyDown}
+            className="hide-scrollbar flex items-center gap-4 overflow-x-auto px-4 min-w-0"
+          >
+            <div className="flex items-center gap-4 min-w-max">
+              {tabs.map((tab) => {
+                const isActive = currentActive === tab.id;
+                const Icon = tab.icon;
+                const iconColor =
+                  tab.tone === 'critical' ? 'var(--color-critical-700, #B91C1C)' : undefined;
+                return (
+                  <button
+                    key={tab.id}
+                    ref={(el) => {
+                      if (el) tabRefs.current.set(tab.id, el);
+                    }}
+                    role="tab"
+                    id={`${baseId}-tab-${tab.id}`}
+                    aria-selected={isActive}
+                    aria-controls={`${baseId}-panel-${tab.id}`}
+                    tabIndex={isActive ? 0 : -1}
+                    disabled={tab.disabled}
+                    onClick={() => handleClick(tab.id)}
+                    className={cn(
+                      'flex items-center justify-center h-12 text-sm transition-colors border-b-2 bg-transparent cursor-pointer outline-none disabled:opacity-40 disabled:cursor-not-allowed',
+                      isActive
+                        ? 'border-[var(--tab-active-border)] text-[var(--text-primary)] font-medium'
+                        : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'flex items-center gap-1.5 px-[8px] py-[4px] rounded-[8px] transition-colors',
+                        isActive && 'bg-[var(--ds-surface-active)]',
+                      )}
+                    >
+                      {Icon && (
+                        <Icon
+                          size={14}
+                          weight={isActive ? 'duotone' : 'regular'}
+                          color={iconColor}
+                          className="shrink-0"
+                        />
+                      )}
+                      {tab.label}
+                      {tab.badge !== undefined && (
+                        <span
+                          className={cn(
+                            'inline-flex items-center justify-center min-w-[16px] h-[18px] px-1.5 rounded-full text-xs',
+                            isActive
+                              ? 'gradient-badge text-[var(--text-inverse-muted)] font-semibold'
+                              : 'bg-[var(--surface-sunken)] text-[var(--text-secondary)] font-medium',
+                          )}
+                        >
+                          {tab.badge}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {rightSlot && <div className="flex items-center shrink-0 pr-4">{rightSlot}</div>}
+        </div>
+      );
+    }
 
     return (
       <div ref={ref} className={cn('w-full', className)} {...props}>
