@@ -58,7 +58,7 @@ export type {
   DataTableAppearance,
   CellLayout as DataTableCellLayout,
 } from './components/data-table'
-export { KpiGrid, KpiTrendBadge, KpiStatCard, KpiProgressCard, KpiComparisonCard, type KpiGridProps, type KpiTrendBadgeProps, type KpiStatCardProps, type KpiProgressCardProps, type KpiComparisonCardProps, type KpiTrendDirection, type KpiCardLayout } from './components/KPI'
+export { KpiGrid, KpiTrendBadge, KpiStatCard, KpiProgressCard, KpiComparisonCard, KpiBreakdownCard, type KpiGridProps, type KpiTrendBadgeProps, type KpiStatCardProps, type KpiProgressCardProps, type KpiComparisonCardProps, type KpiBreakdownCardProps, type KpiTrendDirection, type KpiCardLayout } from './components/KPI'
 export {
   BarChart,
   LineChart,

@@ -756,7 +756,7 @@ export default function Example() {
   {
     slug: 'kpi',
     name: 'KPI',
-    description: 'Dashboard-ready key performance indicator cards for stat and progress use cases.',
+    description: 'Dashboard-ready key performance indicator cards for stat, progress, comparison, and breakdown use cases.',
     category: 'Data Display',
     importName: 'KpiStatCard',
     usageExample: `import { Info } from '@phosphor-icons/react'
@@ -793,11 +793,13 @@ export default function Example() {
     props: [
       { name: 'KpiStatCard', type: 'Component', description: 'Shows title, value, trend delta, and optional sparkline/icon.' },
       { name: 'KpiProgressCard', type: 'Component', description: 'Shows KPI value with a progress bar and completion label.' },
+      { name: 'KpiBreakdownCard', type: 'Component', description: 'Vertical stack of title + value + a single-line breakdown/detail line (subtitle) in primary text. Token-defined padding/min-height/gap; `info` (boolean | string) shows the standard, non-replaceable Info icon (string = tooltip). No trend or progress.' },
+      { name: 'KpiComparisonCard', type: 'Component', description: 'Shows current value with a previous-period comparison row.' },
       { name: 'KpiTrendBadge', type: 'Component', description: 'Compact trend badge for up/down/neutral states.' },
       { name: 'KpiGrid', type: 'Component', description: 'Responsive KPI layout grid with 1-4 column options.' },
     ],
     knobs: [
-      { name: 'variant', type: 'select', options: ['stat', 'progress'], default: 'stat' },
+      { name: 'variant', type: 'select', options: ['stat', 'progress', 'breakdown'], default: 'stat' },
       { name: 'cardWidth', type: 'select', options: ['320', '280'], default: '320' },
       { name: 'trend', type: 'select', options: ['up', 'down', 'neutral'], default: 'up' },
       { name: 'label', type: 'text', default: 'Open Orders' },

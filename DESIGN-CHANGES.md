@@ -311,13 +311,50 @@ the chips component should be created separately."
 - Files: `src/components/Chip.tsx` (new), `src/index.ts`, `src/components/ui/TableShell.tsx`;
   docs: `demos/chip-demo.tsx`, `component-registry.ts`, `[slug]/page.tsx`, `sidebar.tsx`.
 
-## 2026-06-12 — released as v0.4.0 / v0.4.1
+## 2026-06-12 — released as v0.4.0 / v0.4.1 / v0.4.2
 
 Entries 19–31 below shipped in **v0.4.0** (published to GitHub Packages, tagged
 `v0.4.0`): Chip white/Figma count container, Checkbox `--border-control`, Table
 selected-row + default alignment rules, large AI star + PageHeading Figma spec,
 `--text-stack-gap`, Card/Select border fix, **SideNav** (new), Tooltip
-`variant="inverse"`. Entry 32 shipped in **v0.4.1**.
+`variant="inverse"`. Entry 32 shipped in **v0.4.1**. Entries 33–34
+(**KpiBreakdownCard** + its spacing/height/info-icon refinement) shipped in **v0.4.2**.
+
+### 33. KPI — new `KpiBreakdownCard` variant (Figma 321-4023)
+**Suggestion:** "make sure in the KPI component we already have, we have a variant like
+this considered. Implement this design from Figma." (Iris-Shareable, node 321-4023)
+
+- The existing `KpiStatCard` puts title+value on one row and renders subtitle as muted
+  text inside a trend-badge grid — it can't produce the Figma layout. Added
+  **`KpiBreakdownCard`** (4th card, exported): a vertical stack — title (+ optional info
+  icon) → value → a breakdown/detail line in **primary** text (the `subtitle` prop, e.g.
+  "32 DOS · 12 SS · 3 service level"). No trend badge / progress bar. `gap-4` (16px)
+  between rows, per the Figma frame.
+- Reused sibling styling: 14px semibold title, 22px semibold value (Figma `-0.44px` on
+  22px == the existing `-0.02em`), same card chrome/shadow, currency-aware value split.
+- Backward compatible (additive). Docs (all three): kpi-demo `breakdown` variant +
+  code template, registry (variant knob option, component list, description).
+- Files: `src/components/KPI.tsx`, `src/index.ts`; docs: `demos/kpi-demo.tsx`,
+  `component-registry.ts`.
+
+### 34. KpiBreakdownCard — defined spacing/height, single-line text, standard info icon
+**Suggestion:** "height issue with the KPI component… define the spacing and height we're
+providing… the bottom text needs a limit on how much we can give… the info icon should be
+standard and not removed or changed to any other icon."
+
+- **Height + spacing now token-defined:** `--kpi-card-pad` (16px), `--kpi-card-min-h`
+  (128px), `--kpi-stack-gap` (16px). The card uses `min-h-[var(--kpi-card-min-h,128px)]`
+  + `p-[…]` + `gap-[…]` (fallbacks per §32) so it keeps a stable footprint in a `KpiGrid`.
+- **Bottom (breakdown) text limited:** `subtitle` is clamped to a **single line**
+  (`truncate`, full text in `title`); the title is also single-line. This is what fixed
+  the height variance — an unbounded breakdown line wrapped and grew the card.
+- **Standard info icon:** replaced the freeform `icon` prop with **`info?: boolean |
+  string`**, which renders the fixed Phosphor `Info` glyph (string = tooltip). The icon
+  can no longer be removed-by-omission-of-content or swapped for another glyph. (Safe —
+  `KpiBreakdownCard` is unreleased, so no break.)
+- Standards added to CLAUDE.md.
+- Files: `src/components/KPI.tsx`, `src/tokens.css`; docs: `demos/kpi-demo.tsx`,
+  `component-registry.ts`.
 
 ### 32. SideNav / Tooltip — token fallbacks so they survive without our tokens.css
 **Suggestion:** "the side navigation on hover is not reflecting when I'm using the

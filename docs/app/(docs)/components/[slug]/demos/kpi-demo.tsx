@@ -1,11 +1,11 @@
 'use client'
 
 import { Info } from '@phosphor-icons/react'
-import { KpiProgressCard, KpiStatCard, Tooltip } from '@navanta-ai/design-system'
+import { KpiBreakdownCard, KpiProgressCard, KpiStatCard, Tooltip } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
-type Variant = 'stat' | 'progress'
+type Variant = 'stat' | 'progress' | 'breakdown'
 type Trend = 'up' | 'down' | 'neutral'
 type ProgressColor =
   | 'brand'
@@ -89,6 +89,21 @@ export default function Example() {
 }`
         }
 
+        if (variant === 'breakdown') {
+          // KpiBreakdownCard renders the standard info icon itself — just pass `info`.
+          return `import { KpiBreakdownCard } from '@navanta-ai/design-system'
+
+export default function Example() {
+  return (
+    <KpiBreakdownCard
+      title="${safeLabel}"
+      value="${safeNumber}"
+      subtitle="32 DOS · 12 SS · 3 service level"${showInfo ? '\n      info="More info"' : ''}
+    />
+  )
+}`
+        }
+
         return `${statComponentImport}${infoImport}
 
 ${infoConst}
@@ -138,7 +153,15 @@ export default function Example() {
         return (
           <div className="w-full max-w-[680px]">
             <div style={{ width: `${cardWidth}px`, maxWidth: '100%' }}>
-              {variant === 'progress' ? (
+              {variant === 'breakdown' ? (
+                <KpiBreakdownCard
+                  className="max-w-none"
+                  title={label}
+                  value={number}
+                  subtitle="32 DOS · 12 SS · 3 service level"
+                  info={showInfo ? 'More info' : undefined}
+                />
+              ) : variant === 'progress' ? (
                 <KpiProgressCard
                   className="max-w-none"
                   title={label}

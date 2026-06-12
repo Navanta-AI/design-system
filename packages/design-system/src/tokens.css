@@ -137,6 +137,12 @@
      (table title+subtitle cells, page heading, panel headers, …). */
   --text-stack-gap: 4px;
 
+  /* KPI card layout — defined padding / min-height / inter-row gap so cards keep a
+     consistent footprint in a KpiGrid. */
+  --kpi-card-pad: 16px;
+  --kpi-card-min-h: 128px;
+  --kpi-stack-gap: 16px;
+
   /* Side navigation (from the HMTX portal Sidebar) */
   --sidebar-active-bg: var(--muted); /* #f4f4f5 — active item fill */
   --sidebar-hover-bg: #f5f5f5; /* item hover fill */

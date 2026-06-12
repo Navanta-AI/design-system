@@ -1,8 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { Minus, TrendDown, TrendUp } from '@phosphor-icons/react'
+import { Info, Minus, TrendDown, TrendUp } from '@phosphor-icons/react'
 import { cn } from '../utils/cn'
+import { Tooltip } from './Tooltip'
 
 export type KpiTrendDirection = 'up' | 'down' | 'neutral'
 export type KpiCardLayout = 'auto' | 'default' | 'compact'
@@ -429,10 +430,95 @@ const KpiComparisonCard = React.forwardRef<HTMLDivElement, KpiComparisonCardProp
 )
 KpiComparisonCard.displayName = 'KpiComparisonCard'
 
+/**
+ * KpiInfoIcon — the standard KPI info affordance. Always the Phosphor `Info` glyph at
+ * 14px (it is intentionally NOT a freeform icon slot — the info icon must stay standard
+ * and is not swappable). Pass a string to wrap it in a tooltip.
+ */
+function KpiInfoIcon({ tooltip }: { tooltip?: string }) {
+  const glyph = (
+    <span className="inline-flex h-[14px] shrink-0 items-center text-muted-foreground [&_svg]:block [&_svg]:size-[14px]">
+      <Info size={14} weight="regular" aria-hidden={tooltip ? undefined : true} aria-label={tooltip} />
+    </span>
+  )
+  return tooltip ? <Tooltip content={tooltip}>{glyph}</Tooltip> : glyph
+}
+
+export interface KpiBreakdownCardProps extends Omit<KpiCardBaseProps, 'icon'> {
+  /**
+   * Breakdown/detail line under the value (e.g. "32 DOS · 12 SS · 3 service level").
+   * Clamped to a single line — keep it short; overflow is truncated with an ellipsis.
+   */
+  subtitle?: string
+  /**
+   * Show the standard info icon beside the title. Pass a string to attach a tooltip.
+   * The icon is always the standard `Info` glyph and cannot be replaced.
+   */
+  info?: boolean | string
+}
+
+/**
+ * KpiBreakdownCard — the simplest KPI: a vertical stack of title (+ optional standard
+ * info icon), the big value, and a single-line breakdown/detail line in primary text
+ * (e.g. "32 DOS · 12 SS · 3 service level"). No trend badge or progress bar.
+ * (Figma: Iris-Shareable, node 321-4023.) The breakdown line is `subtitle`.
+ *
+ * Spacing/height are token-defined (`--kpi-card-pad`, `--kpi-card-min-h`,
+ * `--kpi-stack-gap`) so the card keeps a consistent footprint in a `KpiGrid`; the
+ * single-line title + breakdown keep the height stable regardless of content length.
+ */
+const KpiBreakdownCard = React.forwardRef<HTMLDivElement, KpiBreakdownCardProps>(
+  ({ className, title, value, subtitle, info, ...props }, ref) => {
+    const currencyMatch = value.match(/^([$€£₹])(.+)$/)
+    const currencySymbol = currencyMatch?.[1]
+    const currencyValue = currencyMatch?.[2]
+    const valueNode = currencySymbol && currencyValue ? (
+      <div className="inline-flex items-start">
+        <span className="pt-[2px] text-[14px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
+          {currencySymbol}
+        </span>
+        <span className="text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+          {currencyValue}
+        </span>
+      </div>
+    ) : (
+      <p className="text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        {value}
+      </p>
+    )
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'mx-auto flex min-h-[var(--kpi-card-min-h,128px)] w-full max-w-[320px] flex-col items-start gap-[var(--kpi-stack-gap,16px)] rounded-[8px] bg-card p-[var(--kpi-card-pad,16px)] text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
+          className
+        )}
+        {...props}
+      >
+        <div className="flex w-full items-center gap-1">
+          <p className="min-w-0 truncate text-[14px] font-semibold leading-[22px] text-foreground">{title}</p>
+          {info != null && info !== false && (
+            <KpiInfoIcon tooltip={typeof info === 'string' ? info : undefined} />
+          )}
+        </div>
+        {valueNode}
+        {subtitle && (
+          <p className="w-full truncate text-[12px] leading-[18px] text-foreground" title={subtitle}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+    )
+  }
+)
+KpiBreakdownCard.displayName = 'KpiBreakdownCard'
+
 export {
   KpiGrid,
   KpiTrendBadge,
   KpiStatCard,
   KpiProgressCard,
   KpiComparisonCard,
+  KpiBreakdownCard,
 }
