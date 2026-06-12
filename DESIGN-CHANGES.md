@@ -311,13 +311,32 @@ the chips component should be created separately."
 - Files: `src/components/Chip.tsx` (new), `src/index.ts`, `src/components/ui/TableShell.tsx`;
   docs: `demos/chip-demo.tsx`, `component-registry.ts`, `[slug]/page.tsx`, `sidebar.tsx`.
 
-## 2026-06-12 — released as v0.4.0
+## 2026-06-12 — released as v0.4.0 / v0.4.1
 
 Entries 19–31 below shipped in **v0.4.0** (published to GitHub Packages, tagged
 `v0.4.0`): Chip white/Figma count container, Checkbox `--border-control`, Table
 selected-row + default alignment rules, large AI star + PageHeading Figma spec,
 `--text-stack-gap`, Card/Select border fix, **SideNav** (new), Tooltip
-`variant="inverse"`.
+`variant="inverse"`. Entry 32 shipped in **v0.4.1**.
+
+### 32. SideNav / Tooltip — token fallbacks so they survive without our tokens.css
+**Suggestion:** "the side navigation on hover is not reflecting when I'm using the
+component in the other project as a package — the tooltip reveal for the collapsed nav
+isn't the same as in this project."
+
+- Cause: the compiled `styles.css` ships our `tokens.css`, but a consumer whose own
+  Tailwind scans our `dist/` (and never imports our tokens) leaves every bare
+  `var(--token)` undefined. SideNav's rail tooltip then rendered as a transparent,
+  shadowless box — the `group-hover` reveal still fired (that utility *is* generated),
+  so it "revealed" but unstyled. Worked in the docs because the docs import our tokens.
+- Fix: hex fallbacks on **every** token ref in `SideNav` + the `Tooltip` inverse variant
+  — `var(--surface-inverse,#18181b)`, `var(--shadow-dropdown, …)`, `--sidebar-*`,
+  `--surface-base`, `--text-*`, `--border-*`, `--primary`, `--foreground`. Arbitrary-value
+  classes use no-space fallbacks; shadow fallbacks live in inline `style`. The fallback
+  rides along in the `dist` class names, so it works on both consumption paths.
+- Standard added to CLAUDE.md. (Other components still use bare tokens — fine when the
+  consumer imports our tokens.css; convert opportunistically if the same report recurs.)
+- Files: `src/components/ui/SideNav.tsx`, `src/components/Tooltip.tsx`.
 
 ### 19. Chip — unselected state gets a white background
 **Suggestion:** "the non selected chip should have white background."

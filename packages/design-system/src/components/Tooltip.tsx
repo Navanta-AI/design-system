@@ -148,12 +148,12 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(({
           >
             <path
               d="M12.0179 0V25.8169L8.88842 21.0921C6.75085 17.8649 3.81579 15.2446 0.367753 13.4853C-0.113524 13.2397 -0.124773 12.5561 0.348165 12.2948L0.496595 12.2128C4.13714 10.2017 7.22982 7.32962 9.50446 3.84762L12.0179 0Z"
-              fill="var(--surface-inverse)"
+              fill="var(--surface-inverse, #18181b)"
             />
           </svg>
           <span
-            className="block w-max max-w-[min(240px,calc(100vw-1rem))] whitespace-normal break-words rounded-lg bg-[var(--surface-inverse)] pb-[7px] pl-4 pr-[18px] pt-2 text-sm font-medium text-white"
-            style={{ boxShadow: 'var(--shadow-dropdown)' }}
+            className="block w-max max-w-[min(240px,calc(100vw-1rem))] whitespace-normal break-words rounded-lg bg-[var(--surface-inverse,#18181b)] pb-[7px] pl-4 pr-[18px] pt-2 text-sm font-medium text-white"
+            style={{ boxShadow: 'var(--shadow-dropdown, 0px 4px 15px 0px rgba(0,0,0,0.25))' }}
           >
             {content}
           </span>

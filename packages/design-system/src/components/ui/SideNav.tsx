@@ -127,12 +127,12 @@ function RailTooltip({ label }: { label: string }) {
       >
         <path
           d="M12.0179 0V25.8169L8.88842 21.0921C6.75085 17.8649 3.81579 15.2446 0.367753 13.4853C-0.113524 13.2397 -0.124773 12.5561 0.348165 12.2948L0.496595 12.2128C4.13714 10.2017 7.22982 7.32962 9.50446 3.84762L12.0179 0Z"
-          fill="var(--surface-inverse)"
+          fill="var(--surface-inverse,#18181b)"
         />
       </svg>
       <span
-        className="block whitespace-nowrap rounded-lg bg-[var(--surface-inverse)] pb-[7px] pl-4 pr-[18px] pt-2 text-sm font-medium text-white"
-        style={{ boxShadow: "var(--shadow-dropdown)" }}
+        className="block whitespace-nowrap rounded-lg bg-[var(--surface-inverse,#18181b)] pb-[7px] pl-4 pr-[18px] pt-2 text-sm font-medium text-white"
+        style={{ boxShadow: "var(--shadow-dropdown, 0px 4px 15px 0px rgba(0,0,0,0.25))" }}
       >
         {label}
       </span>
@@ -154,7 +154,7 @@ function UserAvatar({ user, radius }: { user: SideNavUser; radius: number }) {
   return (
     <span
       className="flex size-8 shrink-0 items-center justify-center text-[13px] font-semibold text-white select-none"
-      style={{ borderRadius: radius, backgroundColor: user.color ?? "var(--primary)" }}
+      style={{ borderRadius: radius, backgroundColor: user.color ?? "var(--primary,#232122)" }}
     >
       {user.initials}
     </span>
@@ -199,8 +199,8 @@ export function SideNav({
       <svg width="0" height="0" className="absolute" aria-hidden="true">
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="var(--foreground)" />
-            <stop offset="100%" stopColor="var(--text-secondary)" />
+            <stop offset="0%" stopColor="var(--foreground,#09090b)" />
+            <stop offset="100%" stopColor="var(--text-secondary,#4b5563)" />
           </linearGradient>
         </defs>
       </svg>
@@ -208,7 +208,7 @@ export function SideNav({
       {/* Collapsed rail — always visible (md+) */}
       <aside
         className={cn(
-          "relative z-30 hidden h-full w-12 shrink-0 flex-col items-center border-r border-[var(--border-default)] bg-[var(--surface-base)] px-1.5 py-2 md:flex",
+          "relative z-30 hidden h-full w-12 shrink-0 flex-col items-center border-r border-[var(--border-default,#e4e4e7)] bg-[var(--surface-base,#ffffff)] px-1.5 py-2 md:flex",
           className,
         )}
       >
@@ -217,7 +217,7 @@ export function SideNav({
         <nav className="flex w-full flex-1 flex-col gap-2 py-3">
           {sections.map((section, si) => (
             <div key={section.label ?? si}>
-              {si > 0 && <div className="my-1 h-px bg-[var(--border-default)]" />}
+              {si > 0 && <div className="my-1 h-px bg-[var(--border-default,#e4e4e7)]" />}
               <div className="flex flex-col items-center gap-2">
                 {section.items.map((item) => {
                   const active = item.key === activeKey;
@@ -231,8 +231,8 @@ export function SideNav({
                         className={cn(
                           "flex size-9 items-center justify-center rounded-lg transition-all",
                           active
-                            ? "bg-[var(--sidebar-active-bg)]"
-                            : "hover:bg-[var(--sidebar-hover-bg)]",
+                            ? "bg-[var(--sidebar-active-bg,#f4f4f5)]"
+                            : "hover:bg-[var(--sidebar-hover-bg,#f5f5f5)]",
                         )}
                       >
                         <Icon
@@ -242,7 +242,7 @@ export function SideNav({
                           className={
                             active
                               ? undefined
-                              : "text-[var(--text-secondary)] transition-colors group-hover:text-[var(--text-primary)]"
+                              : "text-[var(--text-secondary,#4b5563)] transition-colors group-hover:text-[var(--text-primary,#09090b)]"
                           }
                         />
                       </ItemAction>
@@ -262,12 +262,12 @@ export function SideNav({
                 type="button"
                 onClick={onSettingsClick}
                 aria-label={settingsLabel}
-                className="flex size-9 items-center justify-center rounded-lg transition-all hover:bg-[var(--sidebar-hover-bg)]"
+                className="flex size-9 items-center justify-center rounded-lg transition-all hover:bg-[var(--sidebar-hover-bg,#f5f5f5)]"
               >
                 <GearSix
                   size={20}
                   weight="bold"
-                  className="text-[var(--text-secondary)] transition-colors group-hover:text-[var(--text-primary)]"
+                  className="text-[var(--text-secondary,#4b5563)] transition-colors group-hover:text-[var(--text-primary,#09090b)]"
                 />
               </button>
               {!expanded && <RailTooltip label={settingsLabel} />}
@@ -275,12 +275,12 @@ export function SideNav({
           )}
           {user && (
             <>
-              <div className="mb-2 h-px w-full bg-[var(--border-default)]" />
+              <div className="mb-2 h-px w-full bg-[var(--border-default,#e4e4e7)]" />
               <button
                 type="button"
                 onClick={() => onUserClick?.("rail")}
                 aria-label={user.name}
-                className="rounded-[16px] transition-all hover:ring-2 hover:ring-[var(--border-default)]"
+                className="rounded-[16px] transition-all hover:ring-2 hover:ring-[var(--border-default,#e4e4e7)]"
               >
                 <UserAvatar user={user} radius={16} />
               </button>
@@ -300,10 +300,10 @@ export function SideNav({
       <div
         className={cn(
           overlayPosition,
-          "left-0 top-0 z-50 flex h-full w-64 flex-col gap-3 border-r border-[var(--border-default)] bg-[var(--surface-base)] py-2 transition-transform duration-250 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform",
+          "left-0 top-0 z-50 flex h-full w-64 flex-col gap-3 border-r border-[var(--border-default,#e4e4e7)] bg-[var(--surface-base,#ffffff)] py-2 transition-transform duration-250 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform",
         )}
         style={{
-          boxShadow: "var(--shadow-panel)",
+          boxShadow: "var(--shadow-panel, 2px 0px 4px 0px rgba(0,0,0,0.12))",
           transform: expanded ? "translateX(0)" : "translateX(-320px)",
         }}
       >
@@ -314,19 +314,19 @@ export function SideNav({
           type="button"
           onClick={() => setExpanded(false)}
           aria-label="Collapse navigation"
-          className="absolute -right-5 top-3.5 z-50 flex size-[39px] items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-base)] transition-colors hover:bg-[var(--sidebar-hover-bg)]"
-          style={{ boxShadow: "var(--shadow-panel-light)" }}
+          className="absolute -right-5 top-3.5 z-50 flex size-[39px] items-center justify-center rounded-full border border-[var(--border-strong,#71717b)] bg-[var(--surface-base,#ffffff)] transition-colors hover:bg-[var(--sidebar-hover-bg,#f5f5f5)]"
+          style={{ boxShadow: "var(--shadow-panel-light, 4px 0px 4px 0px rgba(0,0,0,0.08))" }}
         >
-          <ArrowLeft size={18} weight="bold" className="text-[var(--text-primary)]" />
+          <ArrowLeft size={18} weight="bold" className="text-[var(--text-primary,#09090b)]" />
         </button>
 
         <nav className="flex w-full flex-1 flex-col gap-5 overflow-y-auto px-2 pt-3">
           {sections.map((section, si) => (
             <div key={section.label ?? si} className="flex w-full flex-col gap-3">
-              {si > 0 && <div className="-mt-2.5 h-px w-full bg-[var(--border-default)]" />}
+              {si > 0 && <div className="-mt-2.5 h-px w-full bg-[var(--border-default,#e4e4e7)]" />}
               {section.label && (
                 <div className="w-full px-3">
-                  <span className="text-[10px] font-semibold uppercase leading-[1.5] tracking-[-0.1px] text-[var(--text-secondary)]">
+                  <span className="text-[10px] font-semibold uppercase leading-[1.5] tracking-[-0.1px] text-[var(--text-secondary,#4b5563)]">
                     {section.label}
                   </span>
                 </div>
@@ -343,22 +343,22 @@ export function SideNav({
                       className={cn(
                         "flex h-9 w-full items-center gap-3 rounded-lg px-3 py-2 transition-all",
                         active
-                          ? "bg-[var(--sidebar-active-bg)]"
-                          : "hover:bg-[var(--sidebar-hover-bg)]",
+                          ? "bg-[var(--sidebar-active-bg,#f4f4f5)]"
+                          : "hover:bg-[var(--sidebar-hover-bg,#f5f5f5)]",
                       )}
                     >
                       <Icon
                         size={16}
                         weight={active ? "fill" : "bold"}
                         color={active ? `url(#${gradientId})` : undefined}
-                        className={active ? undefined : "text-[var(--text-secondary)]"}
+                        className={active ? undefined : "text-[var(--text-secondary,#4b5563)]"}
                       />
                       <span
                         className={cn(
                           "truncate text-[14px] leading-[1.4]",
                           active
-                            ? "font-medium text-[var(--text-primary)]"
-                            : "font-normal text-[var(--text-secondary)]",
+                            ? "font-medium text-[var(--text-primary,#09090b)]"
+                            : "font-normal text-[var(--text-secondary,#4b5563)]",
                         )}
                       >
                         {item.label}
@@ -376,22 +376,22 @@ export function SideNav({
             <button
               type="button"
               onClick={() => onUserClick?.("panel")}
-              className="flex flex-1 items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-[var(--sidebar-hover-bg)]"
+              className="flex flex-1 items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-[var(--sidebar-hover-bg,#f5f5f5)]"
             >
               <UserAvatar user={user} radius={9} />
               <span className="flex min-w-0 flex-1 items-center justify-between">
                 <span className="flex min-w-0 flex-col">
-                  <span className="truncate text-left text-[14px] font-medium leading-[1.42] tracking-[0.14px] text-[var(--text-primary)]">
+                  <span className="truncate text-left text-[14px] font-medium leading-[1.42] tracking-[0.14px] text-[var(--text-primary,#09090b)]">
                     {user.name}
                   </span>
                   {user.description && (
-                    <span className="truncate text-left text-[12px] font-light leading-[1.22] tracking-[0.12px] text-[var(--text-primary)]">
+                    <span className="truncate text-left text-[12px] font-light leading-[1.22] tracking-[0.12px] text-[var(--text-primary,#09090b)]">
                       {user.description}
                     </span>
                   )}
                 </span>
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-base)]">
-                  <DotsThreeVertical size={16} weight="bold" className="text-[var(--text-primary)]" />
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong,#71717b)] bg-[var(--surface-base,#ffffff)]">
+                  <DotsThreeVertical size={16} weight="bold" className="text-[var(--text-primary,#09090b)]" />
                 </span>
               </span>
             </button>
