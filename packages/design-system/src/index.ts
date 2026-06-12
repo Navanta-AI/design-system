@@ -8,6 +8,7 @@ export type { ClassValue } from 'clsx'
 // Components
 export { Button, buttonVariants, type ButtonProps } from './components/Button'
 export { Pill, pillVariants, type PillProps } from './components/Pill'
+export { Chip, type ChipProps } from './components/Chip'
 export { Input, type InputProps } from './components/Input'
 export {
   Card,

@@ -126,6 +126,24 @@
   --border-default: var(--border);
   --border-light: #f1f3f5;
   --border-strong: #71717b;
+  /* Selection-control (checkbox/radio) resting border — Figma Color/Neutral/400 */
+  --border-control: #9f9fa9;
+
+  /* AI star (large) gradient — Figma HMTX-Portal "AI-star-large.svg" (node 1726-5082) */
+  --ai-star-from: #8a49be;
+  --ai-star-to: #396eb6;
+
+  /* Vertical gap between body text and its label/subtext in stacked text columns
+     (table title+subtitle cells, page heading, panel headers, …). */
+  --text-stack-gap: 4px;
+
+  /* Side navigation (from the HMTX portal Sidebar) */
+  --sidebar-active-bg: var(--muted); /* #f4f4f5 — active item fill */
+  --sidebar-hover-bg: #f5f5f5; /* item hover fill */
+  --shadow-panel: 2px 0px 4px 0px rgba(0, 0, 0, 0.12); /* expanded panel */
+  --shadow-panel-light: 4px 0px 4px 0px rgba(0, 0, 0, 0.08); /* collapse button */
+  --surface-inverse: #18181b; /* rail tooltip fill */
+  --shadow-dropdown: 0px 4px 15px 0px rgba(0, 0, 0, 0.25);
 
   /* Strong info surfaces — table ID badge fill and avatar/initials background */
   --info-strong: #004b71;
@@ -144,6 +162,9 @@
   /* neutral = Figma Color/Neutral/100 bg + Color/Neutral/900 text (node 546-3127) */
   --pill-neutral-bg: #f4f4f5;
   --pill-neutral-fg: #18181b;
+
+  /* TableShell search field — fixed width (Figma: Iris-Shareable toolbar). */
+  --table-search-width: 320px;
 
   --shadow-menu: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);

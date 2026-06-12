@@ -127,12 +127,14 @@ const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
     return (
       <tr
         ref={ref}
+        // Selection is shown by the row checkbox only — no row tint. data-selected is
+        // exposed so consumers can opt into their own styling.
+        data-selected={selected || undefined}
         style={{ borderBottom: '1px solid var(--border-light)' }}
         className={cn(
           "bg-white transition-[opacity,background-color]",
           hoverable && "[tbody_&]:hover:bg-[#fafafa]",
           striped && "even:bg-muted/30",
-          selected && "bg-primary/20",
           "max-md:block max-md:bg-card max-md:border max-md:border-border max-md:rounded-lg max-md:p-3 max-md:mb-4 max-md:shadow-sm",
           className
         )}
@@ -165,6 +167,9 @@ const TableHeadCell = forwardRef<HTMLTableCellElement, TableHeadCellProps>(
           compact ? "p-2" : "px-4 py-3",
           align === 'center' && "text-center",
           align === 'right' && "text-right",
+          // Default alignment: every column left (numbers included), last column right.
+          // Only applies when `align` is unset, so an explicit align always wins.
+          align == null && "last:text-right",
           sortable && "cursor-pointer select-none transition-colors hover:text-primary",
           className
         )}
@@ -172,7 +177,16 @@ const TableHeadCell = forwardRef<HTMLTableCellElement, TableHeadCellProps>(
         aria-sort={sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : undefined}
         {...props}
       >
-        <span className={cn("flex items-center gap-2", align === 'right' && "justify-end", align === 'center' && "justify-center")}>
+        <span
+          className={cn(
+            "flex items-center gap-2",
+            align === 'right' && "justify-end",
+            align === 'center' && "justify-center",
+            // The label is a flex row, so the th's last:text-right can't move it — mirror
+            // the last-column default here.
+            align == null && "[th:last-child>&]:justify-end",
+          )}
+        >
           {ai && <AiStar size={14} className="shrink-0" title="AI-generated column" />}
           {children}
           {sortable && (
@@ -294,7 +308,7 @@ function renderVariant(props: TableCellProps): React.ReactNode {
       // Optional product/description subtitle below the ID (e.g. SKU + product name).
       if (props.subtitle != null) {
         return (
-          <span className="flex flex-col">
+          <span className="flex flex-col gap-[var(--text-stack-gap)]">
             {idRow}
             <span className="text-[12px] leading-[18px] text-[var(--text-secondary)] whitespace-nowrap">
               {props.subtitle}
@@ -320,7 +334,7 @@ function renderVariant(props: TableCellProps): React.ReactNode {
               )}
             </span>
           )}
-          <span className="flex flex-col">
+          <span className="flex flex-col gap-[var(--text-stack-gap)]">
             <span className="text-[14px] font-medium leading-[22px] text-[var(--text-primary)] whitespace-nowrap">{props.title}</span>
             {props.subtitle != null && (
               <span className="text-[12px] leading-[18px] text-[var(--text-secondary)] whitespace-nowrap">{props.subtitle}</span>
@@ -348,7 +362,7 @@ function renderVariant(props: TableCellProps): React.ReactNode {
       const sub =
         props.subtext ?? (props.relative !== false && props.date != null ? formatRelativeTime(props.date, props.now) : null);
       return (
-        <span className="flex flex-col">
+        <span className="flex flex-col gap-[var(--text-stack-gap)]">
           <span className="text-[14px] leading-[22px] text-[var(--text-primary)] whitespace-nowrap">
             {props.date != null ? formatTableDate(props.date) : null}
           </span>
@@ -412,6 +426,9 @@ const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>((props, ref) 
         compact && "p-2",
         align === 'center' && "text-center",
         align === 'right' && "text-right",
+        // Default alignment: left for every column (numbers included), right for the
+        // last column only. An explicit `align` wins.
+        align == null && "last:text-right",
         mono && !variant && "font-mono text-xs tracking-tight",
         "max-md:flex max-md:justify-between max-md:items-start max-md:py-3 max-md:px-0 max-md:border-b max-md:border-border max-md:text-right max-md:last:border-b-0",
         className

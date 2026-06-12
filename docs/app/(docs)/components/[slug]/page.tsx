@@ -17,6 +17,7 @@ type DemoComponent = React.ComponentType<{ meta: ComponentMeta }>
 const demoMap: Record<string, DemoComponent> = {
   button: dynamic(() => import('./demos/button-demo').then((m) => m.ButtonDemo)),
   pill: dynamic(() => import('./demos/pill-demo').then((m) => m.PillDemo)),
+  chip: dynamic(() => import('./demos/chip-demo').then((m) => m.ChipDemo)),
   input: dynamic(() => import('./demos/input-demo').then((m) => m.InputDemo)),
   card: dynamic(() => import('./demos/card-demo').then((m) => m.CardDemo)),
   textarea: dynamic(() => import('./demos/textarea-demo').then((m) => m.TextareaDemo)),
@@ -43,6 +44,7 @@ const demoMap: Record<string, DemoComponent> = {
   'line-chart': dynamic(() => import('./demos/line-chart-demo').then((m) => m.LineChartDemo)),
   'stacked-bar-chart': dynamic(() => import('./demos/stacked-bar-chart-demo').then((m) => m.StackedBarChartDemo)),
   'page-heading': dynamic(() => import('./demos/page-heading-demo').then((m) => m.PageHeadingDemo)),
+  'side-nav': dynamic(() => import('./demos/side-nav-demo').then((m) => m.SideNavDemo)),
   'table-shell': dynamic(() => import('./demos/table-shell-demo').then((m) => m.TableShellDemo)),
   'detail-panel': dynamic(() => import('./demos/detail-panel-demo').then((m) => m.DetailPanelDemo)),
   'christy-suggestions': dynamic(() => import('./demos/christy-suggestions-demo').then((m) => m.ChristySuggestionsDemo)),

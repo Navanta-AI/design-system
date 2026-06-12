@@ -112,7 +112,8 @@ const { sorted, getHeadProps } = useTableSort(orders, (o, key) => {
       <Table.HeadCell {...getHeadProps('warehouse', false)}>Warehouse</Table.HeadCell>
       {/* ai prop: neutral heading + the Christy AI star */}
       <Table.HeadCell ai>Christy Insight</Table.HeadCell>
-      <Table.HeadCell align="right">Qty</Table.HeadCell>
+      {/* last column right-aligns by default; other columns stay left (numbers too) */}
+      <Table.HeadCell>Qty</Table.HeadCell>
     </Table.Row>
   </Table.Header>
   <Table.Body>
@@ -126,7 +127,7 @@ const { sorted, getHeadProps } = useTableSort(orders, (o, key) => {
         <Table.Cell>
           <span className="font-medium text-[var(--text-accent)]">{o.insight}</span>
         </Table.Cell>
-        <Table.Cell align="right" variant="input" value={qty[o.po]} onValueChange={setQty} inputType="number" />
+        <Table.Cell variant="input" value={qty[o.po]} onValueChange={setQty} inputType="number" />
       </Table.Row>
     ))}
   </Table.Body>
@@ -226,7 +227,8 @@ export function TableDemo({ meta: _ }: { meta: ComponentMeta }) {
                   </Table.HeadCell>
                 ))}
                 <Table.HeadCell ai>Christy Insight</Table.HeadCell>
-                <Table.HeadCell align="right">Qty</Table.HeadCell>
+                {/* Last column right-aligns by default — no align prop needed */}
+                <Table.HeadCell>Qty</Table.HeadCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -252,7 +254,6 @@ export function TableDemo({ meta: _ }: { meta: ComponentMeta }) {
                       <span className="font-medium text-[var(--text-accent)]">{o.insight}</span>
                     </Table.Cell>
                     <Table.Cell
-                      align="right"
                       variant="input"
                       value={qty[o.po]}
                       onValueChange={(v) => setQty((prev) => ({ ...prev, [o.po]: v }))}

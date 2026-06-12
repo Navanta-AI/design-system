@@ -61,7 +61,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             aria-checked={indeterminate ? 'mixed' : undefined}
             aria-describedby={displayHelper ? helperId : undefined}
             className={cn(
-              'peer relative z-10 size-4 shrink-0 rounded border border-input bg-transparent ring-offset-background appearance-none transition-colors cursor-pointer',
+              // Unchecked border uses --border-control (neutral-400, not --input) so it stays visible on white.
+              'peer relative z-10 size-4 shrink-0 rounded border border-[var(--border-control)] bg-transparent ring-offset-background appearance-none transition-colors cursor-pointer',
               // Selected (checked) and partial (indeterminate) states get the dark primary border.
               'checked:border-primary indeterminate:border-primary',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background',

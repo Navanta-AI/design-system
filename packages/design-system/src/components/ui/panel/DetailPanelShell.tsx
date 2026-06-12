@@ -74,7 +74,7 @@ export function DetailPanelShell({
       >
         {/* Header */}
         <div className="flex items-start justify-between shrink-0 px-4 py-3">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-[var(--text-stack-gap)]">
             <span className="text-[16px] font-semibold text-[var(--text-primary)] leading-[1.5]">{title}</span>
             {subtitle && <span className="text-[14px] text-[var(--text-secondary)]">{subtitle}</span>}
           </div>

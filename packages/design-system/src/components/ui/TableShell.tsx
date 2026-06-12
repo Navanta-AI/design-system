@@ -16,6 +16,7 @@ import { Button } from "../Button";
 import { Switch } from "../Switch";
 import { Tabs, type TabItem } from "../Tabs";
 import { type PillProps } from "../Pill";
+import { Chip } from "../Chip";
 import { Popover } from "./Popover";
 import {
   type FilterFacet,
@@ -74,29 +75,6 @@ export interface TableColumn {
   hidden?: boolean;
 }
 
-/* Active-chip fill per Pill semantic — reuses the pill tonal tokens. */
-const CHIP_ACTIVE_CLASS: Record<NonNullable<PillProps["variant"]>, string> = {
-  info: "border-transparent bg-[var(--pill-info-bg)] text-[var(--pill-info-fg)]",
-  danger: "border-transparent bg-[var(--pill-danger-bg)] text-[var(--pill-danger-fg)]",
-  warning: "border-transparent bg-[var(--pill-warning-bg)] text-[var(--pill-warning-fg)]",
-  neutral: "border-transparent bg-[var(--pill-neutral-bg)] text-[var(--pill-neutral-fg)]",
-};
-
-/* Icon tint per semantic — applied to the chip's leading glyph in BOTH states so
-   chips stay distinguishable even when inactive. */
-const CHIP_ICON_COLOR: Record<NonNullable<PillProps["variant"]>, string> = {
-  info: "text-[var(--pill-info-fg)]",
-  danger: "text-[var(--pill-danger-fg)]",
-  warning: "text-[var(--pill-warning-fg)]",
-  neutral: "text-[var(--pill-neutral-fg)]",
-};
-
-const CHIP_BASE =
-  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--kds-color-focus-ring)] focus-visible:ring-offset-1";
-
-const CHIP_INACTIVE =
-  "border-[var(--border-light)] bg-[var(--surface-base)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]";
-
 /* ── Unified filter band helpers (facets API) ─────────────────────────────── */
 
 /** Sentinel for a select facet's "cleared" entry — a non-empty value so the DS
@@ -109,17 +87,16 @@ function FacetSearch({
   value,
   onChange,
   placeholder,
-  widthClass = "flex-1 sm:max-w-[480px]",
 }: {
   value?: string;
   onChange: (v: string) => void;
   placeholder: string;
-  widthClass?: string;
 }) {
   // Figma search spec (Iris-Shareable 449-4173): rounded-8 box, regular-weight
-  // trailing magnifier, light neutral-400 placeholder.
+  // trailing magnifier, light neutral-400 placeholder. Fixed width via the
+  // --table-search-width DS token (capped to the container on narrow screens).
   return (
-    <div className={`min-w-[200px] ${widthClass}`}>
+    <div className="w-[var(--table-search-width)] max-w-full shrink-0">
       <Input
         size="md"
         type="search"
@@ -135,41 +112,7 @@ function FacetSearch({
   );
 }
 
-/** A pill-style toggle chip (used for `toggle` facets and `toggle-group` options). */
-function ChipButton({
-  active,
-  variant,
-  icon,
-  label,
-  count,
-  onToggle,
-}: {
-  active: boolean;
-  variant?: PillProps["variant"];
-  icon?: ReactNode;
-  label: ReactNode;
-  count?: number;
-  onToggle: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onToggle}
-      className={`${CHIP_BASE} ${active ? CHIP_ACTIVE_CLASS[variant ?? "neutral"] : CHIP_INACTIVE}`}
-    >
-      {icon != null && (
-        <span className={`inline-flex shrink-0 [&>svg]:size-3.5 ${CHIP_ICON_COLOR[variant ?? "neutral"]}`}>
-          {icon}
-        </span>
-      )}
-      <span>{label}</span>
-      {count != null && <span className={active ? "opacity-70" : "opacity-60"}>{count}</span>}
-    </button>
-  );
-}
-
-/** Multi-select chip group — reuses the existing aria-pressed chips. */
+/** Multi-select chip group — one DS `Chip` per option. */
 function ToggleGroupChips({ facet }: { facet: ToggleGroupFacet }) {
   const toggle = (val: string) => {
     const on = facet.value.includes(val);
@@ -178,15 +121,16 @@ function ToggleGroupChips({ facet }: { facet: ToggleGroupFacet }) {
   return (
     <>
       {facet.options.map((opt) => (
-        <ChipButton
+        <Chip
           key={opt.value}
-          active={facet.value.includes(opt.value)}
+          selected={facet.value.includes(opt.value)}
           variant={opt.variant}
           icon={opt.icon}
-          label={opt.label}
           count={opt.count}
-          onToggle={() => toggle(opt.value)}
-        />
+          onClick={() => toggle(opt.value)}
+        >
+          {opt.label}
+        </Chip>
       ))}
     </>
   );
@@ -235,14 +179,15 @@ function InlineFacet({ facet }: { facet: FilterFacet }) {
       );
     case "toggle":
       return (
-        <ChipButton
-          active={facet.active}
+        <Chip
+          selected={facet.active}
           variant={facet.variant}
           icon={facet.icon}
-          label={facet.label}
           count={facet.count}
-          onToggle={facet.onToggle}
-        />
+          onClick={facet.onToggle}
+        >
+          {facet.label}
+        </Chip>
       );
   }
 }
@@ -275,14 +220,15 @@ function MoreFiltersContent({ facets }: { facets: FilterFacet[] }) {
                 </div>
               )}
               {f.kind === "toggle" && (
-                <ChipButton
-                  active={f.active}
+                <Chip
+                  selected={f.active}
                   variant={f.variant}
                   icon={f.icon}
-                  label={f.label}
                   count={f.count}
-                  onToggle={f.onToggle}
-                />
+                  onClick={f.onToggle}
+                >
+                  {f.label}
+                </Chip>
               )}
             </div>
           ))}
@@ -578,7 +524,6 @@ export function TableShell({
               value={searchValue}
               onChange={onSearchChange}
               placeholder={searchPlaceholder}
-              widthClass="w-full sm:w-[320px]"
             />
           )}
           {/* Filters live to the right of the search (Figma layout). */}
@@ -632,15 +577,16 @@ export function TableShell({
                 <span className="mr-1 text-[13px] font-medium text-[var(--text-secondary)]">{filterChipsLabel}</span>
               )}
               {filterChips.map((chip) => (
-                <ChipButton
+                <Chip
                   key={chip.key}
-                  active={chip.active}
+                  selected={chip.active}
                   variant={chip.variant}
                   icon={chip.icon}
-                  label={chip.label}
                   count={chip.count}
-                  onToggle={chip.onToggle}
-                />
+                  onClick={chip.onToggle}
+                >
+                  {chip.label}
+                </Chip>
               ))}
             </div>
           )}

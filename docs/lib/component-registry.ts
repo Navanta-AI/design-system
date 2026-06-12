@@ -146,6 +146,47 @@ export default function Example() {
     ],
   },
   {
+    slug: 'chip',
+    name: 'Chip',
+    description:
+      'A compact, toggleable filter/selection control in a fully-rounded shape. Unselected chips sit on a white surface with a default border; selecting fills with the secondary surface and a strong border. The leading icon is tinted by variant (blue/red/amber/grey) and the trailing count renders in its own rounded container. Used by TableShell’s filter chips, but standalone.',
+    category: 'Data Display',
+    importName: 'Chip',
+    usageExample: `import { Chip } from '@navanta-ai/design-system'
+import { WarningCircle } from '@phosphor-icons/react'
+import * as React from 'react'
+
+export default function Example() {
+  const [on, setOn] = React.useState(false)
+  return (
+    <Chip
+      variant="danger"
+      selected={on}
+      count={4}
+      icon={<WarningCircle weight="duotone" />}
+      onClick={() => setOn((v) => !v)}
+    >
+      Critical
+    </Chip>
+  )
+}`,
+    props: [
+      { name: 'selected', type: 'boolean', default: 'false', description: 'Selected/pressed state — shown with a strong border (aria-pressed).' },
+      { name: 'variant', type: `'info' | 'danger' | 'warning' | 'neutral'`, default: 'neutral', description: 'Tints the leading icon by semantic (blue/red/amber/grey).' },
+      { name: 'icon', type: 'React.ReactNode', description: 'Leading icon — a duotone Phosphor glyph.' },
+      { name: 'count', type: 'number', description: 'Optional trailing count — rendered in its own rounded container.' },
+      { name: 'children', type: 'React.ReactNode', description: 'Chip label.' },
+      { name: 'onClick', type: '() => void', description: 'Toggle handler (Chip is a <button>).' },
+    ],
+    knobs: [
+      { name: 'variant', type: 'select', options: ['info', 'danger', 'warning', 'neutral'], default: 'danger' },
+      { name: 'selected', type: 'boolean', default: true },
+      { name: 'label', type: 'text', default: 'Critical' },
+      { name: 'count', type: 'text', default: '4' },
+      { name: 'icon', type: 'boolean', default: true },
+    ],
+  },
+  {
     slug: 'input',
     name: 'Input',
     description:
@@ -619,8 +660,10 @@ export default function Example() {
       { name: 'side', type: "'top' | 'right' | 'bottom' | 'left'", default: "'top'", description: 'The preferred side of the trigger to render against when open.' },
       { name: 'align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'The preferred alignment against the trigger.' },
       { name: 'delay', type: 'number', default: '300', description: 'Duration in milliseconds before the tooltip appears.' },
+      { name: 'variant', type: "'default' | 'inverse'", default: "'default'", description: 'default = light popover surface; inverse = the HMTX portal look — dark surface-inverse bubble with the curved pointer aimed at the trigger (the SideNav rail style).' },
     ],
     knobs: [
+      { name: 'variant', type: 'select', options: ['default', 'inverse'], default: 'default' },
       { name: 'side', type: 'select', options: ['top', 'right', 'bottom', 'left'], default: 'top' },
       { name: 'align', type: 'select', options: ['start', 'center', 'end'], default: 'center' },
       { name: 'delay', type: 'select', options: ['0', '300', '700'], default: '300' },
@@ -847,7 +890,7 @@ export default function Example() {
     slug: 'page-heading',
     name: 'Page Heading',
     description:
-      'A page header with the Christy AI star icon, a gradient title, and a subtitle. Used at the top of a view.',
+      'A page header with the large Christy AI star (single four-point spark, AiStar variant="large"), a neutral title, and a subtitle. Used at the top of a view.',
     category: 'Layout',
     importName: 'PageHeading',
     usageExample: `import { PageHeading } from '@navanta-ai/design-system'
@@ -856,12 +899,64 @@ export default function Example() {
   return <PageHeading title="Order Dashboard" subtitle="Track shipments and resolve claims in one place" />
 }`,
     props: [
-      { name: 'title', type: 'string', description: 'Gradient page title.' },
-      { name: 'subtitle', type: 'string', description: 'Purple subtitle below the title.' },
+      { name: 'title', type: 'string', description: 'Page title (neutral text-primary).' },
+      { name: 'subtitle', type: 'string', description: 'Subtitle below the title (neutral text-secondary).' },
     ],
     knobs: [
       { name: 'title', type: 'text', default: 'Order Dashboard' },
       { name: 'subtitle', type: 'text', default: 'Track shipments and resolve claims in one place' },
+    ],
+  },
+  {
+    slug: 'side-nav',
+    name: 'Side Navigation',
+    description:
+      'The standard portal side navigation (from the HMTX portal): a 48px collapsed icon rail with tooltips that is always visible, plus a 256px expanded panel that slides over it with a backdrop. Grouped sections with uppercase labels, Phosphor icons (bold at rest, fill when active), a settings gear, and a user block that anchors a profile menu.',
+    category: 'Layout',
+    importName: 'SideNav',
+    usageExample: `import { SideNav } from '@navanta-ai/design-system'
+import { SquaresFour, Package } from '@phosphor-icons/react'
+import * as React from 'react'
+
+export default function Example() {
+  const [activeKey, setActiveKey] = React.useState('dashboard')
+  return (
+    <SideNav
+      sections={[
+        {
+          label: 'Core Operations',
+          items: [
+            { key: 'dashboard', label: 'Dashboard', icon: SquaresFour },
+            { key: 'orders', label: 'Order Tracking', icon: Package, href: '/orders' },
+          ],
+        },
+      ]}
+      activeKey={activeKey}
+      onNavigate={(item) => setActiveKey(item.key)}
+      user={{ name: 'John Smith', description: 'Portal Admin', initials: 'JS' }}
+      onUserClick={(anchor) => {/* open profile dropdown */}}
+      onSettingsClick={() => {/* go to account settings */}}
+    />
+  )
+}`,
+    props: [
+      { name: 'sections', type: 'SideNavSection[]', description: 'Grouped nav items: { label?, items: { key, label, icon, href? }[] }. Icons are Phosphor components (rendered bold; fill when active).' },
+      { name: 'activeKey', type: 'string', description: 'key of the active item — gets the active fill and icon treatment.' },
+      { name: 'onNavigate', type: '(item: SideNavItem) => void', description: 'Called on item click (also collapses the expanded panel).' },
+      { name: 'expanded', type: 'boolean', description: 'Controlled expanded state; pair with onExpandedChange. Omit for uncontrolled (defaultExpanded).' },
+      { name: 'defaultExpanded', type: 'boolean', default: 'false', description: 'Uncontrolled initial expanded state.' },
+      { name: 'onExpandedChange', type: '(expanded: boolean) => void', description: 'Fires when the panel expands/collapses.' },
+      { name: 'logo', type: 'React.ReactNode', description: 'Expanded-panel logo (full wordmark).' },
+      { name: 'logoCollapsed', type: 'React.ReactNode', description: 'Rail logo (monogram).' },
+      { name: 'user', type: 'SideNavUser', description: '{ name, description?, initials?, avatarSrc?, color? } — renders the bottom user block.' },
+      { name: 'onUserClick', type: "(anchor: 'rail' | 'panel') => void", description: 'User block click — anchor tells which surface to anchor a profile dropdown to.' },
+      { name: 'onSettingsClick', type: '() => void', description: 'Renders the gear button on the rail when provided.' },
+      { name: 'overlayIn', type: "'viewport' | 'container'", default: "'viewport'", description: 'Whether the expanded panel + backdrop overlay the viewport (fixed) or the nearest positioned ancestor (absolute).' },
+    ],
+    knobs: [
+      { name: 'expanded', type: 'boolean', default: false },
+      { name: 'user', type: 'boolean', default: true },
+      { name: 'settings', type: 'boolean', default: true },
     ],
   },
   {

@@ -1,6 +1,6 @@
 {
   "name": "@navanta-ai/design-system",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Navanta Design System — component library for the Navanta client portal",
   "private": false,
   "publishConfig": {

@@ -283,6 +283,234 @@ all is part of standard table shell (heading, icon, search, filters, tabs, pagin
 - Files: `src/components/ui/TableShell.tsx`, `src/components/ui/index.ts`; docs:
   `product-catalog-template.tsx`, `table-shell-playground.tsx`, `component-registry.ts`.
 
+### 17. TableShell — search fixed at 320px via a DS token (post-v0.3.0)
+**Suggestion:** "the search width on the table shell must have fixed size of 320px; make sure
+that rule is defined in the design system."
+
+- Added a token **`--table-search-width: 320px`** to `tokens.css` (the DS source of truth) and
+  pointed the TableShell search (`FacetSearch`) at it: `w-[var(--table-search-width)] max-w-full`
+  — a fixed 320px (capped to the container on very narrow screens), no longer the responsive
+  `w-full sm:w-[320px]`. Dropped the `widthClass` variation so both the facet band and the
+  legacy toolbar use the one rule.
+- Files: `packages/design-system/src/tokens.css`, `src/components/ui/TableShell.tsx`.
+
+### 18. Chip — standalone component, secondary-button style, border-based selection
+**Suggestion:** "the filter chips should follow our secondary button style; selected should
+have a border that makes it feel selected; radius is fine; don't deviate from the DS; and
+the chips component should be created separately."
+
+- New standalone **`Chip`** component (`packages/design-system/src/components/Chip.tsx`,
+  exported) — replaces TableShell's inline `ChipButton` + `CHIP_*` constants.
+- Follows the **secondary Button** style (`bg-secondary` / `secondary-foreground`,
+  `hover:bg-secondary/80`), keeping the existing `rounded-full` radius. **Selection** is now a
+  strong **`border-[var(--primary)]`** (transparent when unselected → no layout shift) instead
+  of a tonal fill, so it reads as selected. The leading icon stays variant-tinted
+  (`--pill-*-fg`) for at-a-glance distinction. `aria-pressed` toggle button.
+- TableShell's toggle / toggle-group / legacy filter chips all render via `Chip` now.
+- Docs (all three): `chip-demo.tsx`, registry (slug `chip`, Data Display), demoMap, sidebar icon.
+- Files: `src/components/Chip.tsx` (new), `src/index.ts`, `src/components/ui/TableShell.tsx`;
+  docs: `demos/chip-demo.tsx`, `component-registry.ts`, `[slug]/page.tsx`, `sidebar.tsx`.
+
+## 2026-06-12 — released as v0.4.0
+
+Entries 19–31 below shipped in **v0.4.0** (published to GitHub Packages, tagged
+`v0.4.0`): Chip white/Figma count container, Checkbox `--border-control`, Table
+selected-row + default alignment rules, large AI star + PageHeading Figma spec,
+`--text-stack-gap`, Card/Select border fix, **SideNav** (new), Tooltip
+`variant="inverse"`.
+
+### 19. Chip — unselected state gets a white background
+**Suggestion:** "the non selected chip should have white background."
+
+- Unselected: `bg-background` (white) + `border-[var(--border-default)]` so the chip stays
+  visible on white surfaces; hover `bg-secondary/60`.
+- Selected: unchanged fill (`bg-secondary`, hover `/80`) + strong `border-[var(--primary)]`.
+  Selection now reads as both a fill change and a border, with no layout shift (border is
+  always present, only the color changes).
+- Docs: registry + demo comment updated to describe the white/filled states.
+- Files: `src/components/Chip.tsx`; docs: `component-registry.ts`, `demos/chip-demo.tsx`.
+
+### 20. Chip — count in a separate container + Figma spec alignment
+**Suggestion:** "the numbers in the chips should have a separate container. Implement this
+design from Figma." (Iris-Shareable, node 736:10951)
+
+- **Count badge** is now its own fully-rounded container (Figma "Number" frame): `min-w-4
+  px-1.5`, 12px medium text. Figma's `color/neutral/100 #f4f4f5` → `bg-muted`,
+  `neutral/600` → `--text-secondary`. On a **selected** chip (whose fill is the same
+  `#f4f4f5`) the badge flips to `bg-background` so it stays distinct — Figma only specs the
+  unselected state.
+- Chip body aligned to the Figma frame: `gap-1` (4px), `px-3 py-[2px]`, label 14px
+  regular on a 22px line in `--text-primary` (was 13px medium `secondary-foreground`),
+  icon 12px (was 14px). Border stays `--border-default` (DS token) rather than Figma's
+  raw `#d9d9d9`, per the semantic-tokens-over-hex standard.
+- Docs: registry description + `count` prop description updated.
+- Files: `src/components/Chip.tsx`; docs: `component-registry.ts`.
+
+### 21. Checkbox — prominent default (unchecked) border
+**Suggestion:** "in the default state of the checkbox we need to make sure that our border
+looks prominent. right now it is very light that it hides."
+
+- Unchecked border: `border-input` (`--input` = #e4e4e7, near-invisible on white) →
+  briefly `--border-strong` (#71717b), then per follow-up ("let's use the neutral 400")
+  a new **`--border-control`** token = **#9f9fa9** (Figma Color/Neutral/400, the file's
+  neutral palette matches Tailwind v4 zinc). Kept separate from `--border-strong`
+  (zinc-500), which RadioCard's donut + Table progress dots still use.
+- Checked/indeterminate (`border-primary`) and error (`border-destructive`) states are
+  unchanged and still override the base (verified cascade order in compiled `styles.css`).
+- No API change → no registry/demo updates needed.
+- Files: `src/components/Checkbox.tsx`, `src/tokens.css`.
+
+### 22. Table — no selected-row background
+**Suggestion:** first "the background of row in the table is too dark, make it light"
+(briefly `bg-primary/20` → `/10`), then "let's not have any background on checked row."
+
+- `TableRow` no longer tints selected rows at all — selection is shown by the row
+  checkbox only. The `selected` prop is kept (backward compatible) and now emits a
+  **`data-selected`** attribute so consumers can opt into their own styling.
+- Files: `src/components/Table.tsx`.
+
+### 23. Card & Select popover — black borders in consumer apps (missing border color)
+**Suggestion:** "the cards and dropdown somehow have the black border when I'm using
+them as components from the design system. please check why."
+
+- **Root cause:** the compiled `styles.css` intentionally ships **no preflight** (so it
+  can't clobber consumer base styles). Without Tailwind's base `border-color` rule, a
+  bare `border` utility falls back to CSS-initial **`currentColor`** → black borders in
+  consumer apps. The docs site masked it because its own Tailwind base layer supplies
+  the default.
+- Fix: explicit `border-border` on the two offenders — `Card` root and `SelectContent`
+  (dropdown popover). Audited the rest of the package: all other borders already carry
+  an explicit color (utility, inline style, or variant class).
+- **Standard going forward:** in DS components, never use a bare `border`/`border-b`
+  utility — always pair it with an explicit color class.
+- Files: `src/components/Card.tsx`, `src/components/Select.tsx`.
+
+### 24. Table — columns left-aligned by default, last column right
+**Suggestion:** "table columns are always left aligned by default, even if there is a
+number column. it should be right aligned only if it is the last column."
+
+- `TableHeadCell` + `TableCell`: when `align` is **unset**, the **last column**
+  auto-right-aligns via `last:text-right` (head label is a flex row, so the head cell
+  mirrors it with `[th:last-child>&]:justify-end`). All other columns stay left —
+  including number columns. An explicit `align` prop always wins (the auto rule is only
+  added when `align == null`), so `align="left"` on a last column opts out.
+- Docs: `table-demo.tsx` Qty column (last) dropped its now-redundant `align="right"` in
+  both the live demo and the code snippet, with comments noting the default.
+- Files: `src/components/Table.tsx`; docs: `demos/table-demo.tsx`.
+
+### 25. PageHeading — large AI star (Figma AI-star-large) as default
+**Suggestion:** "for page heading, lets use this star instead as default."
+(Figma: HMTX-Portal, node 1726-5082, "AI-star-large.svg fill")
+
+- New **`variant="large"`** on `AiStar` — the single four-point spark with the exact
+  Figma path + gradient (`#8A49BE → #396EB6`, userSpaceOnUse coords preserved). Stops
+  read **`--ai-star-from` / `--ai-star-to`** tokens (new in `tokens.css`) with the hex
+  as fallback. Default `variant="small"` (the two-spark mark) is unchanged — Table `ai`
+  columns and ChristySuggestions keep it (backward compatible, opt-in per standard).
+- `PageHeading` now renders `<AiStar variant="large" size={40} />`. Note the large
+  asset carries built-in padding (spark spans 6→24 of a 30 viewBox), so the visible
+  spark is ~60% of the box — that whitespace is part of the Figma asset.
+- Docs: registry PageHeading description/props refreshed (also removed stale
+  "gradient title / purple subtitle" wording left over from the pre-neutral era).
+- Files: `src/components/ui/AiStar.tsx`, `src/components/ui/PageHeading.tsx`,
+  `src/tokens.css`; docs: `component-registry.ts`.
+
+### 26. PageHeading — full layout/type from the HMTX-Portal heading spec
+**Suggestion:** "have the page heading look like this. Implement this design from Figma."
+(Figma: HMTX-Portal, node 1726-5081)
+
+- Star: large variant at **30px** (was 40) — the Figma frame places the star in a 30px box.
+- Title: **22px semibold, `tracking-[-0.44px]`, `leading-[1.33]`** (was 20px,
+  tracking-tight, leading-tight).
+- Subtitle: **14px regular, `leading-[1.5]`** (was 16px / 1.3). Row gap 8px and text-column
+  gap 4px already matched.
+- Colors kept on semantic tokens (`--text-primary` / `--text-secondary`): the Figma frame
+  sets both texts `#1e1e1e`, but the neutral-token split was an explicit earlier decision
+  (2026-05-30 §1) and the rendered design reads the same.
+- Files: `src/components/ui/PageHeading.tsx`.
+
+### 27. `--text-stack-gap` — defined spacing for body-text + label-text stacks
+**Suggestion:** "can you define the spacing between the two texts we have usually in
+columns where we have body text and label text."
+
+- New token **`--text-stack-gap: 4px`** — the vertical gap between body text and its
+  label/subtext in stacked text columns. 4px was already the de-facto value
+  (PageHeading/panel `gap-1`, form helpers `mt-1`); the token makes it tunable in one place.
+- Applied via `gap-[var(--text-stack-gap)]` to: **Table** variant-cell stacks that
+  previously had **no** gap (id+subtitle, party title+subtitle, date+subtext),
+  **PageHeading**, **DetailPanelShell** header. Form-control helper texts
+  (Checkbox/Radio `mt-1`) left as-is — same 4px result.
+- Standard recorded in CLAUDE.md.
+- Files: `src/tokens.css`, `src/components/Table.tsx`, `src/components/ui/PageHeading.tsx`,
+  `src/components/ui/panel/DetailPanelShell.tsx`.
+
+### 28. SideNav — portal side navigation as a DS component
+**Suggestion:** "check the portal of hmtx and let's have the side navigation component as
+well" → "no, look at the @../Navanta/hmtx-portal/" (source the working app, not Figma).
+
+- New **`SideNav`** (`src/components/ui/SideNav.tsx`, exported) — a generalized port of
+  `hmtx-portal/src/components/layout/Sidebar.tsx`: a **48px collapsed icon rail**
+  (always visible md+, DS `Tooltip` on hover) + a **256px expanded panel** that slides
+  over it with a backdrop. Grouped sections w/ 10px uppercase labels; items 36px,
+  rounded-lg; icons are Phosphor **components** (bold at rest → fill + neutral 900→700
+  gradient when active); settings gear; user block (initials/photo avatar) firing
+  `onUserClick('rail' | 'panel')` so apps can anchor their own profile dropdown.
+- App-specific parts stripped: routing (plain `href`/`onNavigate` instead of Next Link +
+  persona context), ProfileDropdown. (Rail tooltips initially used DS `Tooltip` —
+  reverted to portal parity in §29.)
+- `expanded` is controlled or uncontrolled; **`overlayIn: 'viewport' | 'container'`**
+  picks fixed vs absolute overlay (container mode powers the docs demo).
+- New tokens (portal parity): `--sidebar-active-bg` (= `--muted`), `--sidebar-hover-bg`
+  #f5f5f5, `--shadow-panel`, `--shadow-panel-light`.
+- Docs (all three + nav): `side-nav-demo.tsx`, registry (slug `side-nav`, Layout),
+  demoMap, sidebar icon.
+- Files: `src/components/ui/SideNav.tsx` (new), `src/components/ui/index.ts`,
+  `src/tokens.css`; docs: `demos/side-nav-demo.tsx` (new), `component-registry.ts`,
+  `[slug]/page.tsx`, `sidebar.tsx`.
+
+### 29. SideNav — hover experience matched to the HMTX portal
+**Suggestion:** "have the on hover experience of side navigation be the same as how we
+have done it in hmtx."
+
+- Rail tooltips: DS `Tooltip` (light, 300ms delay) → the portal's **instant inverse
+  tooltip** — pure CSS `group-hover` (no delay), `--surface-inverse` fill, the curved
+  arrow SVG, 15px offset, `--shadow-dropdown`. Hidden while the expanded panel is open
+  (matches portal).
+- Inactive rail icons (and the gear) now **darken to `--text-primary` on hover**
+  (`group-hover`), as in the portal's `SidebarIcon`.
+- New tokens: `--surface-inverse` #18181b, `--shadow-dropdown` 0 4px 15px rgba(0,0,0,.25).
+- Files: `src/components/ui/SideNav.tsx`, `src/tokens.css`.
+
+### 30. SideNav — tooltip arrow seam fix
+**Suggestion:** "in the tooltip vector the pointer seems to be having gap — reduce it."
+
+- Cause: the arrow SVG paints **before** the bubble, so the bubble's
+  `--shadow-dropdown` rendered over the joint (a dark sliver reading as a gap), and the
+  path overlapped the bubble by only ~1px.
+- Fix: arrow gets `z-[1]` (paints above the shadow) and moves `left-[-11px]` →
+  **`left-[-9px]`** (~3px tucked under the bubble). Deliberate 2px deviation from the
+  portal markup, which has the same latent seam.
+- Files: `src/components/ui/SideNav.tsx`.
+
+### 31. Tooltip `variant="inverse"` + Navanta logo in the SideNav demo
+**Suggestion:** "let's have tooltip view as well. also on the top let's have the navanta
+logo on the side navigation instead."
+
+- **`Tooltip` gains `variant="inverse"`** (opt-in; default unchanged): the HMTX portal
+  look — `--surface-inverse` bubble, white medium text, `--shadow-dropdown`, and the
+  curved pointer aimed at the trigger. Pointer is side-aware (rotates for
+  top/right/bottom/left) with a 15px offset, `z-[1]` + ~4px tuck so the bubble shadow
+  can't show through the joint (§30). Registry + demo updated (variant knob, plus an
+  all-four-sides inverse showcase).
+- SideNav docs demo logo: AiStar + text placeholder → **Navanta brand images**
+  (`docs/public/navanta-logo.png` 40px tall expanded, `navanta-monogram.png` 28px rail).
+  ⚠️ The two attached files arrived **byte-identical** (a generic PNG icon, not the
+  logos) — the paths are wired; replace both files in `docs/public/` with the real
+  exports.
+- Files: `src/components/Tooltip.tsx`; docs: `demos/tooltip-demo.tsx`,
+  `demos/side-nav-demo.tsx`, `component-registry.ts`, `public/navanta-logo.png`,
+  `public/navanta-monogram.png`.
+
 ---
 
 ## 2026-05-30
