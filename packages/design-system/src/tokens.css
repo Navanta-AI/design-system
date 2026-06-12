@@ -109,6 +109,9 @@
   --text-primary: var(--foreground);
   --text-secondary: var(--muted-foreground);
   --text-neutral: #94a3b8;
+  /* Page-heading title (Figma "Heading 4" — 20px/600/22.8px). Slightly warmer than
+     --text-primary; light only — dark mode lifts it to --foreground below. */
+  --text-heading: #1e1e1e;
   --text-accent: var(--kds-color-brand-accent);
   --text-accent-dark: color-mix(in oklab, var(--kds-color-brand-accent) 80%, black);
   --text-danger-vivid: var(--destructive);
@@ -240,6 +243,7 @@
 
   --surface-raised: #18181b;
   --text-neutral: #94a3b8;
+  --text-heading: var(--foreground); /* lift the page-heading title for dark mode */
   --text-inverse-muted: #e2e8f0;
 
   /* Link / strong-info surfaces (dark) */

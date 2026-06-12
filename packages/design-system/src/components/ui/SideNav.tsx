@@ -223,7 +223,7 @@ export function SideNav({
                   const active = item.key === activeKey;
                   const Icon = item.icon;
                   return (
-                    <span key={item.key} className="group relative">
+                    <span key={item.key} className="group relative inline-flex">
                       <ItemAction
                         item={item}
                         aria-label={item.label}
@@ -257,7 +257,7 @@ export function SideNav({
 
         <div className="flex w-full flex-col items-center gap-2 py-2">
           {onSettingsClick && (
-            <span className="group relative">
+            <span className="group relative inline-flex">
               <button
                 type="button"
                 onClick={onSettingsClick}

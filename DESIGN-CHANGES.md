@@ -319,6 +319,8 @@ selected-row + default alignment rules, large AI star + PageHeading Figma spec,
 `--text-stack-gap`, Card/Select border fix, **SideNav** (new), Tooltip
 `variant="inverse"`. Entry 32 shipped in **v0.4.1**. Entries 33–34
 (**KpiBreakdownCard** + its spacing/height/info-icon refinement) shipped in **v0.4.2**.
+Entries 35–36 (PageHeading "Heading 4" title token + SideNav rail-tooltip alignment)
+shipped in **v0.4.3**.
 
 ### 33. KPI — new `KpiBreakdownCard` variant (Figma 321-4023)
 **Suggestion:** "make sure in the KPI component we already have, we have a variant like
@@ -336,6 +338,33 @@ this considered. Implement this design from Figma." (Iris-Shareable, node 321-40
   code template, registry (variant knob option, component list, description).
 - Files: `src/components/KPI.tsx`, `src/index.ts`; docs: `demos/kpi-demo.tsx`,
   `component-registry.ts`.
+
+### 36. SideNav — rail tooltip vertical alignment (pointer off-center)
+**Suggestion:** "the on-hover tooltip for the collapsed side panel — the SVG tip isn't
+aligned the way the example shows."
+
+- Cause: the per-item `.group` wrapper was an inline `<span>`, so the tooltip's
+  `top-1/2 -translate-y-1/2` resolved against the span's **line-box** height (~font
+  metrics), not the 36px button — the whole tooltip (pointer included) rode high and the
+  tip missed the item's centerline. The portal used a block `<div>`, which sizes to the
+  item.
+- Fix: `group relative` → **`group relative inline-flex`** on both the nav-item and
+  settings wrappers, giving the wrapper a real 36px box so `top-1/2` centers on the item.
+  Arrow centering within the bubble was already correct.
+- Files: `src/components/ui/SideNav.tsx`.
+
+### 35. PageHeading — title pinned to the "Heading 4" type token (20px)
+**Suggestion:** "in the page heading we need the title at color #1E1E1E, 20px, 600,
+line-height 22.8px (114%) — specific to this heading size." (Figma "Heading 4")
+
+- Title: 22px/`-0.44px`/`leading-[1.33]` on `--text-primary` (from §26) →
+  **20px / 600 / `leading-[22.8px]` (114%), no letter-spacing**, on a new
+  **`--text-heading`** token (#1e1e1e light; lifts to `--foreground` in dark so it stays
+  legible). Referenced with a hex fallback per §32. Supersedes §26's title sizing; the
+  30px star, 8px row gap, and 14px subtitle are unchanged.
+- New token added to `tokens.css` (light + dark) rather than hardcoding the hex, per the
+  semantic-tokens standard.
+- Files: `src/components/ui/PageHeading.tsx`, `src/tokens.css`.
 
 ### 34. KpiBreakdownCard — defined spacing/height, single-line text, standard info icon
 **Suggestion:** "height issue with the KPI component… define the spacing and height we're
