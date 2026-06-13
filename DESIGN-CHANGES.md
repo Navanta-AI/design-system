@@ -320,7 +320,70 @@ selected-row + default alignment rules, large AI star + PageHeading Figma spec,
 `variant="inverse"`. Entry 32 shipped in **v0.4.1**. Entries 33–34
 (**KpiBreakdownCard** + its spacing/height/info-icon refinement) shipped in **v0.4.2**.
 Entries 35–36 (PageHeading "Heading 4" title token + SideNav rail-tooltip alignment)
-shipped in **v0.4.3**.
+shipped in **v0.4.3**. Entries 37–40 (SideNav rail tooltip → JS Tooltip, nav icon
+weights, table two-line 0px gap, table `serial` column) shipped in **v0.4.4**
+(2026-06-13).
+
+### 40. Table — new `serial` cell variant (row number column)
+**Suggestion:** "let's create a column in the table that is a serial number column."
+
+- New **`variant="serial"`** on `TableCell` — renders `value` as a muted
+  (`--text-secondary`), `tabular-nums`, 14px/22px row number. The consumer passes the
+  number (e.g. `page offset + index + 1`) so it stays correct under sort/pagination
+  rather than auto-counting (which would break with page offsets). Header is a plain
+  `Table.HeadCell` (e.g. `#`); left-aligned by the default column rule.
+- Backward compatible (additive variant, reuses `value`). Docs (all three): table-demo
+  live table + code snippet get a leading `#` serial column; registry cell-variant list +
+  description.
+- Files: `src/components/Table.tsx`; docs: `demos/table-demo.tsx`, `component-registry.ts`.
+
+### 39. Table — two-line cells back to 0px gap (standard)
+**Suggestion:** "the two-line table columns (order date, ETA, ship to) should have 0px
+gap, not the [`--text-stack-gap`] gap. Have this as standard."
+
+- Reverts §27's application of `--text-stack-gap` (4px) to the three table variant-cell
+  stacks (date+subtext, party title+subtitle, id+subtitle) → back to `flex flex-col`
+  (0px). The 22px/18px line-heights already separate the lines.
+- `--text-stack-gap` (4px) is unchanged and still used by **PageHeading** and
+  **DetailPanelShell** header (not table cells). Status cell (dots + label) keeps its
+  `gap-1` — it's not a two-line text column.
+- Standard updated in CLAUDE.md: table two-line cells use 0px gap.
+- Files: `src/components/Table.tsx`.
+
+### 38. SideNav — nav icons: bold outline (inactive) + fill (active)
+**Suggestion:** "the icons have two different weights for filled vs outline… are we using
+bold or regular by default?" → briefly tried `regular`, then "let's have bold outline and
+filled."
+
+- Confirmed the inactive state was `bold` (`weight={active ? "fill" : "bold"}`). Tried
+  `regular` to balance against the fill, but per the follow-up the chosen treatment is
+  **inactive = `bold` outline, active = `fill`** (Phosphor has no combined "filled-bold"
+  weight — `fill` and `bold` are mutually exclusive; active is distinguished by the fill +
+  neutral 900→700 gradient + active background pill).
+- Net: nav-icon weights unchanged from the original; `SideNavIconProps['weight']` widened
+  to `"regular" | "bold" | "fill"` (harmless). Collapse arrow + user-row dots stay `bold`.
+- Files: `src/components/ui/SideNav.tsx`.
+
+### 37. SideNav — rail tooltip uses the JS Tooltip (fixes "no reveal" in consumer apps)
+**Suggestion:** "the tooltip isn't reflecting when using the SideNav in a project — works
+in the docs but not when consuming the component. Find what's causing the difference."
+
+- Cause: the hand-rolled rail tooltip revealed via `opacity-0` → `group-hover:opacity-100`.
+  Both utilities have **equal specificity**, so the winner is pure source order. In our
+  `styles.css` `group-hover:opacity-100` (byte ~40418) sits after `opacity-0` (~32182) →
+  works in docs. But a consumer that imports our `styles.css` **and** loads its own
+  Tailwind afterward gets *their* `.opacity-0` later in the cascade → it overrides our
+  rule and the tooltip stays at opacity 0. (SideNav body renders fine — only the
+  hover-reveal is contested, which is the exact symptom.)
+- Fix: the rail now uses the DS **`Tooltip` (`variant="inverse"`, `side="right"`,
+  `delay={0}`)** instead of the CSS-only `RailTooltip` (removed). The Tooltip mounts the
+  bubble via JS state only while hovered — it is never in the DOM with `opacity:0`, so no
+  cross-stylesheet rule can suppress it. Order-independent and robust. Visually identical
+  (the inverse variant is the same markup, §31), and it carries the §32 token fallbacks +
+  §36 `inline-flex` alignment for free. `group` is kept on the wrapper so the icon's
+  hover-darken still works. (Note: arbitrary-value utilities like the icon color rarely
+  collide across stylesheets — only common ones like `opacity-0` do.)
+- Files: `src/components/ui/SideNav.tsx`.
 
 ### 33. KPI — new `KpiBreakdownCard` variant (Figma 321-4023)
 **Suggestion:** "make sure in the KPI component we already have, we have a variant like

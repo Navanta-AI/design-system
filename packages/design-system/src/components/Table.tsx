@@ -205,7 +205,7 @@ const TableHeadCell = forwardRef<HTMLTableCellElement, TableHeadCellProps>(
 TableHeadCell.displayName = 'TableHeadCell';
 
 /** Standardized cell content types (matches the HMTX Portal table design). */
-export type TableCellVariant = 'id' | 'party' | 'status' | 'date' | 'input' | 'pill';
+export type TableCellVariant = 'serial' | 'id' | 'party' | 'status' | 'date' | 'input' | 'pill';
 
 export interface TableCellProps extends Omit<React.TdHTMLAttributes<HTMLTableCellElement>, 'onChange'> {
   align?: 'left' | 'center' | 'right';
@@ -215,7 +215,9 @@ export interface TableCellProps extends Omit<React.TdHTMLAttributes<HTMLTableCel
   /** Renders standardized content instead of `children`. */
   variant?: TableCellVariant;
 
-  /* variant="id" — ID / SKU with optional circle-badge icon + copy button */
+  /* variant="serial" / "id" — row serial number / ID / SKU. `serial` renders `value` as a
+     muted, tabular-figure number (pass the row number, e.g. page offset + index + 1, so it
+     stays correct under pagination/sort). `id` adds an optional circle-badge icon + copy. */
   value?: string;
   /** Leading icon; when present a navy circle badge is shown (set badge={false} to suppress). */
   icon?: React.ReactNode;
@@ -270,6 +272,12 @@ function StatusDots({ steps, completed, tone }: { steps: number; completed: numb
 
 function renderVariant(props: TableCellProps): React.ReactNode {
   switch (props.variant) {
+    case 'serial':
+      return (
+        <span className="text-[14px] leading-[22px] tabular-nums text-[var(--text-secondary)] whitespace-nowrap">
+          {props.value}
+        </span>
+      );
     case 'id': {
       const showBadge = props.badge ?? Boolean(props.icon);
       // Only link-style (link color + medium weight) when the ID is actually a
@@ -308,7 +316,7 @@ function renderVariant(props: TableCellProps): React.ReactNode {
       // Optional product/description subtitle below the ID (e.g. SKU + product name).
       if (props.subtitle != null) {
         return (
-          <span className="flex flex-col gap-[var(--text-stack-gap)]">
+          <span className="flex flex-col">
             {idRow}
             <span className="text-[12px] leading-[18px] text-[var(--text-secondary)] whitespace-nowrap">
               {props.subtitle}
@@ -334,7 +342,7 @@ function renderVariant(props: TableCellProps): React.ReactNode {
               )}
             </span>
           )}
-          <span className="flex flex-col gap-[var(--text-stack-gap)]">
+          <span className="flex flex-col">
             <span className="text-[14px] font-medium leading-[22px] text-[var(--text-primary)] whitespace-nowrap">{props.title}</span>
             {props.subtitle != null && (
               <span className="text-[12px] leading-[18px] text-[var(--text-secondary)] whitespace-nowrap">{props.subtitle}</span>
@@ -362,7 +370,7 @@ function renderVariant(props: TableCellProps): React.ReactNode {
       const sub =
         props.subtext ?? (props.relative !== false && props.date != null ? formatRelativeTime(props.date, props.now) : null);
       return (
-        <span className="flex flex-col gap-[var(--text-stack-gap)]">
+        <span className="flex flex-col">
           <span className="text-[14px] leading-[22px] text-[var(--text-primary)] whitespace-nowrap">
             {props.date != null ? formatTableDate(props.date) : null}
           </span>

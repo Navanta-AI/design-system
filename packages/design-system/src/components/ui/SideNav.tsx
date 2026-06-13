@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ArrowLeft, DotsThreeVertical, GearSix } from "@phosphor-icons/react";
 import { cn } from "../../utils/cn";
+import { Tooltip } from "../Tooltip";
 
 /* ─────────────────────────────────────────────
  *  SideNav — the standard portal side navigation
@@ -15,13 +16,13 @@ import { cn } from "../../utils/cn";
  *
  *  Icons follow the Phosphor component contract — pass the component
  *  itself (e.g. `Package`), not an element; the nav renders it `bold`
- *  by default and `fill` when active (tinted with the neutral
+ *  outline by default and `fill` when active (tinted with the neutral
  *  900→700 gradient).
  * ───────────────────────────────────────────── */
 
 export interface SideNavIconProps {
   size?: number;
-  weight?: "bold" | "fill";
+  weight?: "regular" | "bold" | "fill";
   className?: string;
   color?: string;
 }
@@ -29,7 +30,7 @@ export interface SideNavIconProps {
 export interface SideNavItem {
   key: string;
   label: string;
-  /** Phosphor-style icon component (rendered bold; fill when active). */
+  /** Phosphor-style icon component (rendered bold outline; fill when active). */
   icon: React.ComponentType<SideNavIconProps>;
   /** Rendered as an <a href> when set; otherwise a <button>. */
   href?: string;
@@ -101,42 +102,6 @@ function ItemAction({
     <button type="button" className={className} style={style} onClick={onClick} aria-label={ariaLabel}>
       {children}
     </button>
-  );
-}
-
-/**
- * The rail's hover tooltip (HMTX portal style): instant (pure CSS group-hover,
- * no delay), inverse surface, with the curved arrow pointing at the item.
- * Hidden while the expanded panel is open.
- */
-function RailTooltip({ label }: { label: string }) {
-  return (
-    <span
-      className="pointer-events-none absolute left-full top-1/2 z-50 ml-[15px] -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
-      aria-hidden="true"
-    >
-      {/* z-[1] paints the arrow above the bubble's drop shadow, and the 2px-right
-          nudge tucks it under the bubble — otherwise the shadow shows through the
-          joint as a thin gap. */}
-      <svg
-        className="absolute left-[-9px] top-1/2 z-[1] -translate-y-1/2"
-        width="13"
-        height="26"
-        viewBox="0 0 13 26"
-        fill="none"
-      >
-        <path
-          d="M12.0179 0V25.8169L8.88842 21.0921C6.75085 17.8649 3.81579 15.2446 0.367753 13.4853C-0.113524 13.2397 -0.124773 12.5561 0.348165 12.2948L0.496595 12.2128C4.13714 10.2017 7.22982 7.32962 9.50446 3.84762L12.0179 0Z"
-          fill="var(--surface-inverse,#18181b)"
-        />
-      </svg>
-      <span
-        className="block whitespace-nowrap rounded-lg bg-[var(--surface-inverse,#18181b)] pb-[7px] pl-4 pr-[18px] pt-2 text-sm font-medium text-white"
-        style={{ boxShadow: "var(--shadow-dropdown, 0px 4px 15px 0px rgba(0,0,0,0.25))" }}
-      >
-        {label}
-      </span>
-    </span>
   );
 }
 
@@ -222,32 +187,48 @@ export function SideNav({
                 {section.items.map((item) => {
                   const active = item.key === activeKey;
                   const Icon = item.icon;
-                  return (
-                    <span key={item.key} className="group relative inline-flex">
-                      <ItemAction
-                        item={item}
-                        aria-label={item.label}
-                        onClick={() => navigate(item)}
-                        className={cn(
-                          "flex size-9 items-center justify-center rounded-lg transition-all",
+                  const itemButton = (
+                    <ItemAction
+                      item={item}
+                      aria-label={item.label}
+                      onClick={() => navigate(item)}
+                      className={cn(
+                        "flex size-9 items-center justify-center rounded-lg transition-all",
+                        active
+                          ? "bg-[var(--sidebar-active-bg,#f4f4f5)]"
+                          : "hover:bg-[var(--sidebar-hover-bg,#f5f5f5)]",
+                      )}
+                    >
+                      <Icon
+                        size={20}
+                        weight={active ? "fill" : "bold"}
+                        color={active ? `url(#${gradientId})` : undefined}
+                        className={
                           active
-                            ? "bg-[var(--sidebar-active-bg,#f4f4f5)]"
-                            : "hover:bg-[var(--sidebar-hover-bg,#f5f5f5)]",
-                        )}
-                      >
-                        <Icon
-                          size={20}
-                          weight={active ? "fill" : "bold"}
-                          color={active ? `url(#${gradientId})` : undefined}
-                          className={
-                            active
-                              ? undefined
-                              : "text-[var(--text-secondary,#4b5563)] transition-colors group-hover:text-[var(--text-primary,#09090b)]"
-                          }
-                        />
-                      </ItemAction>
-                      {!expanded && <RailTooltip label={item.label} />}
+                            ? undefined
+                            : "text-[var(--text-secondary,#4b5563)] transition-colors group-hover:text-[var(--text-primary,#09090b)]"
+                        }
+                      />
+                    </ItemAction>
+                  );
+                  // Collapsed rail: instant inverse tooltip (JS-mounted — robust to a
+                  // consumer's own CSS, unlike a CSS opacity/group-hover reveal). The
+                  // `group` marker keeps the icon's hover-darken working.
+                  return expanded ? (
+                    <span key={item.key} className="group relative inline-flex">
+                      {itemButton}
                     </span>
+                  ) : (
+                    <Tooltip
+                      key={item.key}
+                      className="group"
+                      variant="inverse"
+                      side="right"
+                      delay={0}
+                      content={item.label}
+                    >
+                      {itemButton}
+                    </Tooltip>
                   );
                 })}
               </div>
@@ -256,8 +237,8 @@ export function SideNav({
         </nav>
 
         <div className="flex w-full flex-col items-center gap-2 py-2">
-          {onSettingsClick && (
-            <span className="group relative inline-flex">
+          {onSettingsClick && (() => {
+            const gearButton = (
               <button
                 type="button"
                 onClick={onSettingsClick}
@@ -270,9 +251,15 @@ export function SideNav({
                   className="text-[var(--text-secondary,#4b5563)] transition-colors group-hover:text-[var(--text-primary,#09090b)]"
                 />
               </button>
-              {!expanded && <RailTooltip label={settingsLabel} />}
-            </span>
-          )}
+            );
+            return expanded ? (
+              <span className="group relative inline-flex">{gearButton}</span>
+            ) : (
+              <Tooltip className="group" variant="inverse" side="right" delay={0} content={settingsLabel}>
+                {gearButton}
+              </Tooltip>
+            );
+          })()}
           {user && (
             <>
               <div className="mb-2 h-px w-full bg-[var(--border-default,#e4e4e7)]" />

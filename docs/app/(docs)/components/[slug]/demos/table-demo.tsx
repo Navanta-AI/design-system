@@ -106,6 +106,8 @@ const { sorted, getHeadProps } = useTableSort(orders, (o, key) => {
 <Table hoverable>
   <Table.Header>
     <Table.Row>
+      {/* serial number column */}
+      <Table.HeadCell>#</Table.HeadCell>
       {/* spread getHeadProps to wire functioning sort; pass false to disable a column */}
       <Table.HeadCell {...getHeadProps('po')}>HD PO #</Table.HeadCell>
       <Table.HeadCell {...getHeadProps('ordered')}>Order Date</Table.HeadCell>
@@ -117,8 +119,9 @@ const { sorted, getHeadProps } = useTableSort(orders, (o, key) => {
     </Table.Row>
   </Table.Header>
   <Table.Body>
-    {sorted.map((o) => (
+    {sorted.map((o, i) => (
       <Table.Row key={o.po}>
+        <Table.Cell variant="serial" value={String(i + 1)} />
         <Table.Cell variant="id" value={o.po} icon={<Package weight="fill" />} href="#" />
         <Table.Cell variant="status" status={o.status} />
         <Table.Cell variant="date" date={o.ordered} />
@@ -221,6 +224,8 @@ export function TableDemo({ meta: _ }: { meta: ComponentMeta }) {
           <Table striped={striped} hoverable={hoverable} compact={compact}>
             <Table.Header>
               <Table.Row>
+                {/* serial number column */}
+                <Table.HeadCell>#</Table.HeadCell>
                 {COLUMNS.map((c) => (
                   <Table.HeadCell key={c.key} {...getHeadProps(c.key, sortable[c.key])}>
                     {c.label}
@@ -234,13 +239,14 @@ export function TableDemo({ meta: _ }: { meta: ComponentMeta }) {
             <Table.Body>
               {sorted.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell colSpan={COLUMNS.length + 2} className="py-8 text-center text-muted-foreground">
+                  <Table.Cell colSpan={COLUMNS.length + 3} className="py-8 text-center text-muted-foreground">
                     No orders match your filters.
                   </Table.Cell>
                 </Table.Row>
               ) : (
-                sorted.map((o) => (
+                sorted.map((o, i) => (
                   <Table.Row key={o.po}>
+                    <Table.Cell variant="serial" value={String(i + 1)} data-label="#" />
                     <Table.Cell variant="id" value={o.po} icon={<Package weight="fill" />} href="#" data-label="HD PO #" />
                     <Table.Cell variant="party" avatar={{ initials: o.party.initials }} title={o.party.title} subtitle={o.party.subtitle} data-label="Ship to" />
                     <Table.Cell variant="status" status={o.status} data-label="Status" />

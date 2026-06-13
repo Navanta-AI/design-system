@@ -498,7 +498,7 @@ export default function Example() {
       { name: 'hoverable', type: 'boolean', default: 'false', description: 'Highlight rows on hover.' },
       { name: 'compact', type: 'boolean', default: 'false', description: 'Reduces padding inside cells.' },
       { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Fixes header at the top when scrolling.' },
-      { name: 'Cell variant', type: "'id' | 'party' | 'status' | 'pill' | 'date' | 'input'", description: 'Standardized cell content. Omit for plain text/number (use mono / align as usual).' },
+      { name: 'Cell variant', type: "'serial' | 'id' | 'party' | 'status' | 'pill' | 'date' | 'input'", description: "Standardized cell content. 'serial' renders value as a muted, tabular-figure row number (pass page offset + index + 1). Omit for plain text/number (use mono / align as usual)." },
       { name: 'Cell (id)', type: 'value, icon?, badge?, href?, copyable?, subtitle?', description: 'ID/SKU. With an icon it shows a circle badge; copy button is on by default. Omit icon for the plain (Halstead) style. Pass subtitle for a muted product/description line below the ID (e.g. SKU + product name).' },
       { name: 'Cell (party)', type: 'avatar?: {src|initials}, title, subtitle?', description: 'Avatar (image or initials) with a title and optional subtext — e.g. a "Ship to" column.' },
       { name: 'Cell (status)', type: "status?: TableStatusKey, steps?, completed?, tone?, label?", description: 'Progress dots + label. Pass a registry status key, or set steps/completed/tone/label manually. tone (success/warning/danger/neutral) overrides the dot color.' },
