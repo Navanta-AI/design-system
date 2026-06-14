@@ -29,6 +29,7 @@ export { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogIcon, Dialo
 export { Toast, KToastContainer, Toaster, type ToastProps, type ToastContainerProps, type ToastType } from './components/Toast'
 export { Accordion, type AccordionProps, type AccordionItem } from './components/Accordion'
 export { Tabs, TabPanel, type TabsProps, type TabPanelProps, type TabItem } from './components/Tabs'
+// @deprecated — compound Table is retired in favor of DataTable (below); kept for TableShell + existing consumers, removed in v0.5.0.
 export { Table, type TableProps, type TableHeaderProps, type TableBodyProps, type TableRowProps, type TableHeadCellProps, type TableCellProps, type TableCellVariant } from './components/Table'
 export { TABLE_STATUSES, statusToneColor, formatTableDate, formatRelativeTime, type TableStatusKey, type TableStatusTone, type TableStatusDef } from './components/table-cell-utils'
 export { useTableSort, type SortDirection, type TableSortState, type UseTableSortResult } from './components/use-table-sort'

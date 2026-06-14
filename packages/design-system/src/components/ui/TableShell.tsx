@@ -96,7 +96,7 @@ function FacetSearch({
   // trailing magnifier, light neutral-400 placeholder. Fixed width via the
   // --table-search-width DS token (capped to the container on narrow screens).
   return (
-    <div className="w-[var(--table-search-width)] max-w-full shrink-0">
+    <div className="w-full @4xl/tsfilter:w-[var(--table-search-width)] max-w-full shrink-0">
       <Input
         size="md"
         type="search"
@@ -517,8 +517,11 @@ export function TableShell({
       </div>
 
       {hasFacets ? (
-        /* Unified filter band — search + promoted facets + "More filters" + Clear all */
-        <div className="flex flex-wrap items-center gap-2 px-4 py-4 border-b border-[var(--border-light)] shrink-0">
+        /* Unified filter band — search + promoted facets + "More filters" + Clear all.
+           A `@container/tsfilter` so the search/filter layout responds to the band's own
+           width (not the viewport) — keeps it correct inside narrow consumers, sidebars,
+           and tablet widths where a viewport breakpoint would mis-fire. */
+        <div className="@container/tsfilter flex flex-wrap items-center gap-2 px-4 py-4 border-b border-[var(--border-light)] shrink-0">
           {onSearchChange && (
             <FacetSearch
               value={searchValue}
@@ -526,8 +529,11 @@ export function TableShell({
               placeholder={searchPlaceholder}
             />
           )}
-          {/* Filters live to the right of the search (Figma layout). */}
-          <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+          {/* Filters live to the right of the search only when the band is wide enough to
+              fit on one line (`@4xl/tsfilter` ≈ 896px); otherwise they drop to their own
+              full-width row, wrapping + left-aligned (no `ml-auto`, which would hug right
+              when wrapped). */}
+          <div className="flex flex-wrap items-center gap-2 w-full @4xl/tsfilter:w-auto @4xl/tsfilter:ml-auto">
             {orderedInline.map((f) => (
               <Fragment key={f.key}>
                 <InlineFacet facet={f} />
@@ -671,7 +677,7 @@ export function TableShell({
               onPageChange(1);
             }}
           >
-            <SelectTrigger size="md" className="w-[70px]">
+            <SelectTrigger size="sm" className="w-[70px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

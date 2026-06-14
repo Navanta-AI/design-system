@@ -29,7 +29,7 @@ const demoMap: Record<string, DemoComponent> = {
   toast: dynamic(() => import('./demos/toast-demo').then((m) => m.ToastDemo)),
   accordion: dynamic(() => import('./demos/accordion-demo').then((m) => m.AccordionDemo)),
   tabs: dynamic(() => import('./demos/tabs-demo').then((m) => m.TabsDemo)),
-  table: dynamic(() => import('./demos/table-demo').then((m) => m.TableDemo)),
+  'data-table': dynamic(() => import('./demos/data-table-demo').then((m) => m.DataTableDemo)),
   breadcrumbs: dynamic(() => import('./demos/breadcrumbs-demo').then((m) => m.BreadcrumbsDemo)),
   tooltip: dynamic(() => import('./demos/tooltip-demo').then((m) => m.TooltipDemo)),
   avatar: dynamic(() => import('./demos/avatar-demo').then((m) => m.AvatarDemo)),

@@ -140,7 +140,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
       {isOpen && (
         <div 
-          className="absolute top-[calc(100%+4px)] left-0 z-50 w-[min(280px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] p-4 bg-popover border border-border rounded-md shadow-lg animate-in fade-in slide-in-from-top-1 duration-200" 
+          className="absolute top-[calc(100%+4px)] left-0 z-50 w-[min(280px,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] p-4 bg-popover border border-border rounded-md shadow-lg ds-datepicker-in"
           role="dialog" 
           aria-label="Date picker"
         >

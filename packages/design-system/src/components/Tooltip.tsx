@@ -133,7 +133,7 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(({
           id={tooltipId}
           role="tooltip"
           className={cn(
-            'absolute z-50 inline-block animate-in fade-in-0 zoom-in-95 pointer-events-none',
+            'absolute z-50 inline-block ds-tooltip-in pointer-events-none',
             inverseSideClasses[side],
             alignClasses[side][align]
           )}
@@ -164,7 +164,7 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(({
           id={tooltipId}
           role="tooltip"
           className={cn(
-            'absolute z-50 inline-block w-max max-w-[min(240px,calc(100vw-1rem))] overflow-hidden rounded-md bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 pointer-events-none whitespace-normal break-words',
+            'absolute z-50 inline-block w-max max-w-[min(240px,calc(100vw-1rem))] overflow-hidden rounded-md bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md ds-tooltip-in pointer-events-none whitespace-normal break-words',
             sideClasses[side],
             alignClasses[side][align]
           )}

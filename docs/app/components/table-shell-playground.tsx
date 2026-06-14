@@ -8,9 +8,11 @@ import {
   EmptyState,
   useTableSort,
   TABLE_STATUSES,
+  statusToneColor,
+  formatTableDate,
 } from '@navanta-ai/design-system'
 import type { TableStatusKey, FilterFacet, TableColumn } from '@navanta-ai/design-system'
-import { Package, Star, MagnifyingGlass, WarningCircle, Info, Warning, Tag, Lightning, CalendarBlank } from '@phosphor-icons/react'
+import { Package, Star, MagnifyingGlass, WarningCircle, Info, Warning, Tag, Lightning, CalendarBlank, Copy } from '@phosphor-icons/react'
 import { DynamicCodeBlock } from '@/app/components/dynamic-code-block'
 
 const NOW = new Date('2026-03-03T12:00:00Z').getTime()
@@ -100,6 +102,107 @@ function PillOption({ label, checked, onChange }: { label: string; checked: bool
 
 function ControlLabel({ children }: { children: React.ReactNode }) {
   return <span className="text-xs font-medium text-[#71717a] dark:text-muted-foreground">{children}</span>
+}
+
+/* ── Mobile card (Figma HMTX-Portal 1489-19901) ──────────────────────────────
+   Below `md`, each order renders as a stacked card instead of a table row:
+   header (avatar + HD PO Number + star) · highlighted Status pill-bar ·
+   Ship-to (avatar + name) · Order Date|ETA and Warehouse|Halstead as 2-col pairs. */
+function MobileStatusDots({ status }: { status: TableStatusKey }) {
+  const def = TABLE_STATUSES[status]
+  const color = statusToneColor[def.tone]
+  return (
+    <div className="flex items-center gap-1">
+      {Array.from({ length: def.steps }, (_, i) => (
+        <span
+          key={i}
+          className="size-[10px] shrink-0 rounded-full"
+          style={i < def.completed ? { background: color } : { border: '1px solid var(--border-strong)' }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function MobileField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-1 min-w-0 flex-col gap-1">
+      <span className="text-[13px] leading-[1.4] text-[#71767a]">{label}</span>
+      <span className="text-[14px] leading-[22px] text-[#181a1b]">{children}</span>
+    </div>
+  )
+}
+
+function OrderMobileCard({ o }: { o: Order }) {
+  const def = TABLE_STATUSES[o.status]
+  return (
+    <div className="flex flex-col gap-2 border-b border-[#e4e5e7] p-3">
+      {/* Header — avatar + HD PO Number + star */}
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-white [&>svg]:size-4"
+            style={{ background: 'var(--info-strong)' }}
+          >
+            <Package weight="regular" />
+          </span>
+          <div className="flex flex-col">
+            <span className="text-[14px] font-medium leading-[22px] text-[#18181b]">HD PO Number</span>
+            <span className="flex items-center gap-1">
+              <a href="#" className="text-[14px] font-medium leading-[22px] text-[var(--text-link)] no-underline hover:underline">{o.po}</a>
+              <Copy size={12} weight="regular" className="text-[var(--text-secondary)]" />
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label="Add to watchlist"
+          className="shrink-0 p-1 text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+        >
+          <Star size={20} weight="regular" />
+        </button>
+      </div>
+
+      {/* Status — highlighted pill-bar */}
+      <div
+        className="flex h-[30px] items-center justify-between rounded-[12px] bg-[var(--muted)] px-3 py-2"
+        style={{ boxShadow: '0px 0px 1px 0px rgba(0,0,0,0.57), 0px 1px 4px 0px rgba(10,24,48,0.08)' }}
+      >
+        <span className="text-[14px] leading-[22px] text-[#52525c]">Status</span>
+        <span className="flex items-center gap-2">
+          <span className="text-[14px] leading-[22px] text-[#18181b]">{def.label}</span>
+          <MobileStatusDots status={o.status} />
+        </span>
+      </div>
+
+      {/* Ship to — full-width label + avatar + name */}
+      <div className="flex flex-col gap-1 px-2">
+        <span className="text-[13px] leading-[1.4] text-[#71767a]">Ship to Name</span>
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-flex size-8 shrink-0 items-center justify-center rounded-full"
+            style={{ background: 'var(--info-subtle)' }}
+          >
+            <span className="text-[14px] font-medium text-[var(--text-link)]">{o.party.initials}</span>
+          </span>
+          <div className="flex min-w-0 flex-col">
+            <span className="text-[14px] font-medium leading-[22px] text-[#181a1b]">{o.party.title}</span>
+            <span className="text-[12px] leading-[18px] text-[#52525c]">{o.party.subtitle}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Two-column field pairs */}
+      <div className="flex gap-3 px-2">
+        <MobileField label="Order Date">{formatTableDate(o.ordered)}</MobileField>
+        <MobileField label="ETA">{formatTableDate(o.eta)}</MobileField>
+      </div>
+      <div className="flex gap-3 px-2">
+        <MobileField label="Warehouse">{o.warehouse}</MobileField>
+        <MobileField label="Halstead PO Number">{o.halstead}</MobileField>
+      </div>
+    </div>
+  )
 }
 
 const CODE = `import { TableShell, Table, EmptyState, Button, useTableSort } from '@navanta-ai/design-system'
@@ -369,6 +472,15 @@ export function TableShellPlayground({ showCode = true }: { showCode?: boolean }
           noResultsState={noResultsState}
           isFiltered={!onWatchlist && isFiltered}
         >
+          {/* Mobile: stacked cards (Figma 1489-19901). Hidden ≥ md. */}
+          <div className="md:hidden flex flex-col">
+            {rows.map((o) => (
+              <OrderMobileCard key={o.po} o={o} />
+            ))}
+          </div>
+
+          {/* Desktop: the real table. Hidden < md. */}
+          <div className="hidden md:block">
           <Table hoverable>
             <Table.Header>
               <Table.Row>
@@ -419,6 +531,7 @@ export function TableShellPlayground({ showCode = true }: { showCode?: boolean }
               ))}
             </Table.Body>
           </Table>
+          </div>
         </TableShell>
       </div>
 

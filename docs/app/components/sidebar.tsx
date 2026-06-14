@@ -98,7 +98,7 @@ const componentIconMap: Record<string, NavIcon> = {
   skeleton:   Spinner,
   slider:     SlidersHorizontal,
   switch:     ToggleLeft,
-  table:      Table,
+  'data-table': Table,
   tabs:       Rows,
   textarea:   GridFour,
   toast:      Bell,

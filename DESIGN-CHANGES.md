@@ -8,6 +8,101 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-06-14
+
+### 1. TableShell — filter band stacks left-aligned at narrow breakpoints
+**Suggestion:** "as breakpoint size reduces … the filters [should] stack [to the] next
+line. The filters should align to left side."
+
+- **Bug:** the filter group used `sm:ml-auto` to sit right of the search (Figma desktop
+  layout). But `ml-auto` consumes all free space to a flex item's left, so when the group
+  *wrapped* to its own line it hugged the **right** edge instead of aligning left.
+- **First pass (viewport breakpoint, superseded):** moved the switch to `lg`. This still
+  mis-fired at iPad-landscape (1024px = `lg`): `ml-auto` engaged but the filter set didn't
+  fit one line in the available band width, so it wrapped right again.
+- **Fix (container query):** made the filter band a `@container/tsfilter` and keyed the
+  layout off the **band's own width**, not the viewport — `w-full @4xl/tsfilter:w-auto`
+  + `@4xl/tsfilter:ml-auto` on the filter group, and `w-full
+  @4xl/tsfilter:w-[var(--table-search-width)]` on the search. Below ~896px of band width
+  the search is full-width and filters stack left; above it, search is fixed-width and
+  filters right-align on one line. Correct regardless of sidebars/consumer width.
+- Verified in the full-page playground at band widths above and below the threshold —
+  left-aligned stacked when narrow, Figma right-aligned single line when wide.
+- Files: `src/components/ui/TableShell.tsx`.
+
+### 2. Table — responsive card layout below `md` (fix overlap)
+**Suggestion:** "lets make the table responsive."
+
+- The legacy compound `Table` already had a `max-md:` card layout (header hidden, each
+  row → a bordered card, each cell → a label/value flex row keyed off `data-label`), but
+  it rendered **broken**: cards overlapped because the body's fixed row height
+  (`[&>tr]:h-[56px]`) was never released in card mode, clamping every stacked card to 56px.
+- **Fix:**
+  - `TableBody`: added `max-md:[&>tr]:h-auto` so cards grow to their content below `md`
+    (this was the root cause of the overlap).
+  - `TableCell`: **stacked card layout** — `max-md:flex max-md:flex-col
+    max-md:items-start max-md:gap-1 max-md:text-left max-md:w-full` puts the `data-label`
+    above the value, left-aligned, for every variant (avatar+name, status dots, pills,
+    dates, inline input). Plus `max-md:[&>:last-child]:min-w-0` and
+    `max-md:[&_span]:whitespace-normal` so long values wrap inside the card (variant spans
+    hardcode `whitespace-nowrap` for the desktop table).
+- **Why stacked (not label-left/value-right):** right-aligned values went ragged on
+  multi-line content and the party avatar floated in the empty middle of the row. Stacking
+  groups the avatar tight to the name and reads cleanly top-to-bottom.
+- Desktop layout unchanged (all rules are `max-md:`-scoped). Verified in the docs preview
+  at mobile (clean stacked cards) and desktop (unchanged table).
+- Note: `DataTable` (the standard) handles mobile via its opt-in `renderMobileCard` prop;
+  this fix is for the deprecated `Table` that `TableShell` still composes (retired v0.5.0).
+- Files: `src/components/Table.tsx`.
+
+### 3. Orders table — bespoke mobile card from Figma (1489-19901)
+**Suggestion:** "the design for mobile table is looking pretty bad. we need to make it
+like this — implement this design from Figma. consider all parameters."
+[Figma: HMTX-Portal, node 1489-19901.]
+
+- The generic `Table` card transform (#2) reads as a flat label/value list — fine as a
+  fallback, but the Figma calls for a **curated, structured** Orders card that a generic
+  CSS transform can't derive (it's semantic). So the showcase now renders a bespoke card.
+- **Layout (exact to Figma):** header = navy Package avatar (`--info-strong`) + "HD PO
+  Number" / linked PO# (`--text-link`) + copy glyph, with a star (watchlist) on the right;
+  **Status** as its own highlighted pill-bar (`--muted` bg, `rounded-[12px]`, subtle
+  two-layer shadow) — label left, status label + progress dots right; **Ship to** = label
+  + info-tinted initials avatar (`--info-subtle`) + name/subtitle; then **Order Date | ETA**
+  and **Warehouse | Halstead PO #** as 2-column pairs. Type/spacing per the Figma spec
+  (14/22 values, 13/1.4 labels, 12/18 subtitle, 8px stack gap, 12px card padding).
+- Reuses exported helpers — `TABLE_STATUSES`, `statusToneColor` (dot fill, consistent with
+  the desktop dots), `formatTableDate` — so dates/dots match the desktop table.
+- Wired into `TableShell` children: `md:hidden` card stack + `hidden md:block` desktop
+  table, so the real table is untouched ≥ `md` and the cards own < `md`.
+- Lives in the **docs showcase** (`table-shell-playground.tsx`), not the package: the field
+  set/grouping is app-specific (Orders), so it's a consumer composition over DS primitives,
+  not a new DS primitive. (If a generic table-card API is wanted later, `DataTable`'s
+  `renderMobileCard` is the home for it.)
+- Verified in the preview at mobile (matches Figma) and desktop (real table, cards hidden).
+- Files: `docs/app/components/table-shell-playground.tsx`.
+
+### 4. Tooltip — ship its own entrance animation (consumer parity)
+**Suggestion:** "the tooltip on hover … is not showing the same when I use this as a
+published component in another website" (looks right in the package demo).
+
+- **Root cause:** the Tooltip used the `tailwindcss-animate` utilities `animate-in
+  fade-in-0 zoom-in-95`. That plugin runs in the **docs** Tailwind build but is **not**
+  part of the package's `dist/styles.css` (confirmed: `grep animate-in dist/styles.css`
+  → 0). So consumers importing our `styles.css` had those class names with no rule — and
+  with some Tailwind setups `fade-in-0`/`zoom-in-95` leave the bubble stuck at
+  `opacity:0` / mis-scaled. The docs site masked it (its own Tailwind had the plugin).
+- **Fix:** added a self-contained `.ds-tooltip-in` class + `@keyframes ds-tooltip-in` to
+  `src/styles.css` (the existing "classes the DS references, shipped so consumers don't
+  redefine them" block) and switched both Tooltip variants to it. **Opacity-only** fade —
+  the tooltip uses `translate` for centering, so a transform-based zoom would fight it.
+  Now compiled into `dist/styles.css` (verified), so it renders identically everywhere.
+- Verified in the preview: hovering the SideNav rail shows the inverse bubble with
+  `animation-name: ds-tooltip-in`, `#18181b` background, opacity settling to 1.
+- **Still latent (same class of bug, not yet fixed):** `Select` and `DatePicker` also use
+  `animate-in/fade-in/zoom-in` (`Select.tsx:337`, `DatePicker.tsx:143`). Their dropdowns
+  will have the same consumer gap — worth the same treatment if confirmed.
+- Files: `src/styles.css`, `src/components/Tooltip.tsx`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)
@@ -323,6 +418,29 @@ Entries 35–36 (PageHeading "Heading 4" title token + SideNav rail-tooltip alig
 shipped in **v0.4.3**. Entries 37–40 (SideNav rail tooltip → JS Tooltip, nav icon
 weights, table two-line 0px gap, table `serial` column) shipped in **v0.4.4**
 (2026-06-13).
+
+### 41. Consolidate to one table — `DataTable` is the standard; `Table` deprecated
+**Suggestion:** "we need to have only one set [of tables]." → keep **DataTable**
+(declarative), retire **Table**, via **deprecate-then-remove**.
+
+- The DS had two: the compound **`Table`** (documented/demoed, composed by `TableShell`,
+  where the recent serial/alignment/variant work landed) and the declarative
+  **`DataTable`** (`columns[]`+`data[]`, added in v0.3.2 but undocumented/undemoed here).
+- **Decision:** `DataTable` is the single standard. `Table` is now **`@deprecated`**
+  (JSDoc on the component + the index export), still exported and functional — removal
+  in **v0.5.0**.
+- Docs flipped: removed the **Table** registry entry + demo (deleted `table-demo.tsx`),
+  unregistered from demoMap/sidebar. Added a **Data Table** docs page — registry entry,
+  new `data-table-demo.tsx` (columns/data, client sort, selection + headerVariant knobs),
+  demoMap + sidebar wired to slug `data-table`.
+- **Deferred to v0.5.0:** rebuild `TableShell` on `DataTable` (it still composes the
+  deprecated `Table` internally — works for now), then delete `Table`. The recent `Table`
+  work (serial column, two-line 0px gap, alignment) lives on the deprecated component
+  until that migration ports it onto `DataTable` columns.
+- Standard recorded in CLAUDE.md.
+- Files: `src/components/Table.tsx` (deprecation), `src/index.ts`; docs:
+  `component-registry.ts`, `demos/data-table-demo.tsx` (new), `demos/table-demo.tsx`
+  (deleted), `[slug]/page.tsx`, `components/sidebar.tsx`.
 
 ### 40. Table — new `serial` cell variant (row number column)
 **Suggestion:** "let's create a column in the table that is a serial number column."

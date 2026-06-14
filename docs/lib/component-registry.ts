@@ -487,32 +487,52 @@ export default function Example() {
     ],
   },
   {
-    slug: 'table',
-    name: 'Table',
+    slug: 'data-table',
+    name: 'Data Table',
     description:
-      'A responsive table for tabular data. Table.Cell supports standardized content variants — id (badge + copy), party (avatar + title/subtitle), status (progress dots + label), pill (semantic status Pill), date (auto relative subtext), and input (inline editable) — plus plain text/number by default.',
+      'The standard DS table — declarative `columns[]` + `data[]` as the single source of truth for headers and cells. Each column defines its own cell renderer, width, alignment, and sort. Supports row selection (checkbox slot), leading/trailing slot columns (star, actions), grouped rendering, client or controlled sort, loading/empty states, mobile cards, and footer. (Replaces the deprecated compound `Table`, removed in v0.5.0.)',
     category: 'Data Display',
-    importName: 'Table',
+    importName: 'DataTable',
+    usageExample: `import { DataTable, type DataTableColumn } from '@navanta-ai/design-system'
+
+type Order = { id: string; party: string; qty: number }
+
+const columns: DataTableColumn<Order>[] = [
+  { key: 'id', label: 'Order', cell: (r) => r.id },
+  { key: 'party', label: 'Ship to', cell: (r) => r.party },
+  { key: 'qty', label: 'Qty', align: 'right', sortable: true, cell: (r) => r.qty },
+]
+
+export default function Example() {
+  return (
+    <DataTable
+      columns={columns}
+      data={[{ id: 'PO-1001', party: 'Acme Co', qty: 12 }]}
+      rowKey={(r) => r.id}
+      sortMode="client"
+    />
+  )
+}`,
     props: [
-      { name: 'striped', type: 'boolean', default: 'false', description: 'Alternating background colors for rows.' },
-      { name: 'hoverable', type: 'boolean', default: 'false', description: 'Highlight rows on hover.' },
-      { name: 'compact', type: 'boolean', default: 'false', description: 'Reduces padding inside cells.' },
-      { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Fixes header at the top when scrolling.' },
-      { name: 'Cell variant', type: "'serial' | 'id' | 'party' | 'status' | 'pill' | 'date' | 'input'", description: "Standardized cell content. 'serial' renders value as a muted, tabular-figure row number (pass page offset + index + 1). Omit for plain text/number (use mono / align as usual)." },
-      { name: 'Cell (id)', type: 'value, icon?, badge?, href?, copyable?, subtitle?', description: 'ID/SKU. With an icon it shows a circle badge; copy button is on by default. Omit icon for the plain (Halstead) style. Pass subtitle for a muted product/description line below the ID (e.g. SKU + product name).' },
-      { name: 'Cell (party)', type: 'avatar?: {src|initials}, title, subtitle?', description: 'Avatar (image or initials) with a title and optional subtext — e.g. a "Ship to" column.' },
-      { name: 'Cell (status)', type: "status?: TableStatusKey, steps?, completed?, tone?, label?", description: 'Progress dots + label. Pass a registry status key, or set steps/completed/tone/label manually. tone (success/warning/danger/neutral) overrides the dot color.' },
-      { name: 'Cell (pill)', type: "pillVariant?: 'info'|'danger'|'warning'|'neutral', pillSize?, label, icon?", description: 'Renders a status Pill. Uses label for the text and icon for an optional outline glyph. pillVariant = blue/red/amber/grey.' },
-      { name: 'Cell (date)', type: 'date: Date|string|number, relative?, subtext?, now?', description: 'Formats the date (e.g. "Mar 03, 2026") with an auto relative subtext ("5 mins ago" / "in 2 days"). Pass subtext to override.' },
-      { name: 'Cell (input)', type: 'value, onValueChange, placeholder?, inputType?', description: 'Inline editable cell built on the base Input (compact size, 120px min-width).' },
-      { name: 'HeadCell sortable / ai', type: 'sortable?, sortDirection?, onSort?, ai?', description: 'Per-column sorting UI; set sortable for the caret/clicks. ai renders the Christy AI star before a neutral column label.' },
-      { name: 'Table.Empty', type: 'colSpan?, minHeight?', description: 'Full-width centered empty row — keeps column headers visible and centers an <EmptyState> when there are no rows.' },
-      { name: 'useTableSort()', type: '(data, getValue, initial?) => { sorted, getHeadProps }', description: 'Hook that makes sorting functional: returns sorted rows and getHeadProps(key, enabled?) to spread onto each HeadCell. Pass an initial { key } for default sorting.' },
+      { name: 'columns', type: 'Column<T>[]', description: 'Declarative columns — single source of truth for header + cell. Each: key, label, cell(row, ctx) [required], width? (px | "NN%"), minWidth?/maxWidth?, align? (left/right/center), sortable?, sortKey?, headerCell?, cellClassName?, wrapLines? (1|2), caretSide?, alwaysVisible?.' },
+      { name: 'data', type: 'T[]', description: 'Flat rows. Mutually exclusive with groups.' },
+      { name: 'groups', type: 'GroupConfig<T>[]', description: 'Grouped/sectioned rows — a full-width band above each group, shared colgroup so columns align.' },
+      { name: 'rowKey', type: '(row: T) => string', description: 'Stable per-row key. Required.' },
+      { name: 'selection', type: 'SelectionConfig<T>', description: '{ selected, onToggleRow, onToggleAll, isRowDisabled? } — adds a left checkbox slot column automatically.' },
+      { name: 'sort / onSortChange / sortMode', type: "SortState, fn, 'client' | 'controlled'", description: "Sorting. 'client' sorts flat data internally; 'controlled' (default) defers to the caller." },
+      { name: 'leadingSlots / trailingSlots', type: 'SlotColumn<T>[]', description: 'Non-data columns (star, expand chevron, actions menu) before/after the data columns.' },
+      { name: 'visibleKeys', type: 'string[]', description: 'Ordered visible column keys (column show/hide + reorder). Omit to show all in array order.' },
+      { name: 'isLoading / loadingRowCount / emptyState', type: 'boolean, number, ReactNode', description: 'Skeleton rows while loading; emptyState renders when there are no rows.' },
+      { name: 'onRowClick / isRowClickable / rowClassName / rowStyle / rowHoverColor', type: 'fns', description: 'Per-row interactivity and styling hooks.' },
+      { name: 'rowHeight / headerHeight', type: 'number | "auto", number', description: 'Fixed row height (px) or "auto" for multi-line content.' },
+      { name: 'renderMobileCard / mobileEmpty', type: '(row, ctx) => ReactNode', description: 'Responsive card layout below the table breakpoint.' },
+      { name: 'footer', type: 'ReactNode | cells[]', description: 'Footer row content (totals, etc.).' },
+      { name: 'appearance', type: 'headerVariant, headerBg, cellPaddingX, rowHoverBg, …', description: "Visual knobs to match house styles. headerVariant: 'default' | 'filled' | 'capsule'." },
     ],
     knobs: [
-      { name: 'striped', type: 'boolean', default: false },
-      { name: 'hoverable', type: 'boolean', default: true },
-      { name: 'compact', type: 'boolean', default: false },
+      { name: 'headerVariant', type: 'select', options: ['default', 'filled', 'capsule'], default: 'default' },
+      { name: 'selectable', type: 'boolean', default: false },
+      { name: 'loading', type: 'boolean', default: false },
     ],
   },
   {

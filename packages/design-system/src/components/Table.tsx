@@ -1,4 +1,11 @@
 "use client"
+/**
+ * @deprecated The compound `Table` (and `Table.Header/Body/Row/HeadCell/Cell/Empty`) is
+ * being retired in favor of the declarative **`DataTable`** (`columns[]` + `data[]`,
+ * widths/alignment/grouping/selection as a single source of truth). It stays exported and
+ * functional for now — `TableShell` still composes it — and will be removed in v0.5.0.
+ * New work should use `DataTable`.
+ */
 import React, { forwardRef, createContext, useContext, useState } from 'react';
 import { CaretUp, CaretDown, CaretUpDown, Copy, Check } from '@phosphor-icons/react';
 import { cn } from '../utils/cn';
@@ -109,7 +116,7 @@ export interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionEle
 const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
   ({ className, children, ...props }, ref) => {
     return (
-      <tbody ref={ref} className={cn("[&>tr]:h-[56px] max-md:block", className)} {...props}>
+      <tbody ref={ref} className={cn("[&>tr]:h-[56px] max-md:block max-md:[&>tr]:h-auto", className)} {...props}>
         {children}
       </tbody>
     );
@@ -438,7 +445,13 @@ const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>((props, ref) 
         // last column only. An explicit `align` wins.
         align == null && "last:text-right",
         mono && !variant && "font-mono text-xs tracking-tight",
-        "max-md:flex max-md:justify-between max-md:items-start max-md:py-3 max-md:px-0 max-md:border-b max-md:border-border max-md:text-right max-md:last:border-b-0",
+        // Card mode: stack label above value, left-aligned. Reads cleanly for every
+        // variant (avatar+name, status dots, pills, dates, inline input) and lets
+        // multi-line values wrap naturally instead of going ragged against a right edge.
+        "max-md:flex max-md:flex-col max-md:items-start max-md:gap-1 max-md:py-3 max-md:px-0 max-md:border-b max-md:border-border max-md:text-left max-md:last:border-b-0",
+        // Let values wrap inside the card (variant spans hardcode whitespace-nowrap for
+        // the desktop table) and fill the card width.
+        "max-md:w-full max-md:[&>:last-child]:min-w-0 max-md:[&_span]:whitespace-normal",
         className
       )}
       {...rest}
@@ -475,6 +488,10 @@ const TableEmpty = forwardRef<HTMLTableRowElement, TableEmptyProps>(
 );
 TableEmpty.displayName = 'TableEmpty';
 
+/**
+ * @deprecated Use `DataTable` (declarative `columns[]` + `data[]`). The compound `Table`
+ * is retained for `TableShell` and existing consumers and will be removed in v0.5.0.
+ */
 const Table = Object.assign(TableRoot, {
   Header: TableHeader,
   Body: TableBody,

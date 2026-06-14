@@ -110,4 +110,59 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* Tooltip entrance. The Tooltip used the tailwindcss-animate utilities
+     (`animate-in fade-in-0 zoom-in-95`), which are NOT compiled into this
+     shipped stylesheet — so consumers importing styles.css got an un-animated
+     (and, with some Tailwind setups, opacity:0 / mis-scaled) bubble while the
+     docs site looked fine. Ship a self-contained fade here instead. Opacity
+     only — the tooltip relies on `translate` transforms for centering, so a
+     transform-based zoom would fight that. */
+  .ds-tooltip-in {
+    animation: ds-tooltip-in 0.12s ease-out;
+  }
+
+  /* Select dropdown entrance. Same root cause as the tooltip: the listbox used
+     `animate-in fade-in-0 zoom-in-95`, which isn't compiled into this shipped
+     stylesheet. The popper relies on `translate-y-1` for offset, so a
+     transform-based zoom would fight it — fade opacity only. */
+  .ds-select-in {
+    animation: ds-select-in 0.12s ease-out;
+  }
+
+  /* DatePicker dropdown entrance — replaces `animate-in fade-in
+     slide-in-from-top-1 duration-200`. Positioned via `top`/`left`, not a
+     translate, so a small translateY slide is safe here. */
+  .ds-datepicker-in {
+    animation: ds-datepicker-in 0.2s ease-out;
+  }
+}
+
+@keyframes ds-tooltip-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-select-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-datepicker-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
