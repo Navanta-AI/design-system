@@ -159,6 +159,31 @@ slots were unused noise.
   `docs/.../demos/panel-alert-demo.tsx`, `docs/.../demos/detail-panel-demo.tsx`,
   `docs/lib/component-registry.ts`.
 
+### 8. Tooltip (inverse) — pin bubble radius to 12px so the pointer joint flows in consumers
+**Report:** "allison side navigation is not showing the pointing svg's design correctly …
+the flowy jointing points are not working right" (the SideNav rail tooltip in the Allison
+consumer app, on published 0.4.6).
+
+- **Root cause — docs-masks-consumer radius mismatch.** The inverse tooltip bubble used
+  `rounded-lg`, which compiles to `border-radius: var(--radius-lg)`. Our shipped tokens set
+  `--radius-lg: .5rem` (**8px**) — but the **docs** `globals.css` overrides the scale to
+  `--radius-lg: .75rem` (**12px**). The curved pointer SVG is geometrically tuned to flow
+  into a **12px** corner, so it looked right in the docs (12px) but every real consumer
+  (Tailwind default / our shipped 8px, confirmed live in Allison) got a tighter 8px corner
+  → the pointer↔bubble joint read blunt/notched instead of flowing.
+- **Verified the diagnosis in the actual consumer:** measured Allison's rail tooltip — every
+  value (pointer 13×26, `left:-9px`, `translate:0 -50%`, 4px tuck, dark bg) matched the docs
+  **except** bubble radius (8px vs 12px). Forcing 12px live made the joint flow.
+- **Fix:** hard-pin the bubble to `rounded-[12px]` (explicit arbitrary value, so it is 12px
+  in every environment regardless of the consumer's `--radius-*` scale). Did **not** touch
+  the `--radius-lg` token — that would resize every `rounded-lg` component across all
+  consumers. Per the consumption-robustness standard (don't depend on a consumer's Tailwind
+  scale; pin the value).
+- Verified: rebuilt, copied dist into Allison's `node_modules`, reloaded — the rail tooltip
+  bubble now computes 12px and the pointer joint flows, matching the docs. Docs unchanged
+  (`rounded-[12px]` is 12px there too).
+- Files: `src/components/Tooltip.tsx`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)

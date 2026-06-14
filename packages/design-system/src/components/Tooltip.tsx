@@ -152,7 +152,12 @@ const Tooltip = React.forwardRef<HTMLSpanElement, TooltipProps>(({
             />
           </svg>
           <span
-            className="block w-max max-w-[min(240px,calc(100vw-1rem))] whitespace-normal break-words rounded-lg bg-[var(--surface-inverse,#18181b)] pb-[7px] pl-4 pr-[18px] pt-2 text-sm font-medium text-white"
+            // Radius is hard-pinned to 12px (not `rounded-lg`): the curved pointer
+            // is geometrically tuned to flow into a 12px corner. `rounded-lg`
+            // resolves to var(--radius-lg), which is 12px in our docs but 8px in a
+            // standard consumer (Tailwind default / our shipped token) — the tighter
+            // corner broke the pointer↔bubble joint in consumer apps (e.g. Allison).
+            className="block w-max max-w-[min(240px,calc(100vw-1rem))] whitespace-normal break-words rounded-[12px] bg-[var(--surface-inverse,#18181b)] pb-[7px] pl-4 pr-[18px] pt-2 text-sm font-medium text-white"
             style={{ boxShadow: 'var(--shadow-dropdown, 0px 4px 15px 0px rgba(0,0,0,0.25))' }}
           >
             {content}
