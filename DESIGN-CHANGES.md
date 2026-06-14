@@ -100,8 +100,64 @@ published component in another website" (looks right in the package demo).
   `animation-name: ds-tooltip-in`, `#18181b` background, opacity settling to 1.
 - **Still latent (same class of bug, not yet fixed):** `Select` and `DatePicker` also use
   `animate-in/fade-in/zoom-in` (`Select.tsx:337`, `DatePicker.tsx:143`). Their dropdowns
-  will have the same consumer gap — worth the same treatment if confirmed.
+  will have the same consumer gap — worth the same treatment if confirmed. *(Fixed in
+  entry 5 below.)*
 - Files: `src/styles.css`, `src/components/Tooltip.tsx`.
+
+### 5. Select & DatePicker — ship their own dropdown entrance animations (consumer parity)
+**Suggestion:** follow-up to entry 4 — the same `tailwindcss-animate` gap was confirmed
+latent on the Select and DatePicker dropdowns.
+
+- **Root cause:** identical to the Tooltip. `Select.tsx` used `data-[state=open]:animate-in
+  data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95` and `DatePicker.tsx` used
+  `animate-in fade-in slide-in-from-top-1 duration-200`. Those utilities come from the
+  `tailwindcss-animate` plugin, which runs in the docs Tailwind build but is **not**
+  compiled into the package's `dist/styles.css` — so consumers importing our `styles.css`
+  got the class names with no rule (and, with some setups, a stuck-`opacity:0` dropdown).
+- **Fix:** added self-contained `.ds-select-in` / `.ds-datepicker-in` classes +
+  `@keyframes ds-select-in` / `ds-datepicker-in` to `src/styles.css` (the same shipped
+  `@layer components` block) and switched each component off the plugin utilities.
+  `ds-select-in` is **opacity-only** (the listbox popper relies on `translate-y-1` for its
+  offset, so a transform-based zoom would fight it); `ds-datepicker-in` is opacity + a
+  small `translateY(-0.25rem)→0` slide, which is safe because the calendar is positioned
+  via `top`/`left`, not a transform.
+- Verified: after `npm run build`, both classes and both `@keyframes` appear in
+  `dist/styles.css`; in the docs preview the Select listbox opens with
+  `animation-name: ds-select-in` (fades 0→1) and the DatePicker dialog opens with
+  `animation-name: ds-datepicker-in`.
+- Files: `src/styles.css`, `src/components/Select.tsx`, `src/components/DatePicker.tsx`.
+
+### 6. DataTable — two-line `col` cell layout made gapless (0px standard)
+**Suggestion:** "the stacking params in this [date] cell should apply to all cells with a
+main body line + a secondary label line — make the 0px gap a standard."
+
+- The 0px two-line stack (`flex flex-col`, no gap; the 22px/18px line-heights provide the
+  separation) was already the standard in the legacy `Table` (`id`/`party`/`date`
+  variants) and documented in CLAUDE.md. But `DataTable`'s `col` cell layout — the
+  "primary + secondary line" stack — still carried `gap-[10px]`, so two-line cells in the
+  standard table were inconsistent.
+- **Fix:** dropped the gap from `CELL_LAYOUTS.col` (now `flex flex-col justify-center
+  items-start h-full min-w-0 overflow-hidden`). The horizontal `row`/`center`/`end`
+  `gap-[10px]` (icon↔text) are unchanged. Status (dots + label) keeps its own `gap-1`.
+- Tightened the CLAUDE.md standard to name both implementations (DataTable `col`, legacy
+  `Table` variants) as the single home for body+label cells.
+- Files: `src/components/data-table/DataTable.tsx`, `CLAUDE.md`.
+
+### 7. PanelAlert — drop `badge` + `details` props (**breaking**)
+**Suggestion:** trim `PanelAlert` to its core shape; the `badge` and stacked `details`
+slots were unused noise.
+
+- **Breaking API change** (PanelAlert is publicly exported via
+  `components/ui/panel`): removed the optional `badge?: string` and `details?: string[]`
+  props and the markup that rendered them (the top-right badge pill, the stacked
+  `details` lines, and the `!details` guard around `boldText`). `boldText` now renders
+  whenever set. Remaining props: `type`, `title`, `description`, `boldText`.
+- **Consumer impact:** any consumer passing `badge` or `details` will get a TS error and
+  lose that rendered content; migrate `details` content into `description`/`boldText`.
+- Docs demo + registry updated to drop the removed props.
+- Files: `src/components/ui/panel/PanelAlert.tsx`,
+  `docs/.../demos/panel-alert-demo.tsx`, `docs/.../demos/detail-panel-demo.tsx`,
+  `docs/lib/component-registry.ts`.
 
 ## 2026-06-08
 

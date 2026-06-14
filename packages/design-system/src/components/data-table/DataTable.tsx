@@ -7,13 +7,17 @@ import { DATA_TABLE_DEFAULTS } from "./constants";
 /**
  * Cell layout registry — the flex wrapper injected around every cell's content.
  *   row    — horizontal content (avatar + text, single value)
- *   col    — stacked content (primary + secondary line)
+ *   col    — stacked content (primary body line + secondary label line)
  *   center — horizontally centred (icon-only / status-dot cells)
  *   end    — right-aligned (numeric / currency columns)
+ *
+ * NOTE: `col` is the two-line text stack (date+subtext, id+subtitle, title+subtitle).
+ * Per the DS standard it carries **no gap** — the 22px/18px line-heights already
+ * provide the separation; don't reintroduce `--text-stack-gap` / `gap-*` here.
  */
 export const CELL_LAYOUTS = {
   row:    "flex items-center gap-[10px] h-full min-w-0 overflow-hidden whitespace-nowrap",
-  col:    "flex flex-col justify-center items-start gap-[10px] h-full min-w-0 overflow-hidden",
+  col:    "flex flex-col justify-center items-start h-full min-w-0 overflow-hidden",
   center: "flex items-center justify-center gap-[10px] h-full min-w-0 overflow-hidden whitespace-nowrap",
   end:    "flex items-center justify-end gap-[10px] h-full min-w-0 overflow-hidden whitespace-nowrap",
 } as const;

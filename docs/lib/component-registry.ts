@@ -1157,7 +1157,7 @@ export default function Example() {
     slug: 'panel-alert',
     name: 'Panel Alert',
     description:
-      'A colour-coded alert block for detail panels, with an icon, title, optional badge, description, and detail lines.',
+      'A colour-coded alert block for detail panels, with an icon, title, and description.',
     category: 'Feedback',
     importName: 'PanelAlert',
     usageExample: `import { PanelAlert } from '@navanta-ai/design-system'
@@ -1167,7 +1167,6 @@ export default function Example() {
     <PanelAlert
       type="warning"
       title="Shipment delayed"
-      badge="2 days"
       description="Carrier reported a weather hold in transit."
     />
   )
@@ -1175,13 +1174,10 @@ export default function Example() {
     props: [
       { name: 'type', type: "'danger' | 'warning' | 'info' | 'success' | 'cancelled'", description: 'Severity, which drives colour and icon.' },
       { name: 'title', type: 'string', description: 'Alert title.' },
-      { name: 'badge', type: 'string', description: 'Optional badge shown at the end of the title row.' },
       { name: 'description', type: 'string', description: 'Description text below the title.' },
-      { name: 'details', type: 'string[]', description: 'Additional detail lines.' },
     ],
     knobs: [
       { name: 'type', type: 'select', options: ['danger', 'warning', 'info', 'success', 'cancelled'], default: 'warning' },
-      { name: 'badge', type: 'boolean', default: true },
     ],
   },
   {

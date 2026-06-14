@@ -13,13 +13,11 @@ const alertStyles = {
 interface PanelAlertProps {
   type: "danger" | "warning" | "info" | "success" | "cancelled";
   title: string;
-  badge?: string;
   description: string;
-  details?: string[];
   boldText?: string;
 }
 
-export function PanelAlert({ type, title, badge, description, details, boldText }: PanelAlertProps) {
+export function PanelAlert({ type, title, description, boldText }: PanelAlertProps) {
   const style = alertStyles[type] ?? alertStyles.info;
 
   if (type === "cancelled") {
@@ -48,23 +46,11 @@ export function PanelAlert({ type, title, badge, description, details, boldText 
           )}
         </div>
         <span className="text-[14px] font-semibold leading-[1.3] text-[#333]">{title}</span>
-        {badge && (
-          <span
-            className="ml-auto text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0"
-            style={{ background: `${style.iconColor}18`, color: style.iconColor }}
-          >
-            {badge}
-          </span>
-        )}
       </div>
       {/* Description */}
       <p className="text-[13px] text-[#555] leading-[1.4]">{description}</p>
-      {/* Stacked detail lines */}
-      {details?.map((line, i) => (
-        <span key={i} className="text-[12px] text-[#777] leading-[1.3]">{line}</span>
-      ))}
       {/* Legacy boldText */}
-      {!details && boldText && (
+      {boldText && (
         <p className="text-[13px] text-[#555] leading-[1.4]">
           <span className="font-medium">{boldText}</span>
         </p>

@@ -86,7 +86,6 @@ export default function Example() {
                 <PanelAlert
                   type="warning"
                   title="Shipment delayed"
-                  badge="2 days"
                   description="Carrier reported a weather hold in transit."
                 />
                 <PanelInfoGrid
