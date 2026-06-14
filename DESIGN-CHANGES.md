@@ -184,6 +184,42 @@ consumer app, on published 0.4.6).
   (`rounded-[12px]` is 12px there too).
 - Files: `src/components/Tooltip.tsx`.
 
+### 9. Progress — gradient fills (Figma color-placement) across all semantics + disabled
+**Suggestion:** "in the progress we need to use gradient design like this color placement
+structure … make sure we have all semantic colors in the progress including disabled."
+[Figma: Iris-Shareable, node 740-18842.]
+
+- **Figma structure:** the fill is a linear gradient where the **light** tint is held flat
+  across the trailing ~54% and only ramps to the saturated **dark** shade over the leading
+  ~46% (dark at the very tip) — matching the Figma stops (dark @ offset 0 = tip, light @
+  offset 0.4615 then held), on a `#E4E4E7` (Neutral/200) pill track. Implemented as a
+  3-stop ramp `light 0% → light 54% → dark 100%`. The blue bar is exact: `#234687` (dark,
+  tip) / `#89A9E5` (light). An earlier 2-stop even fade was wrong — corrected to the hold.
+- **Tokens** (`tokens.css`): repurposed the existing `--gradient-progress-*` tokens to this
+  structure — blue is the Figma pair; green/amber/red are derived dark→light pairs to the
+  same placement; added `--gradient-progress-neutral` (disabled) and `--progress-track`
+  (Figma Surface/active). Dark theme overrides the track (`#3f3f46`) + neutral ramp; the
+  semantic gradients are inherited. CSS `90deg` runs left→right and the fill grows from the
+  left, so the dark stop lives at `100%` (the tip).
+- **Component** (`Progress.tsx`): the linear fill and the `CircularProgress` stroke now use
+  these gradients (linear via inline `background-image` with a full-gradient hex fallback —
+  multi-value, so inline only per the consumption-robustness rule; circular via an SVG
+  `<linearGradient>` whose stops mirror the tokens). Track uses `--progress-track`. Added a
+  **`disabled`** prop on both (neutral grey gradient + `opacity-70` + `aria-disabled`).
+  `striped` is now an additive overlay child so it composes over the gradient instead of
+  replacing it; `indeterminate` unchanged.
+- **Variants:** `default`/`success`/`warning`/`error` plus a new **`neutral`** (black /
+  charcoal: `#a1a1aa` held → `#232122` tip; inverts to a light ramp on dark so it stays
+  visible). Additive — no breaking API change. The disabled state has its own
+  `--gradient-progress-disabled` token (grey), freeing `--gradient-progress-neutral` to be
+  the black variant.
+- Docs demo + registry updated: `disabled` knob/prop added, plus a "Semantic gradients +
+  disabled" gallery (all four variants + disabled, linear and circular).
+- Verified in the docs preview: each bar reads darker at the leading edge per the Figma
+  spec; disabled is the muted grey ramp.
+- Files: `src/tokens.css`, `src/components/Progress.tsx`,
+  `docs/.../demos/progress-demo.tsx`, `docs/lib/component-registry.ts`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)

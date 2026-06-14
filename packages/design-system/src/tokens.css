@@ -194,10 +194,22 @@
   /* Christy CTA gradient (Figma: Iris-Shareable) — blue → purple */
   --gradient-christy: linear-gradient(154.42deg, #1d4a86 1.66%, #3d348b 83.4%);
   --gradient-christy-hover: linear-gradient(154.42deg, #153664 1.66%, #2b2566 83.4%);
-  --gradient-progress-green: linear-gradient(90deg, #10b981 0%, #059669 100%);
-  --gradient-progress-amber: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
-  --gradient-progress-red: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
-  --gradient-progress-blue: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  /* Progress fill gradients — "color placement structure" from Figma
+     (Iris-Shareable, node 740-18842): the saturated DARK shade sits at the
+     leading (progress-tip) edge and fades to a LIGHT tint toward the start.
+     CSS 90deg runs left→right, and the fill grows from the left, so the dark
+     stop lives at 100% (the tip). Blue is the exact Figma pair; green/amber/red
+     are derived to the same structure; neutral drives the disabled state.
+     The light tint is HELD flat across the trailing ~54% and only ramps to the
+     dark shade over the leading ~46% (dark at the very tip), matching the Figma
+     stops (dark at offset 0 = tip, light at offset 0.4615 then held). */
+  --progress-track: #e4e4e7;                                                  /* Figma Surface/active (Neutral/200) */
+  --gradient-progress-blue:  linear-gradient(90deg, #89a9e5 0%, #89a9e5 54%, #234687 100%); /* Figma exact */
+  --gradient-progress-green: linear-gradient(90deg, #86efac 0%, #86efac 54%, #166534 100%);
+  --gradient-progress-amber: linear-gradient(90deg, #fcd34d 0%, #fcd34d 54%, #b45309 100%);
+  --gradient-progress-red:   linear-gradient(90deg, #fca5a5 0%, #fca5a5 54%, #991b1b 100%);
+  --gradient-progress-neutral: linear-gradient(90deg, #a1a1aa 0%, #a1a1aa 54%, #232122 100%); /* black/charcoal variant */
+  --gradient-progress-disabled: linear-gradient(90deg, #e4e4e7 0%, #e4e4e7 54%, #a1a1aa 100%); /* disabled state */
 }
 
 .dark {
@@ -270,4 +282,12 @@
   --btn-primary-bg-hover: #e5e5e5;
   --btn-primary-disabled-bg: #3f3f46;
   --btn-primary-disabled-text: #a1a1aa;
+
+  /* Progress (dark): darker track so the fill reads; the fill gradients keep the
+     same dark-leading-edge placement as light mode (inherited from :root). */
+  --progress-track: #3f3f46;
+  /* Neutral inverts on dark — a near-black tip would vanish on the dark track, so
+     the "neutral" fill ramps to near-white at the tip instead. */
+  --gradient-progress-neutral: linear-gradient(90deg, #71717a 0%, #71717a 54%, #fafafa 100%);
+  --gradient-progress-disabled: linear-gradient(90deg, #52525b 0%, #52525b 54%, #71717a 100%); /* disabled on dark */
 }
