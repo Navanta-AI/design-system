@@ -402,9 +402,11 @@ export default function Example() {
       { name: 'defaultValue', type: 'string', description: 'The default value when uncontrolled.' },
       { name: 'onValueChange', type: '(value: string) => void', description: 'Callback fired when the selected value changes.' },
       { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents interaction.' },
+      { name: 'hideCheck', type: 'boolean', default: 'false', description: 'Hide the selected-item checkmark (and its left gutter) in the dropdown list.' },
     ],
     knobs: [
       { name: 'disabled', type: 'boolean', default: false },
+      { name: 'hideCheck', type: 'boolean', default: false },
     ],
   },
   {

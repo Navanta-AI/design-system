@@ -220,6 +220,31 @@ structure … make sure we have all semantic colors in the progress including di
 - Files: `src/tokens.css`, `src/components/Progress.tsx`,
   `docs/.../demos/progress-demo.tsx`, `docs/lib/component-registry.ts`.
 
+### 10. Select — dropdown fits the longest option (≤280px, then wraps); trigger ellipsis; opt-out checkmark
+**Report:** "the select component needs a lot of fixes. like when it is selected, it should
+either wrap the text in next line, or extend the width of the dropdown to match the width
+of the longest text in the dropdown." (Trigger element launched from the docs.)
+
+- **Dropdown popup** (`SelectContent`): was hard-pinned to `width = triggerRect.width`, so a
+  long option was clipped (`SelectItem` used `truncate`). Now the popup is
+  `width: max-content` with `minWidth = trigger width` and a `maxWidth` of **280px** — the
+  Material Design simple-menu max (5 × 56dp); past it readability drops, so options wrap
+  (`whitespace-normal break-words`) instead of growing wider. Also capped to the viewport's
+  right edge, and a trigger wider than 280px still wins (a full-width select isn't shrunk).
+  So the list **extends to the longest option up to 280px, then wraps**.
+- **Trigger** (`SelectTrigger`): **unchanged behavior** — stays a fixed-height, single-line
+  control and truncates a too-long selected value with an ellipsis (`[&>span]:line-clamp-1`).
+  It deliberately does **not** wrap or grow; the full text lives in the open list, not the
+  closed trigger. (An interim build briefly made it wrap — reverted per the design intent.)
+- Docs demo gained a deliberately long option ("Honeycrisp apples from the orchard") so the
+  dropdown's extend-then-wrap behavior is exercised. No API change.
+- **Opt-out checkmark** (`hideCheck`): new boolean on `<Select>` (default `false` — checkmark
+  shown, unchanged). When `true`, the selected-item check in the dropdown is not rendered and
+  its left gutter is dropped (`pl-8` → `pl-2` on both `SelectItem` and `SelectLabel`, kept in
+  sync via context) so option/label text aligns flush-left. Additive, backward compatible.
+- Reference: Material Design Menus (max width 280dp). https://m2.material.io/components/menus
+- Files: `src/components/Select.tsx`, `docs/.../demos/select-demo.tsx`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)

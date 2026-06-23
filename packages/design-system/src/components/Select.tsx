@@ -21,6 +21,7 @@ interface SelectContextValue {
   setHighlightedIndex: React.Dispatch<React.SetStateAction<number>>
   items: SelectItemMeta[]
   enabledItemValues: string[]
+  hideCheck: boolean
 }
 
 const SelectContext = React.createContext<SelectContextValue | null>(null)
@@ -46,6 +47,8 @@ export interface SelectProps {
   defaultValue?: string
   onValueChange?: (value: string) => void
   disabled?: boolean
+  /** Hide the selected-item checkmark in the dropdown list (and its left gutter). */
+  hideCheck?: boolean
   children: React.ReactNode
 }
 
@@ -57,7 +60,7 @@ const Select: React.FC<SelectProps> & {
   Label: typeof SelectLabel
   Item: typeof SelectItem
   Separator: typeof SelectSeparator
-} = ({ value: controlledValue, defaultValue = '', onValueChange, disabled, children }) => {
+} = ({ value: controlledValue, defaultValue = '', onValueChange, disabled, hideCheck = false, children }) => {
   const [internalValue, setInternalValue] = React.useState(defaultValue)
   const [open, setOpen] = React.useState(false)
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
@@ -95,6 +98,7 @@ const Select: React.FC<SelectProps> & {
       setHighlightedIndex,
       items,
       enabledItemValues,
+      hideCheck,
     }),
     [
       open,
@@ -104,6 +108,7 @@ const Select: React.FC<SelectProps> & {
       highlightedIndex,
       items,
       enabledItemValues,
+      hideCheck,
     ]
   )
 
@@ -161,6 +166,9 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
           'focus-visible:border-[var(--foreground)] focus-visible:ring-ring/50 focus-visible:ring-[3px]',
           'active:border-[var(--foreground)] active:ring-ring/30 active:ring-[2px]',
           'disabled:cursor-not-allowed disabled:opacity-50',
+          // Selected value stays on one line and truncates with an ellipsis when the
+          // trigger is too narrow — the trigger never wraps or grows. (The dropdown
+          // list is where long options are shown in full / wrapped — see SelectContent.)
           '[&>span]:line-clamp-1',
           className
         )}
@@ -314,7 +322,17 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
     const triggerRect = triggerRef.current?.getBoundingClientRect()
     const top = (triggerRect?.bottom ?? 0) + window.scrollY + (position === 'popper' ? 4 : 0)
     const left = (triggerRect?.left ?? 0) + window.scrollX
-    const width = triggerRect?.width ?? 0
+    const triggerWidth = triggerRect?.width ?? 0
+    // The popup grows to fit its widest option (`max-content`) but is bounded:
+    //  • never narrower than the trigger (minWidth),
+    //  • never wider than 280px — the Material Design simple-menu max (5 × 56dp);
+    //    past it readability drops and options wrap instead,
+    //  • and never past the viewport's right edge.
+    // A trigger wider than 280px still wins (so a full-width select isn't shrunk).
+    const MENU_MAX_WIDTH = 280
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 0
+    const edgeCap = viewportWidth - (triggerRect?.left ?? 0) - 8
+    const maxWidth = Math.max(triggerWidth, Math.min(MENU_MAX_WIDTH, edgeCap))
 
     const portal = (
       <div
@@ -329,11 +347,13 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
           position: 'absolute',
           top,
           left,
-          width,
+          width: 'max-content',
+          minWidth: triggerWidth,
+          maxWidth,
           zIndex: 9999,
         }}
         className={cn(
-          'relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md',
+          'relative z-50 max-h-96 min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md',
           'ds-select-in',
           position === 'popper' && 'translate-y-1',
           className
@@ -365,13 +385,21 @@ SelectGroup.displayName = 'SelectGroup'
 export interface SelectLabelProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const SelectLabel = React.forwardRef<HTMLDivElement, SelectLabelProps>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('py-1.5 pl-8 pr-2 text-sm font-semibold text-foreground', className)}
-      {...props}
-    />
-  )
+  ({ className, ...props }, ref) => {
+    const { hideCheck } = useSelectContext()
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'py-1.5 pr-2 text-sm font-semibold text-foreground',
+          // match the item gutter so labels align with option text
+          hideCheck ? 'pl-2' : 'pl-8',
+          className
+        )}
+        {...props}
+      />
+    )
+  }
 )
 SelectLabel.displayName = 'SelectLabel'
 
@@ -388,6 +416,7 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
       highlightedIndex,
       enabledItemValues,
       setHighlightedIndex,
+      hideCheck,
     } = useSelectContext()
 
     const itemLabel = React.useMemo(() => extractText(children) || itemValue, [children, itemValue])
@@ -405,7 +434,9 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
         data-disabled={disabled ? '' : undefined}
         data-highlighted={isHighlighted ? '' : undefined}
         className={cn(
-          'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors',
+          'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pr-2 text-sm outline-none transition-colors',
+          // left gutter holds the selected checkmark; drop it when checks are hidden
+          hideCheck ? 'pl-2' : 'pl-8',
           isHighlighted && 'bg-accent text-accent-foreground',
           'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
           className
@@ -422,26 +453,28 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
         }}
         {...props}
       >
-        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-          {isSelected && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4"
-              aria-hidden="true"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-          )}
-        </span>
-        <span className="truncate">{children}</span>
+        {!hideCheck && (
+          <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+            {isSelected && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            )}
+          </span>
+        )}
+        <span className="whitespace-normal break-words">{children}</span>
       </div>
     )
   }
