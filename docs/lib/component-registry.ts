@@ -392,6 +392,47 @@ export default function Example() {
     ],
   },
   {
+    slug: 'segmented-control',
+    name: 'Segmented Control',
+    description: 'A row of mutually-exclusive options in a pill track — pick one of a small set. The active segment lifts onto a white surface. Available in three sizes. Use for switching views/modes inline; for a longer list prefer Select, for form values prefer Radio.',
+    category: 'Forms',
+    importName: 'SegmentedControl',
+    usageExample: `import { SegmentedControl } from '@navanta-ai/design-system'
+import * as React from 'react'
+
+export default function Example() {
+  const [view, setView] = React.useState('list')
+  return (
+    <SegmentedControl
+      aria-label="View"
+      size="md"
+      value={view}
+      onValueChange={setView}
+      options={[
+        { value: 'list', label: 'List' },
+        { value: 'board', label: 'Board' },
+        { value: 'calendar', label: 'Calendar' },
+      ]}
+    />
+  )
+}`,
+    props: [
+      { name: 'options', type: 'SegmentedControlOption[]', description: 'The selectable segments: { value, label, disabled? }.' },
+      { name: 'value', type: 'string', description: 'Controlled selected value.' },
+      { name: 'defaultValue', type: 'string', description: 'Initial value when uncontrolled (defaults to the first option).' },
+      { name: 'onValueChange', type: '(value: string) => void', description: 'Called when the selection changes.' },
+      { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Control size.' },
+      { name: 'fullWidth', type: 'boolean', default: 'false', description: 'Stretch segments to equal widths across the container.' },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the whole control.' },
+      { name: 'aria-label', type: 'string', description: 'Accessible name for the group (recommended).' },
+    ],
+    knobs: [
+      { name: 'size', type: 'select', options: ['sm', 'md', 'lg'], default: 'md' },
+      { name: 'fullWidth', type: 'boolean', default: false },
+      { name: 'disabled', type: 'boolean', default: false },
+    ],
+  },
+  {
     slug: 'select',
     name: 'Select',
     description: 'Displays a list of options for the user to pick from — triggered by a button.',

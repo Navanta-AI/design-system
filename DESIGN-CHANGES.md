@@ -245,6 +245,28 @@ of the longest text in the dropdown." (Trigger element launched from the docs.)
 - Reference: Material Design Menus (max width 280dp). https://m2.material.io/components/menus
 - Files: `src/components/Select.tsx`, `docs/.../demos/select-demo.tsx`.
 
+### 11. SegmentedControl — new component (pick-one pill toggle, 3 sizes)
+**Suggestion:** "[the docs KnobPanel variant switcher] — let's have a page for it and have it
+published in 3 different sizes."
+
+- The pill toggle was docs-only UI inlined in `KnobPanel`; promoted to a real, exported DS
+  component. `SegmentedControl` takes `options[]` ({ value, label, disabled? }), is
+  controlled or uncontrolled (`value`/`defaultValue` + `onValueChange`), and ships three
+  sizes — **sm / md / lg** (segment heights 24 / 28 / 36px; track 28 / 36 / 44px).
+- Active segment lifts onto a white surface (`bg-background` + `border-border` + `shadow-sm`);
+  inactive segments are `text-muted-foreground` with a hover. Matches the existing chrome
+  (same tokens the Select/inputs use).
+- **Accessibility:** `role="radiogroup"` + `role="radio"` segments with roving `tabIndex`
+  and full arrow-key / Home / End navigation (selection follows focus, disabled segments
+  skipped). Optional `fullWidth` stretches segments to equal widths; `disabled` covers the
+  whole control or per-option.
+- Exported from `index.ts`; docs page added (registry entry + demo with an interactive
+  preview and a three-size gallery; wired into the `[slug]` demo map). Closest existing
+  alternatives noted in the docs: `Tabs` and `Radio` (card).
+- Files: `src/components/SegmentedControl.tsx`, `src/index.ts`,
+  `docs/.../demos/segmented-control-demo.tsx`, `docs/lib/component-registry.ts`,
+  `docs/app/(docs)/components/[slug]/page.tsx`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)

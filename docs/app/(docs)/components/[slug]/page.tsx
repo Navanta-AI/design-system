@@ -24,6 +24,7 @@ const demoMap: Record<string, DemoComponent> = {
   checkbox: dynamic(() => import('./demos/checkbox-demo').then((m) => m.CheckboxDemo)),
   radio: dynamic(() => import('./demos/radio-demo').then((m) => m.RadioDemo)),
   switch: dynamic(() => import('./demos/switch-demo').then((m) => m.SwitchDemo)),
+  'segmented-control': dynamic(() => import('./demos/segmented-control-demo').then((m) => m.SegmentedControlDemo)),
   select: dynamic(() => import('./demos/select-demo').then((m) => m.SelectDemo)),
   dialog: dynamic(() => import('./demos/dialog-demo').then((m) => m.DialogDemo)),
   toast: dynamic(() => import('./demos/toast-demo').then((m) => m.ToastDemo)),
