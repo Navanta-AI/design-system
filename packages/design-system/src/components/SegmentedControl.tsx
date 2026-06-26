@@ -19,6 +19,8 @@ export interface SegmentedControlProps
   defaultValue?: string
   onValueChange?: (value: string) => void
   size?: 'sm' | 'md' | 'lg'
+  /** Corner rounding of the track + segments. `full` = pill (default). */
+  radius?: 'full' | 'lg' | 'md' | 'sm' | 'none'
   /** Disables the whole control. */
   disabled?: boolean
   /** Stretch segments to fill the container width (equal widths). */
@@ -33,6 +35,17 @@ const sizeStyles = {
   lg: { wrap: 'gap-1 p-1', seg: 'h-9 px-4 text-sm' },
 } as const
 
+// Track + segment rounding. Explicit px (not the radius scale) so it renders the
+// same in any consumer regardless of their --radius-* theme. Segments nest ~4px
+// tighter than the track so the active pill sits concentric inside the corners.
+const radiusStyles = {
+  full: { wrap: 'rounded-full', seg: 'rounded-full' },
+  lg: { wrap: 'rounded-[12px]', seg: 'rounded-[8px]' },
+  md: { wrap: 'rounded-[8px]', seg: 'rounded-[5px]' },
+  sm: { wrap: 'rounded-[6px]', seg: 'rounded-[4px]' },
+  none: { wrap: 'rounded-none', seg: 'rounded-none' },
+} as const
+
 const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>(
   (
     {
@@ -41,6 +54,7 @@ const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>
       defaultValue,
       onValueChange,
       size = 'md',
+      radius = 'full',
       disabled = false,
       fullWidth = false,
       className,
@@ -98,6 +112,7 @@ const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>
     }
 
     const sz = sizeStyles[size]
+    const rad = radiusStyles[radius]
     // Token utilities (bg-muted / border-border / bg-background / text-foreground /
     // text-muted-foreground) resolve from the shipped styles.css theme, matching the
     // rest of the DS chrome.
@@ -108,7 +123,8 @@ const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>
         aria-label={ariaLabel}
         aria-disabled={disabled || undefined}
         className={cn(
-          'inline-flex items-center rounded-full bg-muted',
+          'inline-flex items-center bg-muted',
+          rad.wrap,
           sz.wrap,
           fullWidth && 'flex w-full',
           disabled && 'cursor-not-allowed opacity-50',
@@ -134,8 +150,9 @@ const SegmentedControl = React.forwardRef<HTMLDivElement, SegmentedControlProps>
               onClick={() => !isDisabled && select(option.value)}
               onKeyDown={(event) => onKeyDown(event, index)}
               className={cn(
-                'inline-flex items-center justify-center rounded-full font-medium whitespace-nowrap outline-none transition-colors',
+                'inline-flex items-center justify-center font-medium whitespace-nowrap outline-none transition-colors',
                 'focus-visible:ring-ring/50 focus-visible:ring-[2px]',
+                rad.seg,
                 sz.seg,
                 fullWidth && 'flex-1',
                 isActive

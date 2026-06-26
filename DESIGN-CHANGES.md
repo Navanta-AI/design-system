@@ -252,7 +252,10 @@ published in 3 different sizes."
 - The pill toggle was docs-only UI inlined in `KnobPanel`; promoted to a real, exported DS
   component. `SegmentedControl` takes `options[]` ({ value, label, disabled? }), is
   controlled or uncontrolled (`value`/`defaultValue` + `onValueChange`), and ships three
-  sizes — **sm / md / lg** (segment heights 24 / 28 / 36px; track 28 / 36 / 44px).
+  sizes — **sm / md / lg** (segment heights 24 / 28 / 36px; track 28 / 36 / 44px) — and a
+  **`radius`** prop (`full` pill default / `lg` / `md` / `sm` / `none` square). Radius uses
+  explicit px (not the `--radius-*` scale) so it's identical across consumers, with segments
+  nested ~4px tighter than the track for concentric corners.
 - Active segment lifts onto a white surface (`bg-background` + `border-border` + `shadow-sm`);
   inactive segments are `text-muted-foreground` with a hover. Matches the existing chrome
   (same tokens the Select/inputs use).

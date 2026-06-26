@@ -26,6 +26,7 @@ export function SegmentedControlDemo({ meta }: { meta: ComponentMeta }) {
               value={view}
               onValueChange={setView}
               size={props.size as 'sm' | 'md' | 'lg' | undefined}
+              radius={props.radius as 'full' | 'lg' | 'md' | 'sm' | 'none' | undefined}
               fullWidth={props.fullWidth as boolean | undefined}
               disabled={props.disabled as boolean | undefined}
             />
@@ -34,7 +35,7 @@ export function SegmentedControlDemo({ meta }: { meta: ComponentMeta }) {
         codeTemplate={(props) => `import { SegmentedControl } from '@navanta-ai/design-system'
 
 <SegmentedControl
-  aria-label="View"${props.size && props.size !== 'md' ? `\n  size="${props.size}"` : ''}${props.fullWidth ? `\n  fullWidth` : ''}
+  aria-label="View"${props.size && props.size !== 'md' ? `\n  size="${props.size}"` : ''}${props.radius && props.radius !== 'full' ? `\n  radius="${props.radius}"` : ''}${props.fullWidth ? `\n  fullWidth` : ''}
   options={[
     { value: 'list', label: 'List' },
     { value: 'board', label: 'Board' },
@@ -54,6 +55,24 @@ export function SegmentedControlDemo({ meta }: { meta: ComponentMeta }) {
               key={size}
               aria-label={`Size ${size}`}
               size={size}
+              defaultValue="list"
+              options={OPTIONS}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Radii */}
+      <div className="flex flex-col gap-3">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Radius
+        </span>
+        <div className="flex flex-col items-start gap-4">
+          {(['full', 'lg', 'md', 'sm', 'none'] as const).map((radius) => (
+            <SegmentedControl
+              key={radius}
+              aria-label={`Radius ${radius}`}
+              radius={radius}
               defaultValue="list"
               options={OPTIONS}
             />
