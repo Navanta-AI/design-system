@@ -81,7 +81,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
               `--border-strong` grey when checked/indeterminate) so a disabled box is
               clearly distinct from an active one regardless of colour perception. The
               `peer-checked:peer-disabled` (two-pseudo) rule outranks `peer-checked`. */}
-          <div className="absolute inset-0 size-4 rounded bg-background pointer-events-none peer-checked:bg-primary peer-indeterminate:bg-primary peer-disabled:bg-[var(--muted,#f4f4f5)] peer-checked:peer-disabled:bg-[var(--border-strong,#71717b)] peer-indeterminate:peer-disabled:bg-[var(--border-strong,#71717b)] transition-colors z-0" />
+          <div className="absolute inset-0 size-4 rounded bg-background pointer-events-none peer-checked:bg-primary peer-indeterminate:bg-primary peer-disabled:bg-[var(--muted,#f4f4f5)] peer-[:disabled:checked]:bg-[var(--border-strong,#71717b)] peer-[:disabled:indeterminate]:bg-[var(--border-strong,#71717b)] transition-colors z-0" />
           {/* Checkmark SVG — shown when fully checked */}
           <svg
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-3 text-primary-foreground pointer-events-none opacity-0 peer-checked:opacity-100 peer-indeterminate:opacity-0 transition-opacity z-20"

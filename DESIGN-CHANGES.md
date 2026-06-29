@@ -288,6 +288,13 @@ published in 3 different sizes."
     keep their dim. All greys are theme tokens with hex fallbacks, so dark mode works too.
 - Docs demo gained a States gallery (enabled vs disabled × unchecked/checked/indeterminate +
   error) so the disabled greys are visible side-by-side. No API change.
+- **Follow-up (post-0.4.12):** the first cut used a two-pseudo `peer-indeterminate:peer-disabled:`
+  rule which *lost* to `peer-disabled:bg-muted` (equal specificity, Tailwind variant sort
+  order) — so disabled-**indeterminate** kept the light muted fill and its white dash was
+  invisible. Rebuilt both disabled-active fills as arbitrary peer selectors
+  (`peer-[:disabled:checked]:` / `peer-[:disabled:indeterminate]:` → `:is(.peer:disabled:…)`,
+  one higher-specificity level) so they win regardless of source order. Verified: disabled
+  checked **and** indeterminate both render the grey fill (#71717b) with a visible mark.
 - Files: `src/components/Checkbox.tsx`, `docs/.../demos/checkbox-demo.tsx`.
 
 ## 2026-06-08
