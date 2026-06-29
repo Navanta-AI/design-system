@@ -66,14 +66,22 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
               // Selected (checked) and partial (indeterminate) states get the dark primary border.
               'checked:border-primary indeterminate:border-primary',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
-              'disabled:cursor-not-allowed disabled:opacity-50',
+              // Disabled: an achromatic grey treatment (border here + grey fill on the
+              // sibling below) rather than dimming the brand colour — so the state reads
+              // for any colour vision (WCAG 1.4.1). Ordered after checked: so a
+              // disabled-checked box shows a grey, not primary, border.
+              'disabled:cursor-not-allowed disabled:border-[var(--border-control,#9f9fa9)]',
               hasError && 'border-destructive focus-visible:ring-destructive',
               className
             )}
             {...props}
           />
-          {/* Filled background — sibling after peer input, z-index behind input */}
-          <div className="absolute inset-0 size-4 rounded bg-background pointer-events-none peer-checked:bg-primary peer-indeterminate:bg-primary transition-colors z-0" />
+          {/* Filled background — sibling after peer input, z-index behind input.
+              Disabled fills are achromatic grey (muted when unchecked, the stronger
+              `--border-strong` grey when checked/indeterminate) so a disabled box is
+              clearly distinct from an active one regardless of colour perception. The
+              `peer-checked:peer-disabled` (two-pseudo) rule outranks `peer-checked`. */}
+          <div className="absolute inset-0 size-4 rounded bg-background pointer-events-none peer-checked:bg-primary peer-indeterminate:bg-primary peer-disabled:bg-[var(--muted,#f4f4f5)] peer-checked:peer-disabled:bg-[var(--border-strong,#71717b)] peer-indeterminate:peer-disabled:bg-[var(--border-strong,#71717b)] transition-colors z-0" />
           {/* Checkmark SVG — shown when fully checked */}
           <svg
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-3 text-primary-foreground pointer-events-none opacity-0 peer-checked:opacity-100 peer-indeterminate:opacity-0 transition-opacity z-20"

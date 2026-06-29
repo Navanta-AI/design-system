@@ -270,6 +270,26 @@ published in 3 different sizes."
   `docs/.../demos/segmented-control-demo.tsx`, `docs/lib/component-registry.ts`,
   `docs/app/(docs)/components/[slug]/page.tsx`.
 
+### 12. Checkbox — disabled state made evident for any colour vision
+**Report:** "the disabled checkbox is not looking evident for a color blind."
+
+- **Bug:** disabled used only `opacity-50`, and only on the input (border) + label. The
+  filled background is a *sibling* of the input, so its opacity never changed — a
+  disabled-**checked** box kept the full dark `--primary` fill + checkmark, nearly identical
+  to an enabled one. The only cue was a faint border / dimmed label — too subtle, and a
+  pure-opacity shift is a weak signal (WCAG 1.4.1 — don't rely on colour/shade alone).
+- **Fix:** disabled is now a clear **achromatic grey** treatment (distinguished by
+  lightness, not hue — so it reads for any colour vision):
+  - border → `--border-control` grey (overrides `checked:border-primary`),
+  - fill (the sibling layer now reacts to `peer-disabled`): unchecked → `--muted` (light
+    grey), checked/indeterminate → `--border-strong` (#71717b mid-grey, white check ≈ 4.7:1),
+    via a two-pseudo `peer-checked:peer-disabled:` rule that outranks `peer-checked:`.
+  - dropped the box `opacity-50` (solid grey is more evident than translucent); label/helper
+    keep their dim. All greys are theme tokens with hex fallbacks, so dark mode works too.
+- Docs demo gained a States gallery (enabled vs disabled × unchecked/checked/indeterminate +
+  error) so the disabled greys are visible side-by-side. No API change.
+- Files: `src/components/Checkbox.tsx`, `docs/.../demos/checkbox-demo.tsx`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)
