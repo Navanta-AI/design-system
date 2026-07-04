@@ -517,7 +517,7 @@ export default function Example() {
     category: 'Data Display',
     importName: 'Tabs',
     props: [
-      { name: 'tabs', type: 'TabItem[]', description: 'Array of tabs with id, label, disabled status, and optional badge.' },
+      { name: 'tabs', type: 'TabItem[]', description: 'Array of tabs: { id, label, disabled?, badge?, icon?, tone? }. Pass `icon` (a Phosphor-style icon component) to render a leading icon alongside the label — supported in every variant.' },
       { name: 'activeTab', type: 'string', description: 'Id of the controlled active tab.' },
       { name: 'onChange', type: '(id: string) => void', description: 'Callback fired when a tab is clicked.' },
       { name: 'variant', type: "'underline' | 'pills' | 'bordered'", default: "'underline'", description: 'Visual style of the tabs.' },
@@ -527,6 +527,7 @@ export default function Example() {
     knobs: [
       { name: 'variant', type: 'select', options: ['underline', 'pills', 'bordered'], default: 'underline' },
       { name: 'size', type: 'select', options: ['sm', 'md', 'lg'], default: 'md' },
+      { name: 'icons', type: 'boolean', default: false },
       { name: 'fullWidth', type: 'boolean', default: false },
       { name: 'disabled', type: 'boolean', default: false },
     ],

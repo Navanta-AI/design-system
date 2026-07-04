@@ -15,9 +15,9 @@ export interface TabItem {
   label: string;
   disabled?: boolean;
   badge?: string | number;
-  /** Leading icon (used by the `underline-pill` variant). */
+  /** Leading icon rendered before the label — supported by every variant. */
   icon?: TabIconComponent;
-  /** `critical` tints the leading icon red (urgency cue) — `underline-pill` only. */
+  /** `critical` tints the leading icon red (urgency cue). */
   tone?: 'critical';
 }
 
@@ -219,6 +219,10 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
         >
           {tabs.map((tab) => {
             const isActive = currentActive === tab.id;
+            const Icon = tab.icon;
+            const iconColor =
+              tab.tone === 'critical' ? 'var(--color-critical-700, #B91C1C)' : undefined;
+            const iconSize = size === 'sm' ? 14 : size === 'lg' ? 18 : 16;
             return (
               <button
                 key={tab.id}
@@ -261,6 +265,14 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                     'inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm leading-[22px] transition-colors',
                     isActive ? 'bg-[var(--surface-hover)] font-medium' : 'font-normal hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]'
                   )}>
+                    {Icon && (
+                      <Icon
+                        size={iconSize}
+                        weight={isActive ? 'duotone' : 'regular'}
+                        color={iconColor}
+                        className="shrink-0"
+                      />
+                    )}
                     {tab.label}
                     {tab.badge !== undefined && (
                       <span className={cn(
@@ -273,6 +285,14 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                   </span>
                 ) : (
                   <>
+                    {Icon && (
+                      <Icon
+                        size={iconSize}
+                        weight={isActive ? 'duotone' : 'regular'}
+                        color={iconColor}
+                        className="shrink-0"
+                      />
+                    )}
                     {tab.label}
                     {tab.badge !== undefined && (
                       <span className={cn(

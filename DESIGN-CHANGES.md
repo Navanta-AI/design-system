@@ -297,6 +297,20 @@ published in 3 different sizes."
   checked **and** indeterminate both render the grey fill (#71717b) with a visible mark.
 - Files: `src/components/Checkbox.tsx`, `docs/.../demos/checkbox-demo.tsx`.
 
+### 13. Tabs — leading icon (icon + text) supported in every variant
+**Suggestion:** "in the tabs component … have text and icon both at once — icons part of
+the tab title."
+
+- `TabItem.icon` already existed but was only rendered by the `underline-pill` variant; the
+  `underline` / `pills` / `bordered` variants ignored it and drew label-only. Now the
+  leading icon renders before the label in **all** variants (icon + text). `tone:'critical'`
+  tints it red everywhere too (was underline-pill-only).
+- Icon size tracks the tab `size` (sm 14 / md 16 / lg 18) and uses the Phosphor `duotone`
+  weight when active, `regular` otherwise, matching the underline-pill treatment. Purely
+  additive — tabs without an `icon` are unchanged.
+- Docs demo gained an "Icon + text" example; registry `tabs` prop doc notes `icon`/`tone`.
+- Files: `src/components/Tabs.tsx`, `docs/.../demos/tabs-demo.tsx`, `docs/lib/component-registry.ts`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)
