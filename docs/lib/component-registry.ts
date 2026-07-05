@@ -444,10 +444,12 @@ export default function Example() {
       { name: 'value', type: 'string', description: 'The controlled selected value.' },
       { name: 'defaultValue', type: 'string', description: 'The default value when uncontrolled.' },
       { name: 'onValueChange', type: '(value: string) => void', description: 'Callback fired when the selected value changes.' },
+      { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height — set on SelectTrigger. Matches the Input field sizes (sm=h-7, md=h-8, lg=h-9).' },
       { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents interaction.' },
       { name: 'hideCheck', type: 'boolean', default: 'false', description: 'Hide the selected-item checkmark (and its left gutter) in the dropdown list.' },
     ],
     knobs: [
+      { name: 'size', type: 'select', options: ['sm', 'md', 'lg'], default: 'md' },
       { name: 'disabled', type: 'boolean', default: false },
       { name: 'hideCheck', type: 'boolean', default: false },
     ],
@@ -726,7 +728,7 @@ export default function Example() {
       { name: 'side', type: "'top' | 'right' | 'bottom' | 'left'", default: "'top'", description: 'The preferred side of the trigger to render against when open.' },
       { name: 'align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'The preferred alignment against the trigger.' },
       { name: 'delay', type: 'number', default: '300', description: 'Duration in milliseconds before the tooltip appears.' },
-      { name: 'variant', type: "'default' | 'inverse'", default: "'default'", description: 'default = light popover surface; inverse = the HMTX portal look — dark surface-inverse bubble with the curved pointer aimed at the trigger (the SideNav rail style).' },
+      { name: 'variant', type: "'default' | 'inverse'", default: "'default'", description: 'Both use the theme-inverse surface (dark bubble in light theme, light in dark theme). inverse adds the HMTX curved pointer aimed at the trigger (SideNav rail style); default is a plain bubble. The tooltip is portaled to <body>, so an overflow:hidden ancestor never clips it.' },
     ],
     knobs: [
       { name: 'variant', type: 'select', options: ['default', 'inverse'], default: 'default' },

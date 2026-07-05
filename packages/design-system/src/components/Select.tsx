@@ -156,10 +156,11 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         disabled={disabled || props.disabled}
         className={cn(
           'flex w-full items-center justify-between rounded-md border border-input bg-background transition-[border-color,color,box-shadow] outline-none',
+          // Height sizes match the Input field exactly (sm/md/lg).
           size === 'sm'
-            ? 'h-7 px-2 text-xs'
+            ? 'h-7 px-2.5 text-xs'
             : size === 'lg'
-              ? 'h-9 px-3 text-sm'
+              ? 'h-9 px-3 text-base md:text-sm'
               : 'h-8 px-3 text-sm',
           'data-[placeholder]:text-muted-foreground',
           'focus:border-[var(--foreground)] focus:ring-ring/50 focus:ring-[3px]',
@@ -256,6 +257,69 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
     } = useSelectContext()
 
     const contentRef = React.useRef<HTMLDivElement>(null)
+    const [pos, setPos] = React.useState<{
+      top: number
+      left: number
+      minWidth: number
+      maxWidth: number
+      maxHeight?: number
+    }>({ top: 0, left: 0, minWidth: 0, maxWidth: 280 })
+
+    // Position the portaled listbox with viewport collision handling: open below the
+    // trigger, but flip above when there isn't room; cap the height to the available
+    // space (it scrolls); clamp horizontally so it never runs off the left/right edge.
+    // Width grows to the widest option, ≥ trigger width, ≤ 280px (Material menu max).
+    React.useEffect(() => {
+      if (!open) return
+      const compute = () => {
+        const trig = triggerRef.current
+        if (!trig) return
+        const r = trig.getBoundingClientRect()
+        const content = contentRef.current
+        const sx = window.scrollX
+        const sy = window.scrollY
+        const vw = document.documentElement.clientWidth || window.innerWidth
+        const vh = window.innerHeight || document.documentElement.clientHeight
+        const canCollide = vw > 0 && vh > 0
+        const GAP = position === 'popper' ? 4 : 0
+        const MARGIN = 8
+        const MENU_MAX_WIDTH = 280
+
+        const minWidth = r.width
+        const maxWidth = canCollide
+          ? Math.max(r.width, Math.min(MENU_MAX_WIDTH, vw - 2 * MARGIN))
+          : Math.max(r.width, MENU_MAX_WIDTH)
+
+        // Height: prefer below; flip above when below can't fit and above has more room.
+        const desired = content ? content.scrollHeight : 0
+        const spaceBelow = vh - r.bottom - GAP - MARGIN
+        const spaceAbove = r.top - GAP - MARGIN
+        let maxHeight: number | undefined
+        let placeAbove = false
+        if (canCollide) {
+          placeAbove = spaceBelow < Math.min(desired || 0, 384) && spaceAbove > spaceBelow
+          maxHeight = Math.min(384, Math.max(96, placeAbove ? spaceAbove : spaceBelow))
+        }
+        const height = maxHeight != null ? Math.min(desired || maxHeight, maxHeight) : desired
+
+        const top = placeAbove ? r.top + sy - GAP - height : r.bottom + sy + GAP
+
+        // Clamp horizontally using the measured (or trigger) width.
+        const w = content ? content.offsetWidth : r.width
+        let left = r.left + sx
+        if (canCollide) left = Math.max(sx + MARGIN, Math.min(left, sx + vw - w - MARGIN))
+
+        setPos({ top, left, minWidth, maxWidth, maxHeight })
+      }
+      compute()
+      const onMove = () => compute()
+      window.addEventListener('scroll', onMove, true)
+      window.addEventListener('resize', onMove)
+      return () => {
+        window.removeEventListener('scroll', onMove, true)
+        window.removeEventListener('resize', onMove)
+      }
+    }, [open, position])
 
     React.useEffect(() => {
       if (!open) return
@@ -319,21 +383,6 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
 
     if (!open) return null
 
-    const triggerRect = triggerRef.current?.getBoundingClientRect()
-    const top = (triggerRect?.bottom ?? 0) + window.scrollY + (position === 'popper' ? 4 : 0)
-    const left = (triggerRect?.left ?? 0) + window.scrollX
-    const triggerWidth = triggerRect?.width ?? 0
-    // The popup grows to fit its widest option (`max-content`) but is bounded:
-    //  • never narrower than the trigger (minWidth),
-    //  • never wider than 280px — the Material Design simple-menu max (5 × 56dp);
-    //    past it readability drops and options wrap instead,
-    //  • and never past the viewport's right edge.
-    // A trigger wider than 280px still wins (so a full-width select isn't shrunk).
-    const MENU_MAX_WIDTH = 280
-    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 0
-    const edgeCap = viewportWidth - (triggerRect?.left ?? 0) - 8
-    const maxWidth = Math.max(triggerWidth, Math.min(MENU_MAX_WIDTH, edgeCap))
-
     const portal = (
       <div
         ref={(node) => {
@@ -345,17 +394,17 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
         data-state="open"
         style={{
           position: 'absolute',
-          top,
-          left,
+          top: pos.top,
+          left: pos.left,
           width: 'max-content',
-          minWidth: triggerWidth,
-          maxWidth,
+          minWidth: pos.minWidth,
+          maxWidth: pos.maxWidth,
+          maxHeight: pos.maxHeight,
           zIndex: 9999,
         }}
         className={cn(
           'relative z-50 max-h-96 min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md',
           'ds-select-in',
-          position === 'popper' && 'translate-y-1',
           className
         )}
         onKeyDown={onKeyDown}

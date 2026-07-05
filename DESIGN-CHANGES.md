@@ -311,6 +311,54 @@ the tab title."
 - Docs demo gained an "Icon + text" example; registry `tabs` prop doc notes `icon`/`tone`.
 - Files: `src/components/Tabs.tsx`, `docs/.../demos/tabs-demo.tsx`, `docs/lib/component-registry.ts`.
 
+### 14. Tooltip — portal past `overflow:hidden` + theme-inverse background (standard)
+**Suggestion:** "make sure the tooltip is still fully visible even if the container has
+hide-overflow; light theme = dark tooltip, dark theme = white tooltip. Keep that as standard."
+
+- **Overflow / clipping:** the tooltip was positioned inline (absolute, relative to the
+  trigger), so an ancestor with `overflow:hidden` (or `clip`/`scroll`) clipped it. It now
+  renders through `ReactDOM.createPortal(…, document.body)` — it can never be clipped by an
+  ancestor, only the viewport. Position is computed in document coords from the trigger rect
+  measuring the trigger + tooltip and placing the box in document coords, re-anchored on
+  scroll (capture) + resize. Works for both variants and all sides/aligns.
+- **Viewport collision (auto-flip + clamp):** if the preferred side lacks room near a
+  viewport edge, the tooltip flips to the opposite side (top↔bottom, left↔right); the
+  cross-axis is then clamped so it never renders off-screen. Guarded on a known viewport
+  size (`clientWidth`/`innerHeight` > 0) — degenerate/headless 0-size environments fall
+  back to the preferred side without clamping. Verified: a `side="top"` trigger pinned to
+  the top edge flips below and stays fully within the viewport.
+- **Theme-inverse colour (now the standard for both variants):** `--surface-inverse` is now a
+  true theme-inverse — `#18181b` in light, flips to `#fafafa` in `.dark` — with a new
+  `--surface-inverse-foreground` (`#fafafa` light / `#18181b` dark). Both `default` and
+  `inverse` tooltips use `bg-[var(--surface-inverse)] text-[var(--surface-inverse-foreground)]`,
+  so the bubble is **dark on light theme, light on dark theme**. (`default` previously used the
+  light popover surface — this is a deliberate visual change to make the inverse look standard.)
+- Verified live: default tooltip portals to `<body>` (parent === body), dark `#18181b`/light
+  `#fafafa` in light theme and flips to `#fafafa`/`#18181b` under `.dark`.
+- Files: `src/components/Tooltip.tsx`, `src/tokens.css`, `docs/lib/component-registry.ts`.
+
+### 15. Select — Input-matched sizes + viewport-aware dropdown (flip/clamp)
+**Suggestion:** "multiple height sizes for Select same as the Input field; the dropdown must
+stay visible even under `overflow:hidden`; and like the tooltip, flip/adjust near a viewport
+edge (left/right/top/bottom) so it's always visible."
+
+- **Sizes match Input exactly:** `SelectTrigger` `size` sm/md/lg now uses
+  `h-7 px-2.5 text-xs` / `h-8 px-3 text-sm` / `h-9 px-3 text-base md:text-sm` — identical to
+  the Input field (sm was `px-2`, lg was `text-sm` before). Exposed as a docs knob.
+- **Overflow:** `SelectContent` already portals to `document.body`, so an `overflow:hidden`
+  (or clip/scroll) ancestor can't clip it — confirmed and kept.
+- **Viewport collision (new):** the listbox now measures the trigger + itself and:
+  flips **above** the trigger when there isn't room below (and above has more); caps its
+  height to the available space (it scrolls, `overflow-y-auto`); clamps horizontally so it
+  never runs off the left/right edge. Width unchanged (grows to widest option, ≥ trigger,
+  ≤ 280px). Guarded on a known viewport size (falls back to open-below when 0/headless).
+  Removed the `translate-y-1` offset (now handled in the computed `top`, so it doesn't fight
+  the flip). Re-anchors on scroll (capture) + resize.
+- Verified: a trigger pinned near the bottom edge opens the dropdown above it, fully within
+  the viewport; md trigger renders at 32px (= Input h-8).
+- Files: `src/components/Select.tsx`, `docs/lib/component-registry.ts`,
+  `docs/.../demos/select-demo.tsx`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)
