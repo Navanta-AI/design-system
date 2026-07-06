@@ -444,7 +444,7 @@ export default function Example() {
       { name: 'value', type: 'string', description: 'The controlled selected value.' },
       { name: 'defaultValue', type: 'string', description: 'The default value when uncontrolled.' },
       { name: 'onValueChange', type: '(value: string) => void', description: 'Callback fired when the selected value changes.' },
-      { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height — set on SelectTrigger. Matches the Input field sizes (sm=h-7, md=h-8, lg=h-9).' },
+      { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height — set on the Select root (inherited by SelectTrigger) or per-trigger on SelectTrigger. Matches the Input field sizes (sm=h-7, md=h-8, lg=h-9).' },
       { name: 'disabled', type: 'boolean', default: 'false', description: 'Prevents interaction.' },
       { name: 'hideCheck', type: 'boolean', default: 'false', description: 'Hide the selected-item checkmark (and its left gutter) in the dropdown list.' },
     ],

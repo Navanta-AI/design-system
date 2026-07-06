@@ -22,6 +22,7 @@ interface SelectContextValue {
   items: SelectItemMeta[]
   enabledItemValues: string[]
   hideCheck: boolean
+  size: 'sm' | 'md' | 'lg'
 }
 
 const SelectContext = React.createContext<SelectContextValue | null>(null)
@@ -49,6 +50,9 @@ export interface SelectProps {
   disabled?: boolean
   /** Hide the selected-item checkmark in the dropdown list (and its left gutter). */
   hideCheck?: boolean
+  /** Trigger height (matches the Input field). Set here on the root, or per-trigger
+   *  on `SelectTrigger` (an explicit `SelectTrigger size` wins). */
+  size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
 }
 
@@ -60,7 +64,7 @@ const Select: React.FC<SelectProps> & {
   Label: typeof SelectLabel
   Item: typeof SelectItem
   Separator: typeof SelectSeparator
-} = ({ value: controlledValue, defaultValue = '', onValueChange, disabled, hideCheck = false, children }) => {
+} = ({ value: controlledValue, defaultValue = '', onValueChange, disabled, hideCheck = false, size = 'md', children }) => {
   const [internalValue, setInternalValue] = React.useState(defaultValue)
   const [open, setOpen] = React.useState(false)
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
@@ -99,6 +103,7 @@ const Select: React.FC<SelectProps> & {
       items,
       enabledItemValues,
       hideCheck,
+      size,
     }),
     [
       open,
@@ -109,6 +114,7 @@ const Select: React.FC<SelectProps> & {
       items,
       enabledItemValues,
       hideCheck,
+      size,
     ]
   )
 
@@ -120,7 +126,7 @@ export interface SelectTriggerProps extends React.ButtonHTMLAttributes<HTMLButto
 }
 
 const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
-  ({ className, children, onClick, onKeyDown, size = 'md', ...props }, ref) => {
+  ({ className, children, onClick, onKeyDown, size: sizeProp, ...props }, ref) => {
     const {
       open,
       setOpen,
@@ -129,7 +135,10 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
       disabled,
       setHighlightedIndex,
       enabledItemValues,
+      size: contextSize,
     } = useSelectContext()
+    // An explicit `size` on SelectTrigger wins; otherwise inherit the root `<Select size>`.
+    const size = sizeProp ?? contextSize
 
     const mergedRef = React.useCallback(
       (node: HTMLButtonElement | null) => {

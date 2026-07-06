@@ -345,6 +345,10 @@ edge (left/right/top/bottom) so it's always visible."
 - **Sizes match Input exactly:** `SelectTrigger` `size` sm/md/lg now uses
   `h-7 px-2.5 text-xs` / `h-8 px-3 text-sm` / `h-9 px-3 text-base md:text-sm` — identical to
   the Input field (sm was `px-2`, lg was `text-sm` before). Exposed as a docs knob.
+- **`size` on the `Select` root (follow-up):** `size` was only on `SelectTrigger`, which is
+  easy to miss — `<Select size="lg">` did nothing. `size` is now accepted on the root and
+  propagated to the trigger via context (an explicit `SelectTrigger size` still wins), so it
+  works whichever way it's set. Demo sets it on the root.
 - **Overflow:** `SelectContent` already portals to `document.body`, so an `overflow:hidden`
   (or clip/scroll) ancestor can't clip it — confirmed and kept.
 - **Viewport collision (new):** the listbox now measures the trigger + itself and:

@@ -15,8 +15,8 @@ export function SelectDemo({ meta }: SelectDemoProps) {
       defaultChildren=""
       renderPreview={(props) => (
         <div className="w-full max-w-xs">
-          <Select disabled={props.disabled as boolean | undefined} hideCheck={props.hideCheck as boolean | undefined}>
-            <SelectTrigger size={props.size as 'sm' | 'md' | 'lg' | undefined} className="w-full sm:w-[180px]">
+          <Select size={props.size as 'sm' | 'md' | 'lg' | undefined} disabled={props.disabled as boolean | undefined} hideCheck={props.hideCheck as boolean | undefined}>
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Select a fruit" />
             </SelectTrigger>
             <SelectContent>
