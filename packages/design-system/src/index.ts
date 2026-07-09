@@ -45,12 +45,14 @@ export { Pagination, type PaginationProps } from './components/Pagination'
 // (e.g. the existing `SortDirection` from use-table-sort).
 export {
   DataTable,
+  ColumnFilterMenu,
   CELL_LAYOUTS as DATA_TABLE_CELL_LAYOUTS,
   DEFAULT_CELL_LAYOUT as DATA_TABLE_DEFAULT_CELL_LAYOUT,
   DATA_TABLE_DEFAULTS,
 } from './components/data-table'
 export type {
   DataTableProps,
+  ColumnFilterMenuProps,
   Column as DataTableColumn,
   SlotColumn as DataTableSlotColumn,
   SelectionConfig as DataTableSelection,

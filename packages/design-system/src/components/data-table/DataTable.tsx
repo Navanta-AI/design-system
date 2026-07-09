@@ -68,6 +68,21 @@ export interface DataTableProps<T> extends DataTableAppearance {
   /** Reserved vertical space as a row count (ignored when rowHeight is "auto"). */
   reserveRowCount?: number;
 
+  /**
+   * Hover-reveal action cluster pinned to the row's trailing edge. DS renders it
+   * as a gradient-masked overlay in the last cell, revealed on row hover/focus
+   * (set `alwaysShowRowActions` to keep it always visible). Clicks inside it don't
+   * bubble to `onRowClick`.
+   */
+  rowActions?: (row: T, ctx: CellContext<T>) => ReactNode;
+  alwaysShowRowActions?: boolean;
+
+  /**
+   * Renders a bulk-action bar (sticky, above the table) whenever the selection is
+   * non-empty. Receives the currently-selected rows. Requires `selection`.
+   */
+  renderBulkBar?: (selectedRows: T[]) => ReactNode;
+
   onRowClick?: (row: T) => void;
   rowClassName?: (row: T) => string;
   /** Per-row inline styles — e.g. a resolved/selected row background. Merged onto the `<tr>`. */
@@ -135,6 +150,9 @@ export function DataTable<T>(props: DataTableProps<T>) {
     loadingRowCount = DATA_TABLE_DEFAULTS.loadingRowCount,
     loadingRow,
     emptyState,
+    rowActions,
+    alwaysShowRowActions = false,
+    renderBulkBar,
     onRowClick,
     rowClassName,
     rowStyle,
@@ -329,6 +347,13 @@ export function DataTable<T>(props: DataTableProps<T>) {
     );
   };
 
+  // The rowActions overlay is hosted in the row's last cell (trailing rightSlot,
+  // else last column) so it pins to the row's right edge.
+  const overlayInSlots = !!rowActions && rightSlots.length > 0;
+  const overlayInColumns = !!rowActions && rightSlots.length === 0 && orderedColumns.length > 0;
+  const lastColKey = overlayInColumns ? orderedColumns[orderedColumns.length - 1].key : null;
+  const lastRightSlotId = overlayInSlots ? rightSlots[rightSlots.length - 1].id : null;
+
   const renderBodyRow = (row: T, index: number) => {
     const id = rowKey(row);
     const isSelected = selection?.selected.has(id) ?? false;
@@ -340,16 +365,34 @@ export function DataTable<T>(props: DataTableProps<T>) {
     const rowHoverVar =
       rowHoverColor != null ? ({ "--dt-row-hover": rowHoverColor(row) ?? rowHoverBg } as CSSProperties) : null;
 
+    // Gradient-masked action cluster, revealed on row hover/focus (or always).
+    const actionsOverlay = rowActions ? (
+      <div
+        className={`dt-row-actions absolute inset-y-0 right-0 flex items-center gap-1 pl-8 ${
+          alwaysShowRowActions ? "dt-row-actions--always" : ""
+        }`}
+        style={{
+          paddingRight: cellPaddingX,
+          background: "linear-gradient(to right, transparent, var(--dt-row-hover) 32px)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {rowActions(row, ctx)}
+      </div>
+    ) : null;
+
     const slotCell = (slot: SlotColumn<T>) => {
       const stop = slot.stopRowClick !== false;
+      const isHost = overlayInSlots && slot.id === lastRightSlotId;
       return (
         <td
           key={slot.id}
           className={`align-middle ${slot.cellClassName ?? ""}`}
-          style={{ height: numericRowHeight }}
+          style={{ height: numericRowHeight, ...(isHost ? { position: "relative", overflow: "visible" } : null) }}
           onClick={stop ? (e) => e.stopPropagation() : undefined}
         >
           <div className="flex h-full items-center">{slot.cell(row, ctx)}</div>
+          {isHost ? actionsOverlay : null}
         </td>
       );
     };
@@ -374,12 +417,18 @@ export function DataTable<T>(props: DataTableProps<T>) {
             typeof col.cellClassName === "function"
               ? col.cellClassName(row)
               : (col.cellClassName ?? "");
+          const isHost = overlayInColumns && col.key === lastColKey;
           const tdStyle: CSSProperties = {
             ...(isAutoHeight
               ? null
-              : { height: numericRowHeight, maxHeight: numericRowHeight, overflow: "hidden" }),
+              : {
+                  height: numericRowHeight,
+                  maxHeight: numericRowHeight,
+                  overflow: isHost ? "visible" : "hidden",
+                }),
             paddingLeft: cellPaddingX,
             paddingRight: cellPaddingX,
+            ...(isHost ? { position: "relative" } : null),
             ...(col.width == null
               ? {
                   ...(col.minWidth != null ? { minWidth: col.minWidth } : null),
@@ -398,8 +447,14 @@ export function DataTable<T>(props: DataTableProps<T>) {
             layoutCls = layoutCls.replace(" h-full", "").replace(" overflow-hidden", "");
           }
           return (
-            <td key={col.key} className={`py-0 ${alignCls} ${extra}`} style={tdStyle}>
+            <td
+              key={col.key}
+              className={`py-0 ${alignCls} ${extra}`}
+              style={tdStyle}
+              onClick={col.stopRowClick ? (e) => e.stopPropagation() : undefined}
+            >
               <div className={layoutCls}>{col.cell(row, ctx)}</div>
+              {isHost ? actionsOverlay : null}
             </td>
           );
         })}
@@ -443,15 +498,25 @@ export function DataTable<T>(props: DataTableProps<T>) {
       </tr>
     );
 
+  const allVisibleRows = isGrouped ? groups!.flatMap((g) => g.rows as T[]) : sortedData;
+  const selectedRows =
+    selection && renderBulkBar ? allVisibleRows.filter((r) => selection.selected.has(rowKey(r))) : [];
+  const showBulkBar = !!renderBulkBar && selectedRows.length > 0;
+
   return (
     <>
       <div
         className={`${renderMobileCard ? "hidden md:flex" : "flex"} w-full flex-col`}
         style={{ ...rootVars, ...(reservedHeight != null ? { minHeight: reservedHeight } : null) }}
       >
+        {showBulkBar && (
+          <div className="ds-datepicker-in sticky top-0 z-[2] w-full">
+            {renderBulkBar!(selectedRows)}
+          </div>
+        )}
         <div className={`w-full overflow-x-auto hide-scrollbar ${showEmpty ? "" : "flex-1"}`}>
           <table
-            className="min-w-full text-sm"
+            className="dt-table min-w-full text-sm"
             style={{ tableLayout: orderedColumns.some((c) => c.width == null) ? "auto" : "fixed" }}
           >
             <colgroup>
@@ -483,7 +548,15 @@ export function DataTable<T>(props: DataTableProps<T>) {
               {!isLoading && isGrouped &&
                 groups!.flatMap((group) => [
                   renderGroupBand(group),
-                  ...group.rows.map((row, i) => renderBodyRow(row, i)),
+                  ...(group.rows.length === 0 && group.emptyState != null
+                    ? [
+                        <tr key={`__ge_${group.key}`} className="border-b border-[color:var(--dt-row-border)]">
+                          <td colSpan={colCount} style={{ paddingLeft: cellPaddingX, paddingRight: cellPaddingX }}>
+                            {group.emptyState}
+                          </td>
+                        </tr>,
+                      ]
+                    : group.rows.map((row, i) => renderBodyRow(row, i))),
                 ])}
               {!isLoading && !isGrouped && sortedData.map(renderBodyRow)}
             </tbody>

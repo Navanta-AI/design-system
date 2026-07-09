@@ -97,3 +97,56 @@ export function resetFacet(f: FilterFacet): void {
 export function facetsActiveCount(facets: FilterFacet[]): number {
   return facets.reduce((n, f) => n + facetActiveCount(f), 0);
 }
+
+/** Clear every facet back to its inactive state (drives the "Clear all" action). */
+export function clearAllFacets(facets: FilterFacet[]): void {
+  facets.forEach(resetFacet);
+}
+
+/** A single applied filter, shown as a removable chip in the applied-filters bar. */
+export interface AppliedFacetChip {
+  /** Unique React key. */
+  key: string;
+  /** Chip text — the selected option's label (or the insight's label). */
+  label: ReactNode;
+  /** Dimension name (e.g. "Status") — for an optional prefix. */
+  facetLabel: ReactNode;
+  /** Remove just this value (leaves the facet's other selections intact). */
+  onRemove: () => void;
+}
+
+/**
+ * Flatten every active facet value into one removable chip each — a select's value,
+ * each of a toggle-group's selected values, or an active boolean insight. Drives the
+ * TableShell applied-filters bar so a selection made anywhere (a facet control OR a
+ * DataTable `ColumnFilterMenu` bound to the same state) shows as a crossable chip.
+ */
+export function facetAppliedChips(facets: FilterFacet[]): AppliedFacetChip[] {
+  const chips: AppliedFacetChip[] = [];
+  for (const f of facets) {
+    if (f.kind === "select") {
+      if (f.value != null && f.value !== "") {
+        const opt = f.options.find((o) => o.value === f.value);
+        chips.push({
+          key: f.key,
+          label: opt?.label ?? f.value,
+          facetLabel: f.label,
+          onRemove: () => f.onChange(null),
+        });
+      }
+    } else if (f.kind === "toggle-group") {
+      for (const v of f.value) {
+        const opt = f.options.find((o) => o.value === v);
+        chips.push({
+          key: `${f.key}:${v}`,
+          label: opt?.label ?? v,
+          facetLabel: f.label,
+          onRemove: () => f.onChange(f.value.filter((x) => x !== v)),
+        });
+      }
+    } else if (f.active) {
+      chips.push({ key: f.key, label: f.label, facetLabel: f.label, onRemove: () => f.onToggle() });
+    }
+  }
+  return chips;
+}

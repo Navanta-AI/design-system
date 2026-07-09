@@ -51,6 +51,13 @@ export interface Column<T> {
   cellLayout?: CellLayout;
   wrapLines?: 1 | 2;
   /**
+   * When true, clicks inside this cell don't bubble to `onRowClick` — for
+   * interactive cells (a Select/dropdown, inline input, action button) that
+   * shouldn't trigger a row navigation. Default false. (`SlotColumn` stops by
+   * default; regular data columns opt in.)
+   */
+  stopRowClick?: boolean;
+  /**
    * Which side of the label the sort caret sits on. Right-aligned numeric
    * headers often want the caret BEFORE the label. Defaults to "trailing".
    */
@@ -99,6 +106,12 @@ export interface GroupConfig<T> {
   rows: readonly T[];
   /** Extra className on the band's `<td>`. */
   headerClassName?: string;
+  /**
+   * Rendered as a full-width row under the band when this group's `rows` is
+   * empty (e.g. after a shared search/filter narrows it to zero) — for per-group
+   * "No products need review." messaging. Omit to render nothing for empty groups.
+   */
+  emptyState?: ReactNode;
 }
 
 /**

@@ -363,6 +363,167 @@ edge (left/right/top/bottom) so it's always visible."
 - Files: `src/components/Select.tsx`, `docs/lib/component-registry.ts`,
   `docs/.../demos/select-demo.tsx`.
 
+### 16. DataTable — expandable rows, hover row-actions, bulk bar, per-column stopRowClick, group emptyState
+**Suggestion:** a batch of DataTable gaps (expandable/inline sub-row editor; hover-reveal
+action overlay; interactive cell that stops row-click; per-group empty state; first-class
+bulk bar). Assessed the full list — items 3 (`visibleKeys` reorder), 7 (right-align), and 8
+(`cellLayout:"col"`) were **already supported**, so only the following are new:
+
+- **Expandable / nested rows (#1):** `isRowExpanded?(row)` + `renderNestedRow?(row, ctx)`
+  (+ optional `nestedRowClassName`) render a full-`colSpan` `<tr>` directly beneath the
+  matching row (inline override/hold/reject editors, detail panels, nested content).
+  `renderBodyRow` emits `<Fragment>{dataRow}{nestedRow}</>`. (Unified with the concurrently
+  merged `renderNestedRow` API from PR #2 — one name for the feature, not two.)
+- **Hover row-actions (#2):** `rowActions?(row, ctx)` renders a gradient-masked cluster
+  pinned to the row's trailing edge (hosted in the last cell, `position:relative`), revealed
+  on `tr:hover`/`:focus-within` via a **shipped, `.dt-table`-scoped CSS rule** (NOT the
+  `opacity-0 → group-hover` utility cascade, per the consumer-safety standard).
+  `alwaysShowRowActions` forces it visible. Clicks don't bubble to `onRowClick`.
+- **`Column.stopRowClick` (#4):** regular data columns can now stop row-click propagation
+  (a Select/dropdown/inline-input cell), matching `SlotColumn`'s existing flag.
+- **`GroupConfig.emptyState` (#5):** rendered as a full-width row under a group's band when
+  that group has zero rows after filtering ("No pre-cleared products.").
+- **`renderBulkBar` (#6):** `renderBulkBar?(selectedRows)` renders a **sticky bar above the
+  table** whenever the selection is non-empty (requires `selection`); reuses `ds-datepicker-in`
+  for the slide-in.
+- Docs: registry props documented (incl. the confirmation that `visibleKeys` reorders +
+  filters), demo gained an expandable/hover-actions/bulk-bar example and a grouped
+  empty-state example. Verified live: expanded sub-row, `.dt-row-actions` overlay, bulk bar,
+  and the empty group all render; no console errors.
+- Files: `src/components/data-table/DataTable.tsx`, `.../types.ts`, `src/styles.css`,
+  `docs/lib/component-registry.ts`, `docs/.../demos/data-table-demo.tsx`.
+
+### 17. DataTable — `ColumnFilterMenu` (column-header filter + sort, synced to the TableShell band)
+**Suggestion:** column-level sort/filter menu (per `iris/docs/data-table-column-filter-menu.md`)
+whose applied filters "reflect on the TableShell right above the data table — use the
+existing filter-showing component."
+
+- New exported `ColumnFilterMenu` — a funnel in a column header opens a popover with a
+  **Sort** section (A→Z / Z→A) and a **Filter** section (checkbox list of the column's
+  distinct values + Clear). Built to the reference spec: portaled to `<body>` (escapes the
+  table's `overflow` clip), `position:fixed`, measure-then-reveal, auto-flip above +
+  viewport clamp, reposition (not close) on scroll/resize, dismiss on outside-mousedown /
+  Escape. Fully controlled (`label`, `activeDir`, `options`, `selected`, `onSort`,
+  `onToggle`, `onClear`, `sortable?`).
+- Tokens mapped to DS: accent = `--info-strong` (the same "selected" blue the DataTable
+  checkbox uses), hover `--surface-hover`, border/divider `--border-default`, elevation
+  `--shadow-menu` (matches the DS `Popover` chrome exactly — border + shadow + 10px radius),
+  `--surface-base`/`--text-primary`/`--text-secondary` — all with hex fallbacks. Uses the DS
+  `Checkbox` for options. (Elevation switched from `--shadow-dropdown` to `--shadow-menu` so
+  every DS floating panel shares one chrome; portal + viewport-collision behavior unchanged.)
+- **Reflects in the TableShell band via the existing facet component:** because it's fully
+  controlled, binding its `selected`/`onToggle`/`onClear` to the same state as a TableShell
+  `toggle-group` `FilterFacet` makes the applied filter show as chips in the filter band
+  above — no new "filter display" needed. Verified live: selecting "Open" in the column
+  funnel pressed the "Open" chip in the band and filtered the table to the Open rows.
+- Rendered via a column's `headerCell` (set `sortable:false` so the funnel owns sort).
+  Exported from the package (`ColumnFilterMenu`, `ColumnFilterMenuProps`). Docs demo +
+  registry note added.
+- **Auto-search for long lists (STANDARD, added later):** when a filter list has more than
+  **7** values, the menu automatically shows a DS `Input` search above the checkbox list
+  (list scrolls internally so Sort + search stay pinned); typing filters by label, "No
+  matches" when empty, query is local + resets on close. Applied to BOTH `ColumnFilterMenu`
+  and TableShell's `FacetMultiSelect` (the collapsed "Filters" menu multi-selects), keyed off
+  a shared `SEARCH_THRESHOLD = 7`. Verified: an 8-warehouse column shows the search ("re" →
+  Reno); the 3-value Status column shows none.
+- Files: `src/components/data-table/ColumnFilterMenu.tsx`, `.../data-table/index.ts`,
+  `src/index.ts`, `src/components/ui/TableShell.tsx`, `docs/lib/component-registry.ts`,
+  `docs/.../demos/data-table-demo.tsx`.
+
+### 18. TableShell — mandatory applied-filters bar (removable chips + Clear all) for facets
+**Suggestion:** "when a filter is selected there should be a section at the top of the table
+listing the filters, each crossable, with a Clear all — mandatory whenever filters are on."
+
+- The `facets` band rendered the filter *controls* but no applied-filter *summary* (the
+  removable-pill bar only existed on the deprecated `activeFilters` prop). Added an
+  auto-derived applied-filters bar to the facets branch: it renders **whenever any facet has
+  an active value**, one crossable chip per applied value (✕ removes just that value) plus a
+  **Clear all** that resets every facet. No opt-in — mandatory when filters are selected.
+- Driven by two new `facets.ts` helpers — `facetAppliedChips(facets)` (flattens select
+  value / each toggle-group value / active insight into `{ key, label, facetLabel, onRemove }`)
+  and `clearAllFacets(facets)`. Both exported for consumers who build a bespoke bar.
+- Because it derives from the facet state, a value picked in a DataTable `ColumnFilterMenu`
+  bound to the same facet shows here too — one source of truth across the column menu, the
+  band chips, and this bar. Verified: selecting statuses added crossable chips above the
+  table; Clear all removed them and un-pressed the band chips.
+- **Style (Figma Iris-Shareable, node 1057-6227):** a leading **"Filtered by:"** label
+  (text-secondary, 14px), value chips with a light `--border-default` border + `--surface-base`
+  fill + trailing ✕, and a **"Clear All"** link in the info-blue (`--info-strong`). Chips show
+  the value only (dimension implied by the label), matching the reference.
+- Files: `src/components/ui/facets.ts`, `src/components/ui/TableShell.tsx`,
+  `src/components/ui/index.ts`.
+
+### 19. TableShell — search always left / filters always right, width-based collapse to "Filters"
+**Suggestion:** "the search stays on left and the filters stay on right. and in case the
+filters are more they are stacked in more filters select option."
+
+- **Bug:** the facets band let the filter group wrap to its own line when the promoted set
+  didn't fit — search would end up above the filters (two rows) at desktop, or the filters
+  clipped past the band's right edge at tablet widths. Neither matched the ask (search LEFT,
+  filters RIGHT, one row, overflow into a filters popover).
+- **Fix (container query, two right-side layouts keyed off the band's own width):**
+  - Search sits LEFT and shrinks to a floor; the filter group is `ml-auto shrink-0`, pinned
+    RIGHT on the **same row** — it never wraps below the search.
+  - **Wide (`@4xl/tsfilter` ≈ 896px+):** inline promoted facets + the count-based
+    **"More filters"** popover (`splitFacets`/`maxInlineChips`), as before.
+  - **Narrow (below `@4xl`):** the inline group is hidden and **every** facet collapses into
+    a single **"Filters"** popover (badged with the total active count). Nothing clips at any
+    width regardless of how many facets there are — the collapse is width-driven, so a
+    consumer doesn't have to hand-tune `maxInlineChips` for small screens.
+  - Both layouts render from the same facet state, so a selection made in either (or in a
+    DataTable `ColumnFilterMenu` bound to the same facet) stays in sync and flows into the
+    applied-filters bar (#18).
+- Verified in the docs preview: desktop = search left + inline facets + "More filters" on one
+  row; 760px = search left + one "Filters" button (all facets grouped inside, no clip);
+  selecting a value in the collapsed popover badged the button and populated the applied bar.
+- Supersedes the earlier `w-full`-stacking behavior (this session's entry #1) — the band no
+  longer stacks filters below the search; it collapses them into a popover instead.
+- Files: `src/components/ui/TableShell.tsx`.
+
+### 20a. TableShell — collapsed "Filters" menu is a uniform column of dropdowns (no doubled labels)
+**Suggestion:** "all items should be dropdown here and seems like we are repeating the labels twice."
+
+- The collapsed "Filters" popover (and the wide "More filters" overflow) rendered a section
+  **header** per `group` PLUS the facet's own **label** — so single-facet groups read
+  "STATUS / Status", "PRIORITY / Priority", etc. And it mixed controls (selects as dropdowns,
+  Priority/Insights as loose chips).
+- **Fix:** `MoreFiltersContent` now renders ONE labeled row per facet — label shown once, no
+  uppercase group header duplicating it — and every control is a **dropdown**:
+  - `select` → the DS `Select` (full-width).
+  - `toggle-group` (e.g. Priority) and each `group` of boolean `toggle` insights (e.g.
+    Insights: High demand / This week / At risk) → a new **`FacetMultiSelect`** (a nested
+    `Popover` of DS `Checkbox`es styled like `SelectTrigger`; trigger shows the placeholder,
+    the single value, or "N selected").
+- Inline chips in the WIDE band are unchanged (chips still read best inline); this is the
+  menu representation only. Verified: menu shows Status / Due date / Priority / Insights /
+  Warehouse as five dropdowns; checking "Critical" in the Priority dropdown badged it and
+  populated the applied-filters bar.
+- Files: `src/components/ui/TableShell.tsx`.
+
+### 20b. TableShell — Customize auto-populates from the table's columns; first column FIXED (standard)
+**Suggestion:** "the customize dropdown should always have all columns that are part of the
+table below automatically it should read them. also it should have the first column as fixed
+and rest should be movable. keep this as standard."
+
+- The Customize popover required a hand-maintained parallel `TableColumn[]`, and it omitted the
+  table's fixed lead column entirely (the playground listed only the optional columns).
+- **Standard now:** pass the SAME `columns` your table renders to `TableShell.columns` — a
+  `DataTable`'s `Column[]` is assignable directly (shared `key` / `label` / `alwaysVisible`),
+  so the popover always lists EXACTLY the table's columns, no second list to maintain. The
+  **first column is FIXED** — always shown, no toggle, not draggable (rendered with a "Fixed"
+  tag); every other column shows/hides + reorders.
+- **Controlled model (chosen wiring — "TableShell reads DataTable columns"):** added
+  `visibleKeys` + `onVisibleKeysChange` to TableShell, mirroring `DataTable.visibleKeys`.
+  Share one `visibleKeys` state between the two: Customize edits emit the next ordered visible
+  keys and the DataTable renders from them. `onColumnsChange` (mutated `hidden` + order) stays
+  as the legacy path for the deprecated `Table`. `TableColumn` gained `alwaysVisible?` to match
+  `Column`.
+- Verified in both demos: the DataTable example (`ColumnFilterExample`, visibleKeys mode) lists
+  Order (Fixed) + Ship to / Status / Qty — toggling Qty hid it in the table and back; the
+  TableShell playground (legacy mode) lists HD PO # (Fixed) + all nine optional columns.
+- Files: `src/components/ui/TableShell.tsx`; docs: `data-table-demo.tsx`,
+  `table-shell-playground.tsx`, `component-registry.ts`.
+
 ## 2026-06-08
 
 ### 1. Pill — new status-tag component (semantic variants × 3 sizes)

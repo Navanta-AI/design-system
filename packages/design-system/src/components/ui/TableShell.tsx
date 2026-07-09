@@ -17,12 +17,15 @@ import { Switch } from "../Switch";
 import { Tabs, type TabItem } from "../Tabs";
 import { type PillProps } from "../Pill";
 import { Chip } from "../Chip";
+import { Checkbox } from "../Checkbox";
 import { Popover } from "./Popover";
 import {
   type FilterFacet,
   type SelectFacet,
   type ToggleGroupFacet,
   facetsActiveCount,
+  facetAppliedChips,
+  clearAllFacets,
 } from "./facets";
 
 export interface ActiveFilter {
@@ -71,8 +74,11 @@ export interface TableColumn {
   label: string;
   /** Can the user hide this column? Default true. `false` = always shown. */
   hideable?: boolean;
-  /** Currently hidden (controlled). */
+  /** Currently hidden (controlled). Used in the legacy `onColumnsChange` mode. */
   hidden?: boolean;
+  /** Pinned visible; cannot be hidden. Mirrors DataTable's `Column.alwaysVisible`
+      so a DataTable's `columns` can be passed straight through to Customize. */
+  alwaysVisible?: boolean;
 }
 
 /* ── Unified filter band helpers (facets API) ─────────────────────────────── */
@@ -81,6 +87,9 @@ export interface TableColumn {
  *  Select collects it (it skips falsy values), keeping it keyboard-navigable and
  *  letting the trigger show the placeholder label. Mapped back to null on change. */
 const FACET_CLEAR = "__all__";
+
+/** STANDARD: a filter value list longer than this auto-shows a search field. */
+const FACET_SEARCH_THRESHOLD = 7;
 
 /** Search field shared by the legacy toolbar and the unified facet band. */
 function FacetSearch({
@@ -93,10 +102,11 @@ function FacetSearch({
   placeholder: string;
 }) {
   // Figma search spec (Iris-Shareable 449-4173): rounded-8 box, regular-weight
-  // trailing magnifier, light neutral-400 placeholder. Fixed width via the
-  // --table-search-width DS token (capped to the container on narrow screens).
+  // trailing magnifier, light neutral-400 placeholder. Pinned left at the
+  // --table-search-width DS token; shrinks (down to a floor) when the band is
+  // narrow so it stays on one row with the right-aligned filters.
   return (
-    <div className="w-full @4xl/tsfilter:w-[var(--table-search-width)] max-w-full shrink-0">
+    <div className="w-[var(--table-search-width)] max-w-full min-w-[150px] shrink">
       <Input
         size="md"
         type="search"
@@ -137,14 +147,14 @@ function ToggleGroupChips({ facet }: { facet: ToggleGroupFacet }) {
 }
 
 /** Single-select dropdown — reuses the DS `Select` unmodified (null ↔ "" bridge). */
-function FacetSelectControl({ facet }: { facet: SelectFacet }) {
+function FacetSelectControl({ facet, fullWidth }: { facet: SelectFacet; fullWidth?: boolean }) {
   const placeholder = facet.placeholder ?? "All";
   return (
     <Select
       value={facet.value ?? FACET_CLEAR}
       onValueChange={(v) => facet.onChange(v === FACET_CLEAR ? null : v)}
     >
-      <SelectTrigger size="md" className="w-auto min-w-[120px]">
+      <SelectTrigger size="md" className={fullWidth ? "w-full" : "w-auto min-w-[120px]"}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
@@ -156,6 +166,86 @@ function FacetSelectControl({ facet }: { facet: SelectFacet }) {
         ))}
       </SelectContent>
     </Select>
+  );
+}
+
+interface MultiSelectItem {
+  key: string;
+  label: ReactNode;
+  icon?: ReactNode;
+  checked: boolean;
+  onToggle: () => void;
+}
+
+/**
+ * Multi-select dropdown — a nested `Popover` of checkboxes styled like `SelectTrigger`.
+ * Used in the collapsed "Filters" menu so a multi-value facet (a toggle-group, or a
+ * bundle of boolean insight toggles) reads as a uniform dropdown alongside the single-
+ * selects, instead of a loose row of chips.
+ */
+function FacetMultiSelect({ placeholder, items }: { placeholder: ReactNode; items: MultiSelectItem[] }) {
+  const active = items.filter((i) => i.checked);
+  const triggerText =
+    active.length === 0 ? placeholder : active.length === 1 ? active[0].label : `${active.length} selected`;
+  // STANDARD: a long value list gets an automatic search field (string labels only).
+  const [query, setQuery] = useState("");
+  const showSearch = items.length > FACET_SEARCH_THRESHOLD;
+  const q = query.trim().toLowerCase();
+  const searchText = (i: MultiSelectItem) => (typeof i.label === "string" ? i.label : i.key).toLowerCase();
+  const visible = showSearch && q ? items.filter((i) => searchText(i).includes(q)) : items;
+  return (
+    <Popover
+      align="start"
+      className="w-full"
+      label={typeof placeholder === "string" ? placeholder : "Filter"}
+      trigger={({ open, triggerProps }) => (
+        <button
+          type="button"
+          {...triggerProps}
+          className="flex h-8 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-sm text-[var(--text-primary)] outline-none transition-[border-color,box-shadow] focus:border-[var(--foreground)] focus:ring-[3px] focus:ring-ring/50"
+        >
+          <span className={`line-clamp-1 ${active.length === 0 ? "text-[var(--text-neutral)]" : ""}`}>
+            {triggerText}
+          </span>
+          <CaretDown size={16} className={`shrink-0 opacity-50 transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+      )}
+    >
+      <div className="flex min-w-[200px] flex-col gap-0.5">
+        {showSearch && (
+          <div className="pb-1">
+            <Input
+              size="sm"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search"
+              iconRight={<MagnifyingGlass weight="regular" />}
+              clearable
+              onClear={() => setQuery("")}
+            />
+          </div>
+        )}
+        <div className={`flex flex-col gap-0.5 ${showSearch ? "max-h-[220px] overflow-y-auto" : ""}`}>
+          {visible.length === 0 ? (
+            <span className="px-1.5 py-1.5 text-[13px] text-[var(--text-secondary)]">No matches</span>
+          ) : (
+            visible.map((i) => (
+              <label
+                key={i.key}
+                className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 transition-colors hover:bg-[var(--surface-hover)]"
+              >
+                <Checkbox checked={i.checked} onChange={i.onToggle} />
+                {i.icon != null && (
+                  <span className="inline-flex shrink-0 text-[var(--text-secondary)] [&>svg]:size-4">{i.icon}</span>
+                )}
+                <span className="text-[13px] text-[var(--text-primary)]">{i.label}</span>
+              </label>
+            ))
+          )}
+        </div>
+      </div>
+    </Popover>
   );
 }
 
@@ -192,46 +282,55 @@ function InlineFacet({ facet }: { facet: FilterFacet }) {
   }
 }
 
-/** Contents of the "More filters" popover — facets sectioned by `group`. */
+/**
+ * Contents of the "More filters" / collapsed "Filters" popover — a uniform column of
+ * labeled DROPDOWNS (one row per facet). Single-selects use the DS `Select`; a
+ * toggle-group and each bundle of boolean insight toggles (grouped by `group`) collapse
+ * into a `FacetMultiSelect`. Each row shows its label ONCE — no separate section header
+ * duplicating the control's own label.
+ */
 function MoreFiltersContent({ facets }: { facets: FilterFacet[] }) {
-  const groups: { group: string; facets: FilterFacet[] }[] = [];
+  type Row = { key: string; label: ReactNode; node: ReactNode };
+  const rows: Row[] = [];
+  // Bundle consecutive boolean toggles sharing a `group` into one multi-select row.
+  const toggleIndex = new Map<string, number>();
+  const toggleItems = new Map<string, MultiSelectItem[]>();
+
   for (const f of facets) {
-    const g = f.group ?? "Filters";
-    const bucket = groups.find((x) => x.group === g);
-    if (bucket) bucket.facets.push(f);
-    else groups.push({ group: g, facets: [f] });
+    if (f.kind === "select") {
+      rows.push({ key: f.key, label: f.label, node: <FacetSelectControl facet={f} fullWidth /> });
+    } else if (f.kind === "toggle-group") {
+      const items: MultiSelectItem[] = f.options.map((o) => ({
+        key: o.value,
+        label: o.label,
+        icon: o.icon,
+        checked: f.value.includes(o.value),
+        onToggle: () =>
+          f.onChange(
+            f.value.includes(o.value) ? f.value.filter((v) => v !== o.value) : [...f.value, o.value],
+          ),
+      }));
+      rows.push({ key: f.key, label: f.label, node: <FacetMultiSelect placeholder="Any" items={items} /> });
+    } else {
+      const g = f.group ?? f.key;
+      if (!toggleIndex.has(g)) {
+        toggleIndex.set(g, rows.length);
+        toggleItems.set(g, []);
+        rows.push({ key: `toggles:${g}`, label: f.group ?? f.label, node: null });
+      }
+      toggleItems.get(g)!.push({ key: f.key, label: f.label, icon: f.icon, checked: f.active, onToggle: f.onToggle });
+    }
   }
+  toggleIndex.forEach((idx, g) => {
+    rows[idx] = { ...rows[idx], node: <FacetMultiSelect placeholder="Any" items={toggleItems.get(g)!} /> };
+  });
+
   return (
     <div className="flex min-w-[240px] flex-col gap-3">
-      {groups.map(({ group, facets: fs }) => (
-        <div key={group} className="flex flex-col gap-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-            {group}
-          </span>
-          {fs.map((f) => (
-            <div key={f.key} className="flex flex-col gap-1.5">
-              {f.kind !== "toggle" && (
-                <span className="text-[12px] text-[var(--text-secondary)]">{f.label}</span>
-              )}
-              {f.kind === "select" && <FacetSelectControl facet={f} />}
-              {f.kind === "toggle-group" && (
-                <div className="flex flex-wrap gap-1.5">
-                  <ToggleGroupChips facet={f} />
-                </div>
-              )}
-              {f.kind === "toggle" && (
-                <Chip
-                  selected={f.active}
-                  variant={f.variant}
-                  icon={f.icon}
-                  count={f.count}
-                  onClick={f.onToggle}
-                >
-                  {f.label}
-                </Chip>
-              )}
-            </div>
-          ))}
+      {rows.map((r) => (
+        <div key={r.key} className="flex flex-col gap-1.5">
+          <span className="text-[12px] font-medium text-[var(--text-secondary)]">{r.label}</span>
+          {r.node}
         </div>
       ))}
     </div>
@@ -241,53 +340,109 @@ function MoreFiltersContent({ facets }: { facets: FilterFacet[] }) {
 /** Built-in Customize popover content — per-column show/hide (Switch) + drag-reorder. */
 function ColumnCustomizeList({
   columns,
+  visibleKeys,
   onChange,
+  onVisibleKeysChange,
 }: {
-  columns: TableColumn[];
+  columns: readonly TableColumn[];
+  /** Ordered visible keys. When provided, Customize runs in "visibleKeys mode":
+      visibility = membership, order = this array (hidden columns listed after),
+      and it emits the next ordered visible keys via `onVisibleKeysChange` — the
+      shape DataTable consumes directly. */
+  visibleKeys?: readonly string[];
+  /** Legacy mode: emit the columns with mutated `hidden`/order. */
   onChange?: (columns: TableColumn[]) => void;
+  /** visibleKeys mode: emit the next ordered visible keys. */
+  onVisibleKeysChange?: (keys: string[]) => void;
 }) {
   const [dragKey, setDragKey] = useState<string | null>(null);
-  const toggle = (key: string) =>
-    onChange?.(columns.map((c) => (c.key === key ? { ...c, hidden: !c.hidden } : c)));
-  const reorder = (fromKey: string, toKey: string) => {
-    if (fromKey === toKey) return;
-    const next = [...columns];
-    const from = next.findIndex((c) => c.key === fromKey);
-    const to = next.findIndex((c) => c.key === toKey);
-    if (from < 0 || to < 0) return;
-    const [moved] = next.splice(from, 1);
-    next.splice(to, 0, moved);
-    onChange?.(next);
+  const useKeys = visibleKeys != null;
+  // STANDARD: the first column of the table is FIXED — always shown, never moved.
+  const pinnedKey = columns[0]?.key;
+
+  // One ordered view for both modes: `{ col, visible }` in display order. In
+  // visibleKeys mode the visible columns come first (in their chosen order), then
+  // the hidden ones; the pinned first column is forced to the front + visible.
+  const items: { col: TableColumn; visible: boolean }[] = (() => {
+    let base: { col: TableColumn; visible: boolean }[];
+    if (useKeys) {
+      const byKey = new Map(columns.map((c) => [c.key, c]));
+      const vis = visibleKeys!
+        .map((k) => byKey.get(k))
+        .filter((c): c is TableColumn => Boolean(c))
+        .map((c) => ({ col: c, visible: true }));
+      const hid = columns
+        .filter((c) => !visibleKeys!.includes(c.key))
+        .map((c) => ({ col: c, visible: false }));
+      base = [...vis, ...hid];
+    } else {
+      base = columns.map((c) => ({ col: c, visible: !c.hidden }));
+    }
+    const pi = base.findIndex((i) => i.col.key === pinnedKey);
+    if (pi > 0) base.unshift(base.splice(pi, 1)[0]);
+    if (base[0]) base[0] = { ...base[0], visible: true };
+    return base;
+  })();
+
+  const emit = (next: { col: TableColumn; visible: boolean }[]) => {
+    if (useKeys) onVisibleKeysChange?.(next.filter((i) => i.visible).map((i) => i.col.key));
+    else onChange?.(next.map((i) => ({ ...i.col, hidden: !i.visible })));
   };
+
+  const toggle = (key: string) => {
+    if (key === pinnedKey) return;
+    emit(items.map((i) => (i.col.key === key ? { ...i, visible: !i.visible } : i)));
+  };
+  const reorder = (fromKey: string, toKey: string) => {
+    if (fromKey === toKey || fromKey === pinnedKey || toKey === pinnedKey) return;
+    const next = [...items];
+    const from = next.findIndex((i) => i.col.key === fromKey);
+    const to = next.findIndex((i) => i.col.key === toKey);
+    if (from < 0 || to < 0) return;
+    next.splice(to, 0, next.splice(from, 1)[0]);
+    emit(next);
+  };
+
   return (
     <div className="flex w-[244px] flex-col gap-0.5">
       <span className="px-1 pb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
         Customize columns
       </span>
-      {columns.map((c) => (
-        <div
-          key={c.key}
-          draggable
-          onDragStart={() => setDragKey(c.key)}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={() => {
-            if (dragKey) reorder(dragKey, c.key);
-            setDragKey(null);
-          }}
-          onDragEnd={() => setDragKey(null)}
-          className={`flex items-center gap-2 rounded-md px-1 py-1.5 transition-colors hover:bg-[var(--surface-hover)] ${dragKey === c.key ? "opacity-50" : ""}`}
-        >
-          <span className="cursor-grab text-[var(--text-neutral)] [&>svg]:size-4" aria-hidden="true">
-            <DotsSixVertical weight="bold" />
-          </span>
-          <span className="flex-1 truncate text-[13px] text-[var(--text-primary)]">{c.label}</span>
-          <Switch
-            checked={!c.hidden}
-            disabled={c.hideable === false}
-            onCheckedChange={() => toggle(c.key)}
-          />
-        </div>
-      ))}
+      {items.map(({ col: c, visible }) => {
+        const pinned = c.key === pinnedKey;
+        const locked = pinned || c.alwaysVisible || c.hideable === false;
+        return (
+          <div
+            key={c.key}
+            draggable={!pinned}
+            onDragStart={pinned ? undefined : () => setDragKey(c.key)}
+            onDragOver={pinned ? undefined : (e) => e.preventDefault()}
+            onDrop={
+              pinned
+                ? undefined
+                : () => {
+                    if (dragKey) reorder(dragKey, c.key);
+                    setDragKey(null);
+                  }
+            }
+            onDragEnd={pinned ? undefined : () => setDragKey(null)}
+            className={`flex items-center gap-2 rounded-md px-1 py-1.5 transition-colors ${pinned ? "" : "hover:bg-[var(--surface-hover)]"} ${dragKey === c.key ? "opacity-50" : ""}`}
+          >
+            <span
+              className={`text-[var(--text-neutral)] [&>svg]:size-4 ${pinned ? "cursor-default opacity-30" : "cursor-grab"}`}
+              aria-hidden="true"
+            >
+              <DotsSixVertical weight="bold" />
+            </span>
+            <span className="flex-1 truncate text-[13px] text-[var(--text-primary)]">{c.label}</span>
+            {pinned ? (
+              <span className="text-[11px] font-medium text-[var(--text-neutral)]">Fixed</span>
+            ) : (
+              <Switch checked={visible} disabled={locked} onCheckedChange={() => toggle(c.key)} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -393,10 +548,21 @@ interface TableShellProps {
   onCustomize?: () => void;
   customizeLabel?: string;
   /** Column definitions for the built-in Customize popover (show/hide + drag-reorder).
-      When provided, the Customize button opens that popover; reflect the resulting
-      order and `hidden` flags when you render the table header + cells. */
-  columns?: TableColumn[];
-  /** Called when columns are toggled/reordered in the Customize popover. */
+      When provided, the Customize button opens that popover. Pass the SAME list your
+      table renders from — for the standard `DataTable`, its `columns` are assignable
+      here directly (shared `key` / `label` / `alwaysVisible`), so the popover always
+      lists exactly the table's columns. The FIRST column is FIXED (always shown, not
+      reorderable). Prefer the `visibleKeys` / `onVisibleKeysChange` pair below (feed the
+      same `visibleKeys` to your DataTable); `onColumnsChange` is the legacy path. */
+  columns?: readonly TableColumn[];
+  /** Ordered visible column keys — the standard controlled model shared with DataTable's
+      `visibleKeys`. When set, Customize edits emit through `onVisibleKeysChange`. */
+  visibleKeys?: readonly string[];
+  /** Called with the next ordered visible keys — wire straight to your DataTable's
+      `visibleKeys` state. */
+  onVisibleKeysChange?: (keys: string[]) => void;
+  /** Legacy: called when columns are toggled/reordered (mutated `hidden` + order).
+      Used only when `visibleKeys` is not provided. */
   onColumnsChange?: (columns: TableColumn[]) => void;
 
   /** Extra header slot rendered above the table body (filter chips, banners, …). */
@@ -445,6 +611,8 @@ export function TableShell({
   onCustomize,
   customizeLabel = "Customize",
   columns,
+  visibleKeys,
+  onVisibleKeysChange,
   onColumnsChange,
   header,
   emptyState,
@@ -460,9 +628,13 @@ export function TableShell({
 
   const facetList = facets ?? [];
   const hasFacets = facetList.length > 0;
+  // Applied-filter chips derived from the active facet values — drives the mandatory
+  // applied-filters bar (each value crossable + Clear all).
+  const appliedChips = hasFacets ? facetAppliedChips(facetList) : [];
   const hasToolbar = Boolean(onSearchChange || filters);
   const { inline: inlineFacets, overflow: overflowFacets } = splitFacets(facetList, maxInlineChips);
   const overflowActive = facetsActiveCount(overflowFacets);
+  const totalActive = facetsActiveCount(facetList);
   // Render chips (toggle / toggle-group) first, then dropdowns (selects) — stable sort.
   const orderedInline = [...inlineFacets].sort(
     (a, b) => (a.kind === "select" ? 1 : 0) - (b.kind === "select" ? 1 : 0),
@@ -507,7 +679,12 @@ export function TableShell({
                 );
               }}
             >
-              <ColumnCustomizeList columns={columns} onChange={onColumnsChange} />
+              <ColumnCustomizeList
+                columns={columns}
+                visibleKeys={visibleKeys}
+                onChange={onColumnsChange}
+                onVisibleKeysChange={onVisibleKeysChange}
+              />
             </Popover>
           ) : (
             <Button variant="ghost" size="sm" iconLeft={<GearSix size={16} weight="regular" />} onClick={onCustomize}>
@@ -521,7 +698,8 @@ export function TableShell({
            A `@container/tsfilter` so the search/filter layout responds to the band's own
            width (not the viewport) — keeps it correct inside narrow consumers, sidebars,
            and tablet widths where a viewport breakpoint would mis-fire. */
-        <div className="@container/tsfilter flex flex-wrap items-center gap-2 px-4 py-4 border-b border-[var(--border-light)] shrink-0">
+        <>
+        <div className="@container/tsfilter flex items-center gap-2 px-4 py-4 border-b border-[var(--border-light)] shrink-0">
           {onSearchChange && (
             <FacetSearch
               value={searchValue}
@@ -529,19 +707,52 @@ export function TableShell({
               placeholder={searchPlaceholder}
             />
           )}
-          {/* Filters live to the right of the search only when the band is wide enough to
-              fit on one line (`@4xl/tsfilter` ≈ 896px); otherwise they drop to their own
-              full-width row, wrapping + left-aligned (no `ml-auto`, which would hug right
-              when wrapped). */}
-          <div className="flex flex-wrap items-center gap-2 w-full @4xl/tsfilter:w-auto @4xl/tsfilter:ml-auto">
-            {orderedInline.map((f) => (
-              <Fragment key={f.key}>
-                <InlineFacet facet={f} />
-              </Fragment>
-            ))}
-            {overflowFacets.length > 0 && (
+          {/* Search stays LEFT (shrinks to a floor as the band narrows); filters stay
+              RIGHT (`ml-auto`) on the SAME row — never stacked below the search.
+              Two right-side layouts driven by the band's OWN width (container query):
+                • WIDE (`@4xl` ≈ 896px+): inline promoted facets + a "More filters"
+                  popover for the count-based overflow (`splitFacets`/`maxInlineChips`).
+                • NARROW (below `@4xl`): ALL facets collapse into a single "Filters"
+                  popover so nothing clips regardless of how many facets there are.
+              The collapse is width-based, so it adapts to any facet count without a
+              consumer having to tune `maxInlineChips`. */}
+          <div className="flex items-center justify-end gap-2 ml-auto shrink-0">
+            {/* Wide layout: inline facets + count-based "More filters" overflow. */}
+            <div className="hidden @4xl/tsfilter:flex items-center gap-2">
+              {orderedInline.map((f) => (
+                <Fragment key={f.key}>
+                  <InlineFacet facet={f} />
+                </Fragment>
+              ))}
+              {overflowFacets.length > 0 && (
+                <Popover
+                  label={typeof moreFiltersLabel === "string" ? moreFiltersLabel : "More filters"}
+                  trigger={({ open, triggerProps }) => (
+                    <button
+                      type="button"
+                      {...triggerProps}
+                      className="inline-flex h-8 items-center gap-2 rounded-md border border-input bg-background px-3 text-[13px] font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] [&>svg]:shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--kds-color-focus-ring)] focus-visible:ring-offset-1"
+                    >
+                      <Funnel weight="duotone" className="size-3.5" />
+                      <span>{moreFiltersLabel}</span>
+                      {overflowActive > 0 && (
+                        <span className="rounded-full bg-[var(--pill-info-bg)] px-1.5 text-[11px] text-[var(--pill-info-fg)]">
+                          {overflowActive}
+                        </span>
+                      )}
+                      <CaretDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+                    </button>
+                  )}
+                >
+                  <MoreFiltersContent facets={overflowFacets} />
+                </Popover>
+              )}
+            </div>
+
+            {/* Narrow layout: every facet collapses into one "Filters" popover. */}
+            <div className="flex @4xl/tsfilter:hidden items-center">
               <Popover
-                label={typeof moreFiltersLabel === "string" ? moreFiltersLabel : "More filters"}
+                label="Filters"
                 trigger={({ open, triggerProps }) => (
                   <button
                     type="button"
@@ -549,21 +760,55 @@ export function TableShell({
                     className="inline-flex h-8 items-center gap-2 rounded-md border border-input bg-background px-3 text-[13px] font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)] [&>svg]:shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--kds-color-focus-ring)] focus-visible:ring-offset-1"
                   >
                     <Funnel weight="duotone" className="size-3.5" />
-                    <span>{moreFiltersLabel}</span>
-                    {overflowActive > 0 && (
+                    <span>Filters</span>
+                    {totalActive > 0 && (
                       <span className="rounded-full bg-[var(--pill-info-bg)] px-1.5 text-[11px] text-[var(--pill-info-fg)]">
-                        {overflowActive}
+                        {totalActive}
                       </span>
                     )}
                     <CaretDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
                   </button>
                 )}
               >
-                <MoreFiltersContent facets={overflowFacets} />
+                <MoreFiltersContent facets={facetList} />
               </Popover>
-            )}
+            </div>
           </div>
         </div>
+
+        {/* Applied-filters bar — mandatory whenever ≥1 filter is selected. Each active
+            value is a crossable chip; "Clear all" resets every facet. Auto-derived from
+            the facets, so a value picked in a DataTable ColumnFilterMenu bound to the same
+            state shows here too. */}
+        {appliedChips.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-[var(--border-light)] shrink-0">
+            <span className="text-sm text-[var(--text-secondary)]">Filtered by:</span>
+            {appliedChips.map((c) => (
+              <span
+                key={c.key}
+                className="inline-flex items-center gap-0.5 rounded-md border border-[var(--border-default,#e4e4e7)] bg-[var(--surface-base,#ffffff)] py-0.5 pl-2.5 pr-1 text-[13px] text-[var(--text-primary)]"
+              >
+                <span>{c.label}</span>
+                <button
+                  type="button"
+                  aria-label="Remove filter"
+                  onClick={c.onRemove}
+                  className="inline-flex items-center justify-center rounded-sm p-0.5 text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                >
+                  <X size={12} weight="bold" />
+                </button>
+              </span>
+            ))}
+            <button
+              type="button"
+              onClick={() => clearAllFacets(facetList)}
+              className="ml-1 text-sm font-medium text-[var(--info-strong,#005b89)] transition-opacity hover:opacity-70"
+            >
+              Clear All
+            </button>
+          </div>
+        )}
+        </>
       ) : (
         <>
           {/* Toolbar: search + filters */}

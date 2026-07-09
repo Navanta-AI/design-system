@@ -381,15 +381,21 @@ export function TableShellPlayground({ showCode = true }: { showCode?: boolean }
   const cols = colOrder
     .map((k) => OPTIONAL_BY_KEY[k])
     .filter((c): c is OptionalColumn => Boolean(c) && visibleCols[c.key])
-  // Bridge the column state to TableShell's built-in Customize popover.
-  const customizeColumns: TableColumn[] = colOrder.map((key) => ({
-    key,
-    label: OPTIONAL_BY_KEY[key].label,
-    hidden: !visibleCols[key],
-  }))
+  // Bridge the column state to TableShell's built-in Customize popover. The list is
+  // the FULL set of table columns — the fixed first column (HD PO #, always rendered)
+  // leads, then the optional columns. TableShell pins the first column automatically.
+  const customizeColumns: TableColumn[] = [
+    { key: 'po', label: 'HD PO #', alwaysVisible: true },
+    ...colOrder.map((key) => ({
+      key,
+      label: OPTIONAL_BY_KEY[key].label,
+      hidden: !visibleCols[key],
+    })),
+  ]
   const applyColumns = (next: TableColumn[]) => {
-    setColOrder(next.map((c) => c.key))
-    setVisibleCols(Object.fromEntries(next.map((c) => [c.key, !c.hidden])))
+    const rest = next.filter((c) => c.key !== 'po')
+    setColOrder(rest.map((c) => c.key))
+    setVisibleCols(Object.fromEntries(rest.map((c) => [c.key, !c.hidden])))
   }
   const isFiltered =
     Boolean(search.trim()) || !!statusFilter || !!due || priorityFilter.size > 0 ||

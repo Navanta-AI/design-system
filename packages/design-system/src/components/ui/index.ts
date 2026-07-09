@@ -17,7 +17,10 @@ export {
   type ToggleGroupFacet,
   type ToggleFacet,
   type FacetOption,
+  type AppliedFacetChip,
   facetActiveCount,
   facetsActiveCount,
   resetFacet,
+  clearAllFacets,
+  facetAppliedChips,
 } from "./facets";
