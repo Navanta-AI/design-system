@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useMemo, type CSSProperties, type ReactNode } from "react";
 import { SortIcon, TableCheckbox } from "./parts";
 import { DATA_TABLE_DEFAULTS } from "./constants";
 
@@ -88,6 +88,21 @@ export interface DataTableProps<T> extends DataTableAppearance {
   rowHeight?: number | "auto";
   headerHeight?: number;
 
+  // ─── Nested row (modular — future nested-row content types plug in here) ────
+  /**
+   * Render an actionable nested row as a full-width sub-row directly below a
+   * row — an inline editor, an expanded panel, nested content, etc. Opt-in and
+   * backward-compatible: omit it and nothing changes. The consumer owns the
+   * content AND its design (this is a pure render-prop), so the table stays
+   * generic — new nested-row variants are added by the caller without touching
+   * table internals. Pair with `isRowExpanded` to control visibility.
+   */
+  renderNestedRow?: (row: T, ctx: CellContext<T>) => ReactNode;
+  /** Which rows currently show their nested row (consumer-owned state). */
+  isRowExpanded?: (row: T) => boolean;
+  /** Optional className applied to the nested row's full-width `<td>`. */
+  nestedRowClassName?: string;
+
   renderMobileCard?: (row: T, ctx: CellContext<T>) => ReactNode;
   mobileEmpty?: ReactNode;
 
@@ -127,6 +142,9 @@ export function DataTable<T>(props: DataTableProps<T>) {
     rowHoverColor,
     rowHeight = DATA_TABLE_DEFAULTS.rowHeight,
     headerHeight = DATA_TABLE_DEFAULTS.headerHeight,
+    renderNestedRow,
+    isRowExpanded,
+    nestedRowClassName,
     reserveRowCount,
     renderMobileCard,
     mobileEmpty,
@@ -336,9 +354,10 @@ export function DataTable<T>(props: DataTableProps<T>) {
       );
     };
 
+    const expanded = Boolean(renderNestedRow && isRowExpanded?.(row));
     return (
+      <Fragment key={id}>
       <tr
-        key={id}
         className={rowCls}
         style={{ height: numericRowHeight, ...rowHoverVar, ...rowStyle?.(row) }}
         onClick={clickable ? () => onRowClick!(row) : undefined}
@@ -386,6 +405,18 @@ export function DataTable<T>(props: DataTableProps<T>) {
         })}
         {rightSlots.map(slotCell)}
       </tr>
+      {expanded && (
+        <tr className="border-b border-[color:var(--dt-row-border)]">
+          <td
+            colSpan={colCount}
+            className={nestedRowClassName}
+            style={{ padding: 0 }}
+          >
+            {renderNestedRow!(row, ctx)}
+          </td>
+        </tr>
+      )}
+      </Fragment>
     );
   };
 
