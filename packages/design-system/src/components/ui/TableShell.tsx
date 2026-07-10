@@ -740,15 +740,17 @@ export function TableShell({
           {/* Search stays LEFT (shrinks to a floor as the band narrows); filters stay
               RIGHT (`ml-auto`) on the SAME row — never stacked below the search.
               Two right-side layouts driven by the band's OWN width (container query):
-                • WIDE (`@4xl` ≈ 896px+): inline promoted facets + a "More filters"
+                • WIDE (`@3xl` ≈ 768px+): inline promoted facets + a "More filters"
                   popover for the count-based overflow (`splitFacets`/`maxInlineChips`).
-                • NARROW (below `@4xl`): ALL facets collapse into a single "Filters"
-                  popover so nothing clips regardless of how many facets there are.
+                • NARROW (below `@3xl`): ALL facets collapse into a single "Filters"
+                  popover so nothing clips. The threshold is tablet-portrait width —
+                  desktop/laptop/tablet-landscape stay inline; only tablet-portrait
+                  and mobile collapse.
               The collapse is width-based, so it adapts to any facet count without a
               consumer having to tune `maxInlineChips`. */}
           <div className="flex items-center justify-end gap-2 ml-auto shrink-0">
             {/* Wide layout: inline facets + count-based "More filters" overflow. */}
-            <div className="hidden @4xl/tsfilter:flex items-center gap-2">
+            <div className="hidden @3xl/tsfilter:flex items-center gap-2">
               {orderedInline.map((f) => (
                 <Fragment key={f.key}>
                   <InlineFacet facet={f} />
@@ -780,7 +782,7 @@ export function TableShell({
             </div>
 
             {/* Narrow layout: every facet collapses into one "Filters" popover. */}
-            <div className="flex @4xl/tsfilter:hidden items-center">
+            <div className="flex @3xl/tsfilter:hidden items-center">
               <Popover
                 label="Filters"
                 trigger={({ open, triggerProps }) => (
