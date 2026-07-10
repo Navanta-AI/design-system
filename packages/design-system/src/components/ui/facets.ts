@@ -54,6 +54,20 @@ export interface ToggleGroupFacet extends FacetBase {
   onChange: (next: string[]) => void;
 }
 
+/** (b2) Multi-select DROPDOWN (Vendor, Status) — same value shape as a
+ *  toggle-group, but rendered as ONE inline dropdown (a checkbox list behind a
+ *  single trigger) instead of a chip per option. So it stays inline like a
+ *  `select` and counts as one control against the inline limit. */
+export interface MultiSelectFacet extends FacetBase {
+  kind: "multi-select";
+  options: FacetOption[];
+  /** Selected values; `[]` = inactive. */
+  value: string[];
+  onChange: (next: string[]) => void;
+  /** Trigger text when nothing is selected (e.g. "Any status"). */
+  placeholder?: string;
+}
+
 /** (c) Boolean insight facet (High demand, This week) — the extensibility primitive. */
 export interface ToggleFacet extends FacetBase {
   kind: "toggle";
@@ -64,7 +78,7 @@ export interface ToggleFacet extends FacetBase {
   onToggle: () => void;
 }
 
-export type FilterFacet = SelectFacet | ToggleGroupFacet | ToggleFacet;
+export type FilterFacet = SelectFacet | ToggleGroupFacet | MultiSelectFacet | ToggleFacet;
 
 /** How many values a facet currently has applied (drives the badge + Clear all). */
 export function facetActiveCount(f: FilterFacet): number {
@@ -72,6 +86,7 @@ export function facetActiveCount(f: FilterFacet): number {
     case "select":
       return f.value != null && f.value !== "" ? 1 : 0;
     case "toggle-group":
+    case "multi-select":
       return f.value.length;
     case "toggle":
       return f.active ? 1 : 0;
@@ -85,6 +100,7 @@ export function resetFacet(f: FilterFacet): void {
       f.onChange(null);
       break;
     case "toggle-group":
+    case "multi-select":
       f.onChange([]);
       break;
     case "toggle":
@@ -134,7 +150,7 @@ export function facetAppliedChips(facets: FilterFacet[]): AppliedFacetChip[] {
           onRemove: () => f.onChange(null),
         });
       }
-    } else if (f.kind === "toggle-group") {
+    } else if (f.kind === "toggle-group" || f.kind === "multi-select") {
       for (const v of f.value) {
         const opt = f.options.find((o) => o.value === v);
         chips.push({

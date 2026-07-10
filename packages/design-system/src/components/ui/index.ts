@@ -15,6 +15,7 @@ export {
   type FilterFacet,
   type SelectFacet,
   type ToggleGroupFacet,
+  type MultiSelectFacet,
   type ToggleFacet,
   type FacetOption,
   type AppliedFacetChip,

@@ -183,7 +183,17 @@ interface MultiSelectItem {
  * bundle of boolean insight toggles) reads as a uniform dropdown alongside the single-
  * selects, instead of a loose row of chips.
  */
-function FacetMultiSelect({ placeholder, items }: { placeholder: ReactNode; items: MultiSelectItem[] }) {
+function FacetMultiSelect({
+  placeholder,
+  items,
+  fullWidth = true,
+}: {
+  placeholder: ReactNode;
+  items: MultiSelectItem[];
+  /** Full-width trigger for the stacked "More filters" popover; set false for an
+   *  inline promoted facet so the trigger shrinks to content (min 150px). */
+  fullWidth?: boolean;
+}) {
   const active = items.filter((i) => i.checked);
   const triggerText =
     active.length === 0 ? placeholder : active.length === 1 ? active[0].label : `${active.length} selected`;
@@ -202,7 +212,7 @@ function FacetMultiSelect({ placeholder, items }: { placeholder: ReactNode; item
         <button
           type="button"
           {...triggerProps}
-          className="flex h-8 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-sm text-[var(--text-primary)] outline-none transition-[border-color,box-shadow] focus:border-[var(--foreground)] focus:ring-[3px] focus:ring-ring/50"
+          className={`flex h-8 ${fullWidth ? "w-full" : "w-auto min-w-[150px]"} items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-sm text-[var(--text-primary)] outline-none transition-[border-color,box-shadow] focus:border-[var(--foreground)] focus:ring-[3px] focus:ring-ring/50`}
         >
           <span className={`line-clamp-1 ${active.length === 0 ? "text-[var(--text-neutral)]" : ""}`}>
             {triggerText}
@@ -267,6 +277,25 @@ function InlineFacet({ facet }: { facet: FilterFacet }) {
           <ToggleGroupChips facet={facet} />
         </div>
       );
+    case "multi-select":
+      return (
+        <FacetMultiSelect
+          placeholder={facet.placeholder ?? facet.label ?? "Any"}
+          fullWidth={false}
+          items={facet.options.map((o) => ({
+            key: o.value,
+            label: o.label,
+            icon: o.icon,
+            checked: facet.value.includes(o.value),
+            onToggle: () =>
+              facet.onChange(
+                facet.value.includes(o.value)
+                  ? facet.value.filter((v) => v !== o.value)
+                  : [...facet.value, o.value],
+              ),
+          }))}
+        />
+      );
     case "toggle":
       return (
         <Chip
@@ -299,7 +328,7 @@ function MoreFiltersContent({ facets }: { facets: FilterFacet[] }) {
   for (const f of facets) {
     if (f.kind === "select") {
       rows.push({ key: f.key, label: f.label, node: <FacetSelectControl facet={f} fullWidth /> });
-    } else if (f.kind === "toggle-group") {
+    } else if (f.kind === "toggle-group" || f.kind === "multi-select") {
       const items: MultiSelectItem[] = f.options.map((o) => ({
         key: o.value,
         label: o.label,
@@ -635,9 +664,10 @@ export function TableShell({
   const { inline: inlineFacets, overflow: overflowFacets } = splitFacets(facetList, maxInlineChips);
   const overflowActive = facetsActiveCount(overflowFacets);
   const totalActive = facetsActiveCount(facetList);
-  // Render chips (toggle / toggle-group) first, then dropdowns (selects) — stable sort.
+  // Render chips (toggle / toggle-group) first, then dropdowns (select / multi-select) — stable sort.
+  const isDropdownKind = (k: FilterFacet["kind"]) => k === "select" || k === "multi-select";
   const orderedInline = [...inlineFacets].sort(
-    (a, b) => (a.kind === "select" ? 1 : 0) - (b.kind === "select" ? 1 : 0),
+    (a, b) => (isDropdownKind(a.kind) ? 1 : 0) - (isDropdownKind(b.kind) ? 1 : 0),
   );
 
   // Integral empty handling: when there are no rows, TableShell paints the
