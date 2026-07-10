@@ -122,7 +122,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               'focus-visible:ring-ring/50 focus-visible:ring-[3px]',
               'active:ring-ring/30 active:ring-[2px]',
               !hasError &&
-                'focus:!border-black dark:focus:!border-white focus-visible:!border-black dark:focus-visible:!border-white active:!border-black dark:active:!border-white',
+                'hover:border-[var(--border-control,#9f9fa9)] focus:!border-black dark:focus:!border-white focus-visible:!border-black dark:focus-visible:!border-white active:!border-black dark:active:!border-white',
               'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
               'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
               hasError &&

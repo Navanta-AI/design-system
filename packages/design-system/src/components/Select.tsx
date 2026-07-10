@@ -2,18 +2,33 @@
 
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
+import { MagnifyingGlass } from '@phosphor-icons/react'
 import { cn } from '../utils/cn'
+import { Checkbox } from './Checkbox'
+import { Input } from './Input'
+
+// STANDARD: a list longer than this auto-shows a search field (unless `searchable`
+// is set explicitly). Matches the DS >7 filter-search threshold.
+const SELECT_SEARCH_THRESHOLD = 7
 
 type SelectItemMeta = {
   value: string
   label: string
   disabled?: boolean
+  /** Optional leading glyph (Phosphor duotone) — mirrored on the trigger when selected. */
+  icon?: React.ReactNode
 }
 
 interface SelectContextValue {
   open: boolean
+  /** Single-select current value ('' in multi mode). */
   value: string
+  /** True when the Select allows multiple selections. */
+  multiple: boolean
+  /** Normalized selected values — one entry (or none) in single mode, N in multi. */
+  selectedValues: string[]
   disabled?: boolean
+  /** Select (single) or toggle (multi) this item value. */
   onValueChange: (value: string) => void
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   triggerRef: React.RefObject<HTMLButtonElement | null>
@@ -23,6 +38,15 @@ interface SelectContextValue {
   enabledItemValues: string[]
   hideCheck: boolean
   size: 'sm' | 'md' | 'lg'
+  /** Whether the dropdown shows a search field that filters options by label. */
+  searchable: boolean
+  /** Current search query (lowercased comparison happens in `matchesQuery`). */
+  query: string
+  setQuery: React.Dispatch<React.SetStateAction<string>>
+  /** True when the option's label passes the active search query. */
+  matchesQuery: (label: string) => boolean
+  /** How many options (incl. disabled) match the query — drives the "No results" row. */
+  visibleCount: number
 }
 
 const SelectContext = React.createContext<SelectContextValue | null>(null)
@@ -43,18 +67,38 @@ function extractText(node: React.ReactNode): string {
   return ''
 }
 
-export interface SelectProps {
-  value?: string
-  defaultValue?: string
-  onValueChange?: (value: string) => void
+interface SelectBaseProps {
   disabled?: boolean
   /** Hide the selected-item checkmark in the dropdown list (and its left gutter). */
   hideCheck?: boolean
+  /** Show a search field at the top of the dropdown that filters options by label.
+   *  Omit to auto-enable for lists longer than 7 options; set explicitly to force
+   *  on/off. */
+  searchable?: boolean
   /** Trigger height (matches the Input field). Set here on the root, or per-trigger
    *  on `SelectTrigger` (an explicit `SelectTrigger size` wins). */
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
 }
+
+/** Single-select (default): one string value. Picking an option closes the menu. */
+export interface SingleSelectProps extends SelectBaseProps {
+  multiple?: false
+  value?: string
+  defaultValue?: string
+  onValueChange?: (value: string) => void
+}
+
+/** Multi-select: an array of values. Picking an option TOGGLES it and the menu stays
+ *  open; the trigger summarizes as the single label or "N selected". */
+export interface MultiSelectProps extends SelectBaseProps {
+  multiple: true
+  value?: string[]
+  defaultValue?: string[]
+  onValueChange?: (value: string[]) => void
+}
+
+export type SelectProps = SingleSelectProps | MultiSelectProps
 
 const Select: React.FC<SelectProps> & {
   Trigger: typeof SelectTrigger
@@ -64,36 +108,81 @@ const Select: React.FC<SelectProps> & {
   Label: typeof SelectLabel
   Item: typeof SelectItem
   Separator: typeof SelectSeparator
-} = ({ value: controlledValue, defaultValue = '', onValueChange, disabled, hideCheck = false, size = 'md', children }) => {
-  const [internalValue, setInternalValue] = React.useState(defaultValue)
+} = (props) => {
+  const { disabled, hideCheck = false, size = 'md', children } = props
+  const multiple = props.multiple === true
+  const controlledValue = props.value
+  const isControlled = controlledValue !== undefined
+  const onValueChange = props.onValueChange as
+    | ((value: string | string[]) => void)
+    | undefined
+
+  const [internalValue, setInternalValue] = React.useState<string | string[]>(
+    props.defaultValue ?? (multiple ? [] : '')
+  )
   const [open, setOpen] = React.useState(false)
   const [highlightedIndex, setHighlightedIndex] = React.useState(-1)
+  const [query, setQuery] = React.useState('')
   const triggerRef = React.useRef<HTMLButtonElement>(null)
 
-  const value = controlledValue !== undefined ? controlledValue : internalValue
+  const rawValue = isControlled ? controlledValue : internalValue
+  const selectedValues: string[] = multiple
+    ? ((rawValue as string[]) ?? [])
+    : rawValue
+      ? [rawValue as string]
+      : []
+
   const items = React.useMemo(() => collectSelectItems(children), [children])
 
+  // Search auto-enables past the threshold unless the consumer sets `searchable`.
+  const searchable = props.searchable ?? items.length > SELECT_SEARCH_THRESHOLD
+  const q = query.trim().toLowerCase()
+  const matchesQuery = React.useCallback(
+    (label: string) => !searchable || !q || label.toLowerCase().includes(q),
+    [searchable, q]
+  )
+
+  // The search query is transient — reset it every time the dropdown closes.
+  React.useEffect(() => {
+    if (!open) setQuery('')
+  }, [open])
+
+  // Keyboard nav + the "No results" row operate on the QUERY-FILTERED set.
   const enabledItemValues = React.useMemo(
-    () => items.filter((item) => !item.disabled).map((item) => item.value),
-    [items]
+    () => items.filter((item) => !item.disabled && matchesQuery(item.label)).map((item) => item.value),
+    [items, matchesQuery]
+  )
+  const visibleCount = React.useMemo(
+    () => items.filter((item) => matchesQuery(item.label)).length,
+    [items, matchesQuery]
   )
 
   const handleValueChange = React.useCallback(
-    (newValue: string) => {
-      if (controlledValue === undefined) {
-        setInternalValue(newValue)
+    (itemValue: string) => {
+      if (multiple) {
+        const cur = ((isControlled ? controlledValue : internalValue) as string[]) ?? []
+        const next = cur.includes(itemValue)
+          ? cur.filter((v) => v !== itemValue)
+          : [...cur, itemValue]
+        if (!isControlled) setInternalValue(next)
+        ;(onValueChange as ((v: string[]) => void) | undefined)?.(next)
+        // Multi keeps the menu open so several values can be picked in one visit.
+      } else {
+        if (!isControlled) setInternalValue(itemValue)
+        ;(onValueChange as ((v: string) => void) | undefined)?.(itemValue)
+        setOpen(false)
+        triggerRef.current?.focus()
       }
-      onValueChange?.(newValue)
-      setOpen(false)
-      triggerRef.current?.focus()
     },
-    [controlledValue, onValueChange]
+    [multiple, isControlled, controlledValue, internalValue, onValueChange]
   )
 
   const contextValue = React.useMemo(
     () => ({
       open,
-      value,
+      value: multiple ? '' : ((rawValue as string) || ''),
+      multiple,
+      selectedValues,
       disabled,
       onValueChange: handleValueChange,
       setOpen: disabled ? ((() => {}) as React.Dispatch<React.SetStateAction<boolean>>) : setOpen,
@@ -104,10 +193,17 @@ const Select: React.FC<SelectProps> & {
       enabledItemValues,
       hideCheck,
       size,
+      searchable,
+      query,
+      setQuery,
+      matchesQuery,
+      visibleCount,
     }),
     [
       open,
-      value,
+      multiple,
+      rawValue,
+      selectedValues,
       disabled,
       handleValueChange,
       highlightedIndex,
@@ -115,6 +211,10 @@ const Select: React.FC<SelectProps> & {
       enabledItemValues,
       hideCheck,
       size,
+      searchable,
+      query,
+      matchesQuery,
+      visibleCount,
     ]
   )
 
@@ -132,6 +232,8 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
       setOpen,
       triggerRef,
       value,
+      multiple,
+      selectedValues,
       disabled,
       setHighlightedIndex,
       enabledItemValues,
@@ -139,6 +241,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
     } = useSelectContext()
     // An explicit `size` on SelectTrigger wins; otherwise inherit the root `<Select size>`.
     const size = sizeProp ?? contextSize
+    const isEmpty = multiple ? selectedValues.length === 0 : !value
 
     const mergedRef = React.useCallback(
       (node: HTMLButtonElement | null) => {
@@ -150,7 +253,8 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
     )
 
     const setDefaultHighlight = () => {
-      const selectedIndex = enabledItemValues.indexOf(value)
+      const target = multiple ? (selectedValues[0] ?? '') : value
+      const selectedIndex = enabledItemValues.indexOf(target)
       setHighlightedIndex(selectedIndex >= 0 ? selectedIndex : 0)
     }
 
@@ -161,7 +265,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         role="combobox"
         aria-expanded={open}
         aria-haspopup="listbox"
-        data-placeholder={!value ? '' : undefined}
+        data-placeholder={isEmpty ? '' : undefined}
         disabled={disabled || props.disabled}
         className={cn(
           'flex w-full items-center justify-between rounded-md border border-input bg-background transition-[border-color,color,box-shadow] outline-none',
@@ -237,11 +341,42 @@ export interface SelectValueProps extends React.HTMLAttributes<HTMLSpanElement> 
 
 const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
   ({ placeholder, className, ...props }, ref) => {
-    const { value, items } = useSelectContext()
-    const selectedLabel = items.find((item) => item.value === value)?.label ?? value
+    const { value, items, multiple, selectedValues } = useSelectContext()
 
+    if (multiple) {
+      const count = selectedValues.length
+      const soleItem = count === 1 ? items.find((item) => item.value === selectedValues[0]) : undefined
+      const summary =
+        count === 0 ? placeholder : count === 1 ? (soleItem?.label ?? selectedValues[0]) : `${count} selected`
+      return (
+        <span
+          ref={ref}
+          className={cn('inline-flex items-center gap-1.5', count === 0 && 'text-muted-foreground', className)}
+          {...props}
+        >
+          {soleItem?.icon != null && (
+            <span className="inline-flex shrink-0 items-center text-[var(--text-secondary,#71717a)] [&>svg]:size-4">
+              {soleItem.icon}
+            </span>
+          )}
+          {summary}
+        </span>
+      )
+    }
+
+    const selectedItem = items.find((item) => item.value === value)
+    const selectedLabel = selectedItem?.label ?? value
     return (
-      <span ref={ref} className={cn(!value && 'text-muted-foreground', className)} {...props}>
+      <span
+        ref={ref}
+        className={cn('inline-flex items-center gap-1.5', !value && 'text-muted-foreground', className)}
+        {...props}
+      >
+        {value && selectedItem?.icon != null && (
+          <span className="inline-flex shrink-0 items-center text-[var(--text-secondary,#71717a)] [&>svg]:size-4">
+            {selectedItem.icon}
+          </span>
+        )}
         {value ? selectedLabel : placeholder}
       </span>
     )
@@ -263,9 +398,23 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
       setHighlightedIndex,
       enabledItemValues,
       onValueChange,
+      searchable,
+      query,
+      setQuery,
+      visibleCount,
     } = useSelectContext()
 
     const contentRef = React.useRef<HTMLDivElement>(null)
+
+    // Focus the search field when the dropdown opens so typing filters immediately.
+    React.useEffect(() => {
+      if (open && searchable) {
+        const id = requestAnimationFrame(() =>
+          contentRef.current?.querySelector<HTMLInputElement>('input[type="search"]')?.focus()
+        )
+        return () => cancelAnimationFrame(id)
+      }
+    }, [open, searchable])
     const [pos, setPos] = React.useState<{
       top: number
       left: number
@@ -419,7 +568,31 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
         onKeyDown={onKeyDown}
         {...props}
       >
-        <div className="p-1">{children}</div>
+        {searchable && (
+          // Pinned above the scrolling option list so it stays put while the list scrolls.
+          <div className="sticky top-0 z-10 border-b border-border bg-popover p-1">
+            <Input
+              size="sm"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search"
+              iconRight={<MagnifyingGlass weight="regular" />}
+              clearable
+              onClear={() => setQuery('')}
+              // Let ArrowUp/Down/Enter fall through to the list's keyboard handler.
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') e.preventDefault()
+              }}
+            />
+          </div>
+        )}
+        <div className="p-1">
+          {children}
+          {searchable && query.trim() !== '' && visibleCount === 0 && (
+            <div className="px-2 py-1.5 text-sm text-muted-foreground">No results</div>
+          )}
+        </div>
       </div>
     )
 
@@ -432,11 +605,18 @@ SelectContent.displayName = 'SelectContent'
 export interface SelectGroupProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 const SelectGroup = React.forwardRef<HTMLDivElement, SelectGroupProps>(
-  ({ className, children, ...props }, ref) => (
-    <div ref={ref} role="group" className={cn(className)} {...props}>
-      {children}
-    </div>
-  )
+  ({ className, children, ...props }, ref) => {
+    const { matchesQuery } = useSelectContext()
+    // Hide the whole group (incl. its label) when a search query filters out every
+    // option inside it — so no orphan section header is left behind.
+    const groupItems = React.useMemo(() => collectSelectItems(children), [children])
+    if (groupItems.length > 0 && !groupItems.some((item) => matchesQuery(item.label))) return null
+    return (
+      <div ref={ref} role="group" className={cn(className)} {...props}>
+        {children}
+      </div>
+    )
+  }
 )
 SelectGroup.displayName = 'SelectGroup'
 
@@ -464,22 +644,31 @@ SelectLabel.displayName = 'SelectLabel'
 export interface SelectItemProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string
   disabled?: boolean
+  /** Optional leading glyph — render a Phosphor icon with `weight="duotone"` to match
+   *  the DS icon convention. Sized to the option text; also mirrored on the trigger
+   *  (via SelectValue) when this option is the selected one. */
+  icon?: React.ReactNode
 }
 
 const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
-  ({ className, children, value: itemValue, disabled, onClick, onMouseEnter, ...props }, ref) => {
+  ({ className, children, value: itemValue, disabled, icon, onClick, onMouseEnter, ...props }, ref) => {
     const {
-      value,
+      selectedValues,
+      multiple,
       onValueChange,
       highlightedIndex,
       enabledItemValues,
       setHighlightedIndex,
       hideCheck,
+      matchesQuery,
     } = useSelectContext()
 
     const itemLabel = React.useMemo(() => extractText(children) || itemValue, [children, itemValue])
 
-    const isSelected = value === itemValue
+    // Hidden by the active search query (label doesn't match).
+    if (!matchesQuery(itemLabel)) return null
+
+    const isSelected = selectedValues.includes(itemValue)
     const enabledIndex = enabledItemValues.indexOf(itemValue)
     const isHighlighted = enabledIndex >= 0 && highlightedIndex === enabledIndex
 
@@ -511,25 +700,37 @@ const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
         }}
         {...props}
       >
-        {!hideCheck && (
-          <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-            {isSelected && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4"
-                aria-hidden="true"
-              >
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-            )}
+        {!hideCheck &&
+          (multiple ? (
+            // Multi-select reads as a checkbox list. The row's onClick drives the
+            // toggle, so the box is display-only (pointer-events-none + readOnly).
+            <span className="pointer-events-none absolute left-2 flex items-center">
+              <Checkbox checked={isSelected} readOnly tabIndex={-1} aria-hidden />
+            </span>
+          ) : (
+            <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+              {isSelected && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              )}
+            </span>
+          ))}
+        {icon != null && (
+          <span className="mr-2 inline-flex shrink-0 items-center text-[var(--text-secondary,#71717a)] [&>svg]:size-4">
+            {icon}
           </span>
         )}
         <span className="whitespace-normal break-words">{children}</span>
@@ -573,10 +774,16 @@ function collectSelectItems(node: React.ReactNode): SelectItemMeta[] {
     if (elementType.displayName === 'SelectItem') {
       const itemValue = (current.props as { value?: string }).value
       if (itemValue) {
+        const itemProps = current.props as {
+          children?: React.ReactNode
+          disabled?: boolean
+          icon?: React.ReactNode
+        }
         map.set(itemValue, {
           value: itemValue,
-          label: extractText((current.props as { children?: React.ReactNode }).children) || itemValue,
-          disabled: Boolean((current.props as { disabled?: boolean }).disabled),
+          label: extractText(itemProps.children) || itemValue,
+          disabled: Boolean(itemProps.disabled),
+          icon: itemProps.icon,
         })
       }
       return

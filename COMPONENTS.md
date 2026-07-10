@@ -275,14 +275,17 @@ Displays a list of options for the user to pick from — triggered by a button.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `string` | — | The controlled selected value. |
-| `defaultValue` | `string` | — | The default value when uncontrolled. |
-| `onValueChange` | `(value: string) => void` | — | Callback fired when the selected value changes. |
+| `multiple` | `boolean` | `false` | Enable multi-select. When true, value/defaultValue/onValueChange become string[]; picking an option TOGGLES it and the menu stays open. The trigger shows the single label or "N selected". |
+| `value` | `string \| string[]` | — | The controlled selected value — string in single mode, string[] when multiple. |
+| `defaultValue` | `string \| string[]` | — | The default value when uncontrolled (string, or string[] when multiple). |
+| `onValueChange` | `(value: string \| string[]) => void` | — | Fired when the selection changes — receives a string in single mode, the full string[] when multiple. |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Trigger height — set on the Select root (inherited by SelectTrigger) or per-trigger on SelectTrigger. Matches the Input field sizes (sm=h-7, md=h-8, lg=h-9). |
 | `disabled` | `boolean` | `false` | Prevents interaction. |
 | `hideCheck` | `boolean` | `false` | Hide the selected-item checkmark (and its left gutter) in the dropdown list. |
+| `searchable` | `boolean` | — | Show a search field at the top of the dropdown that filters options by label (query resets on close; empty groups + their labels hide; shows "No results"). Omit to auto-enable for lists longer than 7 options; set explicitly to force on/off. |
+| `SelectItem icon` | `ReactNode` | — | Per-option leading glyph — pass a Phosphor icon with weight="duotone" (DS convention). Sized to the option text and mirrored on the trigger when that option is selected. |
 
-**Interactive knobs** (playground-configurable): `size`, `disabled`, `hideCheck`
+**Interactive knobs** (playground-configurable): `size`, `searchable`, `disabled`, `hideCheck`
 
 ### Slider
 

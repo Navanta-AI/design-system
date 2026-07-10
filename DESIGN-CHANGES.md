@@ -8,6 +8,43 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-07-10 — v0.4.21
+
+### 1. Input — hover darkens the border
+**Suggestion:** "on hover it should highlight the input borders a bit so you know you are over
+the input field."
+
+- `Input` now darkens its border on hover from the resting `--input` (`#e4e4e7`) to
+  `--border-control` (`#9f9fa9`) — a mid-neutral that reads as "you're over the field" without
+  looking focused. `hover:border-[var(--border-control,#9f9fa9)]`, gated behind `!hasError`
+  (invalid inputs keep their destructive border) and beaten by focus/active (`!border-black`).
+  `border-color` was already in the transition list, so it eases smoothly.
+- Files: `src/components/Input.tsx`.
+
+### 2. Select — multi-select, checkboxes, per-item icons, and searchable
+**Suggestion:** a run of requests — "update the select component to have the multi select
+feature", "the multi select should have checkbox", "duotone icon on left", "add … search
+ability", "user should be able to just enable or remove the search option."
+
+- **`multiple` mode (backward-compatible):** pass `multiple` and `value`/`defaultValue`/
+  `onValueChange` become `string[]`. Picking an option TOGGLES it and the menu stays open; the
+  trigger summarizes as the single label or "N selected". Single-select behavior is unchanged.
+- **Checkboxes in multi mode:** each option renders the DS `Checkbox` in the gutter (display-
+  only — the row's click drives the toggle); single-select keeps its checkmark.
+- **Per-item `icon`:** `SelectItem` takes an `icon` (Phosphor duotone, sized to the text),
+  rendered on the left and mirrored on the trigger when that option is selected.
+- **`searchable`:** a search field (composed DS `Input`) pinned atop the dropdown filters
+  options by label — auto-enabled for lists > 7 (matching the DS >7 filter-search standard),
+  overridable with `searchable` / `searchable={false}`. Empty groups + their labels hide, a
+  "No results" row shows when nothing matches, and the query resets on close. The docs Select
+  playground exposes a **Searchable** knob to enable/remove it live.
+- All verified in the docs preview (toggle counts, checkboxes, icon on trigger, live search
+  filtering + group hiding + No-results + query reset). `Select` stays a single component —
+  no separate multi/search variant.
+- Files: `src/components/Select.tsx`; docs: `select-demo.tsx`, `component-registry.ts`.
+- Follow-up (not in this release): point the v0.4.19 inline `multi-select` FilterFacet at this
+  fuller `Select` so there's one multi-select implementation.
+
 ## 2026-06-14
 
 ### 1. TableShell — filter band stacks left-aligned at narrow breakpoints
