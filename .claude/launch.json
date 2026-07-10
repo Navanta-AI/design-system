@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "docs",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace", "docs"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "allison",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/ashishsharma/Documents/AI mode/Navanta/Allison", "run", "dev", "--", "-p", "3010"],
+      "port": 3010,
+      "autoPort": true
+    }
+  ]
+}
