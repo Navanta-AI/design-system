@@ -1,7 +1,6 @@
 'use client'
 
-import { Info } from '@phosphor-icons/react'
-import { KpiBreakdownCard, KpiProgressCard, KpiStatCard, Tooltip } from '@navanta-ai/design-system'
+import { KpiBreakdownCard, KpiProgressCard, KpiStatCard } from '@navanta-ai/design-system'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -58,23 +57,11 @@ export function KpiDemo({ meta }: { meta: ComponentMeta }) {
         const safeProgressGradient = escapeForTemplate(progressGradientFor(progressColor))
         const changeLabel =
           trend === 'down' ? '-3 vs last month' : trend === 'neutral' ? '0 vs last month' : '+3 vs last month'
-        const progressComponentImport = showInfo
-          ? "import { KpiProgressCard, Tooltip } from '@navanta-ai/design-system'"
-          : "import { KpiProgressCard } from '@navanta-ai/design-system'"
-        const statComponentImport = showInfo
-          ? "import { KpiStatCard, Tooltip } from '@navanta-ai/design-system'"
-          : "import { KpiStatCard } from '@navanta-ai/design-system'"
-        const infoImport = showInfo ? "\nimport { Info } from '@phosphor-icons/react'" : ''
-        const infoConst = showInfo
-          ? 'const infoIcon = (\n  <Tooltip content="More info">\n    <Info size={14} weight="regular" />\n  </Tooltip>\n)\n'
-          : ''
-        const infoProp = showInfo ? '\n      icon={infoIcon}' : ''
-
         if (variant === 'progress') {
-          return `${progressComponentImport}${infoImport}
+          // KpiProgressCard renders the standard info icon itself — just pass `info`.
+          return `import { KpiProgressCard } from '@navanta-ai/design-system'
 
 const progressGradient = "${safeProgressGradient}"
-${infoConst}
 
 export default function Example() {
   return (
@@ -83,7 +70,7 @@ export default function Example() {
       value="${safeNumber}"
       subtitle="${safePercentage}% of $1M credit limit used"
       progress={${percentageValue}}
-      progressGradient={progressGradient}${infoProp}
+      progressGradient={progressGradient}${showInfo ? '\n      info="More info"' : ''}
     />
   )
 }`
@@ -104,9 +91,8 @@ export default function Example() {
 }`
         }
 
-        return `${statComponentImport}${infoImport}
-
-${infoConst}
+        // KpiStatCard renders the standard info icon itself — just pass `info`.
+        return `import { KpiStatCard } from '@navanta-ai/design-system'
 
 export default function Example() {
   return (
@@ -114,7 +100,7 @@ export default function Example() {
       title="${safeLabel}"
       value="${safeNumber}"
       change="${changeLabel}"
-      trend="${trend}"${infoProp}
+      trend="${trend}"${showInfo ? '\n      info="More info"' : ''}
     />
   )
 }`
@@ -141,13 +127,6 @@ export default function Example() {
         const percentageValue = Number.isFinite(parsedPercentage)
           ? Math.min(100, Math.max(0, parsedPercentage))
           : 78.5
-        const info = showInfo ? (
-          <Tooltip content="More info" className="inline-flex h-[14px] items-center align-middle">
-            <span className="inline-flex">
-              <Info size={14} weight="regular" />
-            </span>
-          </Tooltip>
-        ) : undefined
         const progressGradient = progressGradientFor(progressColor)
 
         return (
@@ -166,19 +145,19 @@ export default function Example() {
                   className="max-w-none"
                   title={label}
                   value={number}
-                subtitle={`${rawPercentage}% of $1M credit limit used`}
-                progress={percentageValue}
-                progressGradient={progressGradient}
-                icon={info}
-              />
-            ) : (
+                  subtitle={`${rawPercentage}% of $1M credit limit used`}
+                  progress={percentageValue}
+                  progressGradient={progressGradient}
+                  info={showInfo ? 'More info' : undefined}
+                />
+              ) : (
                 <KpiStatCard
                   className="max-w-none"
                   title={label}
                   value={number}
                   change={trend === 'down' ? '-3 vs last month' : trend === 'neutral' ? '0 vs last month' : '+3 vs last month'}
                   trend={trend}
-                  icon={info}
+                  info={showInfo ? 'More info' : undefined}
                 />
               )}
             </div>

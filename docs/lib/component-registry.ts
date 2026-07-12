@@ -839,14 +839,7 @@ export default function Example() {
     description: 'Dashboard-ready key performance indicator cards for stat, progress, comparison, and breakdown use cases.',
     category: 'Data Display',
     importName: 'KpiStatCard',
-    usageExample: `import { Info } from '@phosphor-icons/react'
-import { KpiGrid, KpiProgressCard, KpiStatCard, Tooltip } from '@navanta-ai/design-system'
-
-const infoIcon = (
-  <Tooltip content="More info">
-    <Info size={14} weight="regular" />
-  </Tooltip>
-)
+    usageExample: `import { KpiGrid, KpiProgressCard, KpiStatCard } from '@navanta-ai/design-system'
 
 export default function Example() {
   return (
@@ -856,7 +849,7 @@ export default function Example() {
         value="$18"
         change="+3 vs last month"
         trend="up"
-        icon={infoIcon}
+        info="More info"
       />
 
       <KpiProgressCard
@@ -865,14 +858,14 @@ export default function Example() {
         subtitle="78.5% of $1M credit limit used"
         progress={78.5}
         progressGradient="linear-gradient(to left, #DE1010 0%, rgba(222,16,16,0.4) 17.788%, rgba(222,16,16,0.4) 100%)"
-        icon={infoIcon}
+        info="More info"
       />
     </KpiGrid>
   )
 }`,
     props: [
-      { name: 'KpiStatCard', type: 'Component', description: 'Shows title, value, trend delta, and optional sparkline/icon.' },
-      { name: 'KpiProgressCard', type: 'Component', description: 'Shows KPI value with a progress bar and completion label.' },
+      { name: 'KpiStatCard', type: 'Component', description: 'The breakdown-card composition (title + standard info icon, HERO value, token frame) with the up/down/neutral trend badge kept intact, bottom-pinned. `info` (boolean | string) shows the standard Info icon; optional subtitle/sparkline row under the badge. `layout`/`compactAt` are deprecated.' },
+      { name: 'KpiProgressCard', type: 'Component', description: 'The breakdown-card layout (title + standard info icon, value, single-line detail; token-defined padding/min-height/gap) with a progress bar as the bottom row. `info` (boolean | string) shows the standard Info icon; tone/progressColor/progressGradient drive the bar. `layout`/`compactAt` are deprecated (always the vertical stack).' },
       { name: 'KpiBreakdownCard', type: 'Component', description: 'Vertical stack of title + value + a single-line breakdown/detail line (subtitle) in primary text. Token-defined padding/min-height/gap; `info` (boolean | string) shows the standard, non-replaceable Info icon (string = tooltip). No trend or progress.' },
       { name: 'KpiComparisonCard', type: 'Component', description: 'Shows current value with a previous-period comparison row.' },
       { name: 'KpiTrendBadge', type: 'Component', description: 'Compact trend badge for up/down/neutral states.' },

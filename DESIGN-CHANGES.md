@@ -8,6 +8,85 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-07-12 — v0.4.22
+
+### 1. KPI cards — remove the 320px max-width
+**Suggestion:** "do KPI cards have max width? … we need to remove that."
+
+- Every KPI card variant capped at `max-w-[320px]` + `mx-auto` (a hardcoded literal, not a
+  token). Removed both from all four variants — cards now fill their `KpiGrid` cell / container
+  (`w-full`, computed `max-width: none`). The docs demo's "Card Width" knob still wraps the
+  example at a fixed width; that's a playground control, not the component.
+- Files: `src/components/KPI.tsx`.
+
+### 2. KPI breakdown card — info icon 2px optical alignment
+**Suggestion:** "in the breakdown card the info icon seems to be 2 px above."
+
+- The stat/comparison variants nudge the title-row info icon down `translate-y-[2px]`; the
+  shared `KpiInfoIcon` (used only by the breakdown card) lacked the nudge, so it sat ~2px
+  high. Added the same `translate-y-[2px]` + `leading-none`. Verified `translate: 0px 2px`
+  computed on the icon.
+- Files: `src/components/KPI.tsx`.
+
+### 3. KpiProgressCard — recast in the breakdown-card layout (bar kept)
+**Suggestion:** "can we have the progress variant look like the breakdown component while
+keeping the progress still part of it?"
+
+- `KpiProgressCard` now renders the breakdown card's vertical stack — truncating title +
+  the STANDARD `info` icon (new `info?: boolean | string` prop, same contract as
+  `KpiBreakdownCard`), the 22px value (currency split), and the single-line detail — inside
+  the token-defined frame (`--kpi-card-pad` / `--kpi-card-min-h` / `--kpi-stack-gap`), with
+  the **progress bar kept** as the bottom row (detail + bar read as one block, 5px gap;
+  `tone` / `progressColor` / `progressGradient` / `showMeta` unchanged).
+- **Height is NOT compromised — both cards clamp to EXACTLY `--kpi-card-min-h` (128px):**
+  the last block (detail+bar on progress, detail line on breakdown) is pinned to the card's
+  bottom with `mt-auto` instead of a fixed third gap. The breakdown card previously
+  overshot the token by ~1px (fixed 16px gaps summed to 129), which made the two variants
+  visibly jump 1px when toggling; now both measure 128.0px with a stable top edge and the
+  last line flush 16px (card pad) from the bottom.
+- **Internal rhythm (per follow-up "keep the number close to the heading"):** the value hugs
+  the title at `--text-stack-gap` (4px) — the standard body↔label stack spacing — so the top
+  reads as ONE cluster, and the freed space flows to the bottom-pinned detail block, giving
+  it its own room.
+- **HERO value + muted detail (final composition, after a rendered A/B lab at `/kpi-lab`):**
+  the breakdown card kept reading as "a lot of white space below" because its lone detail
+  line lacks the mass the progress bar gives the other variant — a spacing problem no gap
+  permutation could fix. Resolution: the VALUE is the hero — bumped 22px → **28px** on both
+  cards (currency symbol 14→16px) so the number absorbs the card's vertical mass, and the
+  detail line drops to **`text-muted-foreground`** for a real title → VALUE → detail
+  hierarchy. The breakdown's detail sits FLUSH at the bottom (16px pad only — the reserved
+  30px "phantom bar zone" is gone); the progress keeps detail + bar bottom-pinned. Verified:
+  heights 128.0/128.0, value 28px both, middle gap 20px (breakdown) / 8px (progress), no
+  dead band. The stat/comparison variants are untouched.
+- Backward compatible: legacy freeform `icon` still renders; `layout` / `compactAt` are
+  accepted but `@deprecated` (the card is always the vertical stack now, so the
+  ResizeObserver compact switch is gone).
+- Demo + registry moved to the `info` prop. Verified: frame matches breakdown (128px min-h,
+  16px gap/pad), order title → value → detail+bar, bar fills 78.5%.
+- Files: `src/components/KPI.tsx`; docs: `kpi-demo.tsx`, `component-registry.ts`.
+
+### 4. KpiStatCard — same breakdown composition, trend badge intact
+**Suggestion:** "can we have the stat ui be like how we have the breakdown but have the up
+and down growth icon style intact?"
+
+- `KpiStatCard` now uses the family composition: token frame (`--kpi-card-pad` /
+  `--kpi-card-min-h`), truncating title + standard `info` icon (new `info?: boolean | string`
+  prop), 28px HERO value at `--text-stack-gap` under the title — and the **`KpiTrendBadge`
+  untouched** (same up/down/neutral tonal pill + TrendUp/TrendDown/Minus icon), bottom-pinned
+  with `mt-auto` in the same zone the other variants use. The badge's 30px height matches the
+  progress card's detail+bar block, so all three variants share identical geometry. Optional
+  `subtitle`/`sparkline` render in a muted row under the badge.
+- Backward compatible: legacy freeform `icon` still renders; `layout`/`compactAt` accepted but
+  `@deprecated` (ResizeObserver compact switch removed — the now-unused `assignRef` /
+  `DEFAULT_KPI_COMPACT_AT` helpers were deleted; `KpiCardLayout` stays exported, deprecated).
+- Demo + registry moved to the `info` prop (the hand-rolled Tooltip+Info snippet is gone from
+  the examples). Verified: 128px height, 28px value, 4px title→value, badge pinned 16px from
+  the bottom, up (green + TrendUp) and down (red + TrendDown) states intact.
+- **Badge hugs its content** (follow-up): the bottom `flex-col` stretched the badge to the
+  full card width by default — added `items-start` so the pill sizes to its text (measured
+  151px vs 288px inner width).
+- Files: `src/components/KPI.tsx`; docs: `kpi-demo.tsx`, `component-registry.ts`.
+
 ## 2026-07-10 — v0.4.21
 
 ### 1. Input — hover darkens the border

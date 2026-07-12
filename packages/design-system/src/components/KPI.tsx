@@ -6,17 +6,8 @@ import { cn } from '../utils/cn'
 import { Tooltip } from './Tooltip'
 
 export type KpiTrendDirection = 'up' | 'down' | 'neutral'
+/** @deprecated Layout switching was removed — KPI cards are always the vertical stack. */
 export type KpiCardLayout = 'auto' | 'default' | 'compact'
-
-const DEFAULT_KPI_COMPACT_AT = 280
-
-function assignRef<T>(ref: React.ForwardedRef<T>, value: T | null) {
-  if (typeof ref === 'function') {
-    ref(value)
-  } else if (ref) {
-    ;(ref as React.MutableRefObject<T | null>).current = value
-  }
-}
 
 export interface KpiGridProps extends React.HTMLAttributes<HTMLDivElement> {
   columns?: 1 | 2 | 3 | 4
@@ -89,10 +80,23 @@ export interface KpiStatCardProps extends KpiCardBaseProps {
   change?: string
   trend?: KpiTrendDirection
   sparkline?: React.ReactNode
+  /**
+   * Show the standard info icon beside the title. Pass a string to attach a tooltip.
+   * The icon is always the standard `Info` glyph and cannot be replaced (same contract
+   * as the breakdown/progress cards). Prefer this over the legacy freeform `icon` slot.
+   */
+  info?: boolean | string
+  /** @deprecated The card is now always the breakdown-style vertical stack. */
   layout?: KpiCardLayout
+  /** @deprecated No longer used — the card no longer switches layout by width. */
   compactAt?: number
 }
 
+/**
+ * KpiStatCard — the breakdown-card composition (title + optional standard info icon,
+ * HERO value hugging the title, token frame) with the up/down/neutral trend badge
+ * kept intact, bottom-pinned where the other variants put their detail block.
+ */
 const KpiStatCard = React.forwardRef<HTMLDivElement, KpiStatCardProps>(
   (
     {
@@ -101,100 +105,71 @@ const KpiStatCard = React.forwardRef<HTMLDivElement, KpiStatCardProps>(
       value,
       subtitle,
       icon,
+      info,
       change,
       trend = 'neutral',
       sparkline,
-      layout = 'auto',
-      compactAt = DEFAULT_KPI_COMPACT_AT,
+      layout: _layout,
+      compactAt: _compactAt,
       ...props
     },
     ref
   ) => {
-    const cardRef = React.useRef<HTMLDivElement | null>(null)
-    const [isAutoCompact, setIsAutoCompact] = React.useState(false)
-
-    React.useEffect(() => {
-      if (layout !== 'auto') return
-      const node = cardRef.current
-      if (!node) return
-
-      const update = (width?: number) => {
-        const nextWidth = width ?? node.getBoundingClientRect().width
-        setIsAutoCompact(nextWidth <= compactAt)
-      }
-
-      update()
-      const observer = new ResizeObserver((entries) => {
-        const entry = entries[0]
-        update(entry?.contentRect.width)
-      })
-      observer.observe(node)
-      return () => observer.disconnect()
-    }, [layout, compactAt])
-
-    const isCompact = layout === 'compact' || (layout === 'auto' && isAutoCompact)
     const currencyMatch = value.match(/^([$€£₹])(.+)$/)
     const currencySymbol = currencyMatch?.[1]
     const currencyValue = currencyMatch?.[2]
+    // HERO value in the breakdown card's style (28px, currency symbol raised at 16px).
     const valueNode = currencySymbol && currencyValue ? (
-      <div className="mt-[1px] inline-flex h-[25px] items-start">
-        <span className="pt-[2px] text-[14px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
+      <div className="inline-flex items-start">
+        <span className="pt-[3px] text-[16px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
           {currencySymbol}
         </span>
-        <span className="-translate-y-[0.5px] text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        <span className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
           {currencyValue}
         </span>
       </div>
     ) : (
-      <div className="mt-[1px] inline-flex h-[25px] items-start">
-        <p className="-translate-y-[0.5px] text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
-          {value}
-        </p>
-      </div>
+      <p className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        {value}
+      </p>
     )
 
     return (
       <div
-        ref={(node) => {
-          cardRef.current = node
-          assignRef(ref, node)
-        }}
+        ref={ref}
         className={cn(
-          'mx-auto flex w-full max-w-[320px] flex-col rounded-[8px] bg-card p-4 text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
+          'flex min-h-[var(--kpi-card-min-h,128px)] w-full flex-col items-start rounded-[8px] bg-card p-[var(--kpi-card-pad,16px)] text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
           className
         )}
         {...props}
       >
-        <div
-          className={cn(
-            'gap-3',
-            isCompact ? 'flex flex-col items-start' : 'flex items-start justify-between'
+        <div className="flex w-full items-center gap-1">
+          <p className="min-w-0 truncate text-[14px] font-semibold leading-[22px] text-foreground">{title}</p>
+          {info != null && info !== false && (
+            <KpiInfoIcon tooltip={typeof info === 'string' ? info : undefined} />
           )}
-        >
-          <div className="inline-flex items-center gap-1">
-            <p className="text-[14px] font-semibold leading-[1.5] text-foreground">{title}</p>
-            {icon && (
-              <span className="inline-flex h-[14px] translate-y-[2px] items-center leading-none text-muted-foreground [&_svg]:block [&_svg]:size-[14px]">
-                {icon}
-              </span>
-            )}
-          </div>
-          {valueNode}
+          {icon && (
+            <span className="inline-flex h-[14px] shrink-0 translate-y-[2px] items-center leading-none text-muted-foreground [&_svg]:block [&_svg]:size-[14px]">
+              {icon}
+            </span>
+          )}
         </div>
-
+        {/* HERO value hugs the title (--text-stack-gap) — same top cluster as the
+            breakdown/progress cards. */}
+        <div className="mt-[var(--text-stack-gap,4px)]">{valueNode}</div>
+        {/* Trend badge (up/down growth style intact) bottom-pinned in the same zone
+            the other variants use for their detail block; the badge's 30px height
+            matches the progress card's detail+bar block exactly. */}
         {(change || subtitle || sparkline) && (
-          <div
-            className={cn(
-              'mt-4 grid gap-0',
-              subtitle || sparkline ? 'h-[60px] grid-rows-2' : 'h-[30px] grid-rows-1'
-            )}
-          >
-            <div className="flex h-[30px] items-end">
-              {change && <KpiTrendBadge direction={trend}>{change}</KpiTrendBadge>}
-            </div>
+          // items-start so the badge HUGS its text (a flex column stretches children
+          // full-width by default).
+          <div className="mt-auto flex w-full flex-col items-start gap-[5px]">
+            {change && <KpiTrendBadge direction={trend}>{change}</KpiTrendBadge>}
             {(subtitle || sparkline) && (
-              <div className="flex h-[30px] items-center">
-                {subtitle && <span className="text-[13px] text-muted-foreground">{subtitle}</span>}
+              <div className="flex w-full items-center gap-2">
+                {subtitle && (
+                  <span className="text-[12px] leading-[18px] text-muted-foreground">{subtitle}</span>
+                )}
                 {sparkline}
               </div>
             )}
@@ -213,10 +188,24 @@ export interface KpiProgressCardProps extends KpiCardBaseProps {
   tone?: 'primary' | 'success' | 'warning' | 'destructive'
   progressColor?: string
   progressGradient?: string
+  /**
+   * Show the standard info icon beside the title. Pass a string to attach a tooltip.
+   * The icon is always the standard `Info` glyph and cannot be replaced (same contract
+   * as `KpiBreakdownCard`). Prefer this over the legacy freeform `icon` slot.
+   */
+  info?: boolean | string
+  /** @deprecated The card is now always the breakdown-style vertical stack. */
   layout?: KpiCardLayout
+  /** @deprecated No longer used — the card no longer switches layout by width. */
   compactAt?: number
 }
 
+/**
+ * KpiProgressCard — the breakdown-card layout (vertical stack of title + optional
+ * standard info icon, big value, single-line detail) with a progress bar kept as the
+ * bottom row. Shares the token-defined frame (`--kpi-card-pad`, `--kpi-card-min-h`,
+ * `--kpi-stack-gap`) so it sits flush next to `KpiBreakdownCard` in a `KpiGrid`.
+ */
 const KpiProgressCard = React.forwardRef<HTMLDivElement, KpiProgressCardProps>(
   (
     {
@@ -225,41 +214,19 @@ const KpiProgressCard = React.forwardRef<HTMLDivElement, KpiProgressCardProps>(
       value,
       subtitle,
       icon,
+      info,
       progress,
       progressLabel = 'Completion',
       showMeta = false,
       tone = 'primary',
       progressColor,
       progressGradient,
-      layout = 'auto',
-      compactAt = DEFAULT_KPI_COMPACT_AT,
+      layout: _layout,
+      compactAt: _compactAt,
       ...props
     },
     ref
   ) => {
-    const cardRef = React.useRef<HTMLDivElement | null>(null)
-    const [isAutoCompact, setIsAutoCompact] = React.useState(false)
-
-    React.useEffect(() => {
-      if (layout !== 'auto') return
-      const node = cardRef.current
-      if (!node) return
-
-      const update = (width?: number) => {
-        const nextWidth = width ?? node.getBoundingClientRect().width
-        setIsAutoCompact(nextWidth <= compactAt)
-      }
-
-      update()
-      const observer = new ResizeObserver((entries) => {
-        const entry = entries[0]
-        update(entry?.contentRect.width)
-      })
-      observer.observe(node)
-      return () => observer.disconnect()
-    }, [layout, compactAt])
-
-    const isCompact = layout === 'compact' || (layout === 'auto' && isAutoCompact)
     const clamped = Math.min(100, Math.max(0, progress))
     const currencyMatch = value.match(/^([$€£₹])(.+)$/)
     const currencySymbol = currencyMatch?.[1]
@@ -281,71 +248,67 @@ const KpiProgressCard = React.forwardRef<HTMLDivElement, KpiProgressCardProps>(
       ...(progressColor ? { backgroundColor: progressColor } : {}),
     }
 
+    // HERO value in the breakdown card's style (28px, currency symbol raised at 16px).
     const valueNode = currencySymbol && currencyValue ? (
-      <div className="mt-[1px] inline-flex h-[25px] items-start">
-        <span className="pt-[2px] text-[14px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
+      <div className="inline-flex items-start">
+        <span className="pt-[3px] text-[16px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
           {currencySymbol}
         </span>
-        <span className="-translate-y-[0.5px] text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        <span className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
           {currencyValue}
         </span>
       </div>
     ) : (
-      <div className="mt-[1px] inline-flex h-[25px] items-start">
-        <p className="-translate-y-[0.5px] text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
-          {value}
-        </p>
-      </div>
+      <p className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        {value}
+      </p>
     )
 
     return (
       <div
-        ref={(node) => {
-          cardRef.current = node
-          assignRef(ref, node)
-        }}
+        ref={ref}
         className={cn(
-          'mx-auto flex w-full max-w-[320px] flex-col rounded-[8px] bg-card p-4 text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
+          // No parent gap — explicit margins keep the TOTAL height at the standard
+          // token footprint (`--kpi-card-min-h`), identical to KpiBreakdownCard: a
+          // third 16px gap before the bar block would push the card past it.
+          'flex min-h-[var(--kpi-card-min-h,128px)] w-full flex-col items-start rounded-[8px] bg-card p-[var(--kpi-card-pad,16px)] text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
           className
         )}
         {...props}
       >
-        <div
-          className={cn(
-            'gap-3',
-            isCompact ? 'flex flex-col items-start' : 'flex items-start justify-between'
+        <div className="flex w-full items-center gap-1">
+          <p className="min-w-0 truncate text-[14px] font-semibold leading-[22px] text-foreground">{title}</p>
+          {info != null && info !== false && (
+            <KpiInfoIcon tooltip={typeof info === 'string' ? info : undefined} />
           )}
-        >
-          <div className="inline-flex items-center gap-1">
-            <p className="text-[14px] font-semibold leading-[1.5] text-foreground">{title}</p>
-            {icon && (
-              <span className="inline-flex h-[14px] translate-y-[2px] items-center leading-none text-muted-foreground [&_svg]:block [&_svg]:size-[14px]">
-                {icon}
-              </span>
-            )}
-          </div>
-          {valueNode}
+          {icon && (
+            <span className="inline-flex h-[14px] shrink-0 translate-y-[2px] items-center leading-none text-muted-foreground [&_svg]:block [&_svg]:size-[14px]">
+              {icon}
+            </span>
+          )}
         </div>
-
-        <div className="mt-4 flex h-[30px] flex-col gap-[5px]">
-          <div className="h-[18px]">
-            {subtitle && (
-              <p className="truncate text-[13px] leading-[18px] tracking-[0.01em] text-muted-foreground">{subtitle}</p>
-            )}
-          </div>
-          <div className="flex h-[7px] items-center">
-            <div className="h-[7px] w-full overflow-hidden rounded-[100px] bg-[#E0E0E0] dark:bg-muted">
-              <div
-                className={cn(
-                  'h-full rounded-l-[2px] rounded-r-[100px] transition-[width]',
-                  !resolvedGradient && !progressColor && toneClass
-                )}
-                style={fillStyle}
-              />
-            </div>
+        {/* Value hugs the title (the standard --text-stack-gap body↔label spacing) so
+            the top reads as ONE cluster; the freed space flows to the bottom block. */}
+        <div className="mt-[var(--text-stack-gap,4px)]">{valueNode}</div>
+        {/* Detail line + bar read as ONE block (tight 5px gap), PINNED to the card's
+            bottom (`mt-auto`) — the card holds the token height instead of growing. */}
+        <div className="mt-auto flex w-full flex-col gap-[5px]">
+          {subtitle && (
+            <p className="w-full truncate text-[12px] leading-[18px] text-muted-foreground" title={subtitle}>
+              {subtitle}
+            </p>
+          )}
+          <div className="h-[7px] w-full overflow-hidden rounded-[100px] bg-[#E0E0E0] dark:bg-muted">
+            <div
+              className={cn(
+                'h-full rounded-l-[2px] rounded-r-[100px] transition-[width]',
+                !resolvedGradient && !progressColor && toneClass
+              )}
+              style={fillStyle}
+            />
           </div>
           {showMeta && (
-            <div className="mt-1 flex items-center justify-between text-[13px] text-muted-foreground">
+            <div className="mt-1 flex w-full items-center justify-between text-[13px] text-muted-foreground">
               <span>{progressLabel}</span>
               <span>{Math.round(clamped)}%</span>
             </div>
@@ -385,7 +348,7 @@ const KpiComparisonCard = React.forwardRef<HTMLDivElement, KpiComparisonCardProp
     <div
       ref={ref}
       className={cn(
-        'mx-auto flex w-full max-w-[320px] flex-col rounded-[8px] bg-card p-4 text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
+        'flex w-full flex-col rounded-[8px] bg-card p-4 text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
         className
       )}
       {...props}
@@ -437,7 +400,7 @@ KpiComparisonCard.displayName = 'KpiComparisonCard'
  */
 function KpiInfoIcon({ tooltip }: { tooltip?: string }) {
   const glyph = (
-    <span className="inline-flex h-[14px] shrink-0 items-center text-muted-foreground [&_svg]:block [&_svg]:size-[14px]">
+    <span className="inline-flex h-[14px] shrink-0 translate-y-[2px] items-center leading-none text-muted-foreground [&_svg]:block [&_svg]:size-[14px]">
       <Info size={14} weight="regular" aria-hidden={tooltip ? undefined : true} aria-label={tooltip} />
     </span>
   )
@@ -474,15 +437,15 @@ const KpiBreakdownCard = React.forwardRef<HTMLDivElement, KpiBreakdownCardProps>
     const currencyValue = currencyMatch?.[2]
     const valueNode = currencySymbol && currencyValue ? (
       <div className="inline-flex items-start">
-        <span className="pt-[2px] text-[14px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
+        <span className="pt-[3px] text-[16px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
           {currencySymbol}
         </span>
-        <span className="text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        <span className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
           {currencyValue}
         </span>
       </div>
     ) : (
-      <p className="text-[22px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+      <p className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
         {value}
       </p>
     )
@@ -491,7 +454,11 @@ const KpiBreakdownCard = React.forwardRef<HTMLDivElement, KpiBreakdownCardProps>
       <div
         ref={ref}
         className={cn(
-          'mx-auto flex min-h-[var(--kpi-card-min-h,128px)] w-full max-w-[320px] flex-col items-start gap-[var(--kpi-stack-gap,16px)] rounded-[8px] bg-card p-[var(--kpi-card-pad,16px)] text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
+          // No parent gap — title→value uses the stack-gap token, and the detail line is
+          // PINNED to the bottom (`mt-auto`), so the card clamps to EXACTLY the
+          // `--kpi-card-min-h` footprint (fixed gaps overshot it by ~1px and made the
+          // card 1px taller than the progress card).
+          'flex min-h-[var(--kpi-card-min-h,128px)] w-full flex-col items-start rounded-[8px] bg-card p-[var(--kpi-card-pad,16px)] text-card-foreground shadow-[0px_0px_1px_0px_rgba(0,0,0,0.25),0px_1px_4px_0px_rgba(0,0,0,0.06)]',
           className
         )}
         {...props}
@@ -502,9 +469,16 @@ const KpiBreakdownCard = React.forwardRef<HTMLDivElement, KpiBreakdownCardProps>
             <KpiInfoIcon tooltip={typeof info === 'string' ? info : undefined} />
           )}
         </div>
-        {valueNode}
+        {/* HERO value hugs the title (--text-stack-gap): the 28px number carries the
+            card's vertical mass so the breakdown never reads as empty space. */}
+        <div className="mt-[var(--text-stack-gap,4px)]">{valueNode}</div>
+        {/* Detail line sits FLUSH at the card bottom (only the card pad below it) in
+            muted secondary text — no reserved bar zone, no phantom gap under the line. */}
         {subtitle && (
-          <p className="w-full truncate text-[12px] leading-[18px] text-foreground" title={subtitle}>
+          <p
+            className="mt-auto w-full truncate text-[12px] leading-[18px] text-muted-foreground"
+            title={subtitle}
+          >
             {subtitle}
           </p>
         )}
