@@ -118,18 +118,18 @@ const KpiStatCard = React.forwardRef<HTMLDivElement, KpiStatCardProps>(
     const currencyMatch = value.match(/^([$€£₹])(.+)$/)
     const currencySymbol = currencyMatch?.[1]
     const currencyValue = currencyMatch?.[2]
-    // HERO value in the breakdown card's style (28px, currency symbol raised at 16px).
+    // HERO value in the breakdown card's style (24px, currency symbol raised at 15px).
     const valueNode = currencySymbol && currencyValue ? (
       <div className="inline-flex items-start">
-        <span className="pt-[3px] text-[16px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
+        <span className="pt-[2px] text-[15px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
           {currencySymbol}
         </span>
-        <span className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        <span className="text-[24px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
           {currencyValue}
         </span>
       </div>
     ) : (
-      <p className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+      <p className="text-[24px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
         {value}
       </p>
     )
@@ -248,18 +248,18 @@ const KpiProgressCard = React.forwardRef<HTMLDivElement, KpiProgressCardProps>(
       ...(progressColor ? { backgroundColor: progressColor } : {}),
     }
 
-    // HERO value in the breakdown card's style (28px, currency symbol raised at 16px).
+    // HERO value in the breakdown card's style (24px, currency symbol raised at 15px).
     const valueNode = currencySymbol && currencyValue ? (
       <div className="inline-flex items-start">
-        <span className="pt-[3px] text-[16px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
+        <span className="pt-[2px] text-[15px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
           {currencySymbol}
         </span>
-        <span className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        <span className="text-[24px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
           {currencyValue}
         </span>
       </div>
     ) : (
-      <p className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+      <p className="text-[24px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
         {value}
       </p>
     )
@@ -437,15 +437,15 @@ const KpiBreakdownCard = React.forwardRef<HTMLDivElement, KpiBreakdownCardProps>
     const currencyValue = currencyMatch?.[2]
     const valueNode = currencySymbol && currencyValue ? (
       <div className="inline-flex items-start">
-        <span className="pt-[3px] text-[16px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
+        <span className="pt-[2px] text-[15px] font-semibold leading-[1.33] tracking-[-0.02em] text-foreground">
           {currencySymbol}
         </span>
-        <span className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+        <span className="text-[24px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
           {currencyValue}
         </span>
       </div>
     ) : (
-      <p className="text-[28px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
+      <p className="text-[24px] font-semibold leading-[1.14] tracking-[-0.02em] text-foreground">
         {value}
       </p>
     )
@@ -469,7 +469,7 @@ const KpiBreakdownCard = React.forwardRef<HTMLDivElement, KpiBreakdownCardProps>
             <KpiInfoIcon tooltip={typeof info === 'string' ? info : undefined} />
           )}
         </div>
-        {/* HERO value hugs the title (--text-stack-gap): the 28px number carries the
+        {/* HERO value hugs the title (--text-stack-gap): the 24px number carries the
             card's vertical mass so the breakdown never reads as empty space. */}
         <div className="mt-[var(--text-stack-gap,4px)]">{valueNode}</div>
         {/* Detail line sits FLUSH at the card bottom (only the card pad below it) in

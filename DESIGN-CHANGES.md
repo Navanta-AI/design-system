@@ -8,6 +8,17 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-07-12 — v0.4.23
+
+### 1. KPI hero value calmed to 24px
+**Suggestion:** "I think the font size of 18 is too big for the overall ui here."
+
+- The hero value stepped down 28px → **24px** (currency symbol 16px → 15px) across all
+  three variants — still enough mass to anchor the card (a bump over the original 22px),
+  but proportioned to the 14px title instead of shouting. Heights verified unchanged at
+  exactly 128px on stat/progress/breakdown. CLAUDE.md standard updated to 24px.
+- Files: `src/components/KPI.tsx`.
+
 ## 2026-07-12 — v0.4.22
 
 ### 1. KPI cards — remove the 320px max-width
