@@ -1,6 +1,7 @@
 'use client'
 
 import { Input } from '@navanta-ai/design-system'
+import { MagnifyingGlass, Envelope } from '@phosphor-icons/react'
 import { ComponentPreview } from '@/app/components/component-preview'
 import type { ComponentMeta } from '@/lib/component-registry'
 
@@ -46,6 +47,51 @@ export function InputDemo({ meta }: InputDemoProps) {
             </div>
           )}
           codeTemplate={() => `import { Input } from '@navanta-ai/design-system'\n\nexport default function Example() {\n  return (\n    <Input\n      label="Email address"\n      placeholder="hello@example.com"\n      error="Invalid email format"\n    />\n  )\n}`}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="font-semibold text-lg border-b border-border pb-2">With icons (start / end)</h3>
+        <ComponentPreview
+          meta={meta}
+          hideKnobs={true}
+          defaultChildren=""
+          renderPreview={() => (
+            <div className="flex w-full max-w-sm flex-col gap-4">
+              <Input
+                label="Search"
+                placeholder="Search orders"
+                iconLeft={<MagnifyingGlass weight="regular" />}
+              />
+              <Input
+                label="Email"
+                placeholder="you@example.com"
+                iconRight={<Envelope weight="regular" />}
+              />
+            </div>
+          )}
+          codeTemplate={() => `import { Input } from '@navanta-ai/design-system'
+import { MagnifyingGlass, Envelope } from '@phosphor-icons/react'
+
+export default function Example() {
+  return (
+    <>
+      {/* Icon at the START */}
+      <Input
+        label="Search"
+        placeholder="Search orders"
+        iconLeft={<MagnifyingGlass weight="regular" />}
+      />
+
+      {/* Icon at the END */}
+      <Input
+        label="Email"
+        placeholder="you@example.com"
+        iconRight={<Envelope weight="regular" />}
+      />
+    </>
+  )
+}`}
         />
       </div>
 

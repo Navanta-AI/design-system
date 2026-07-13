@@ -29,7 +29,10 @@
   --info-foreground: #09090b;
 
   --border: #e4e4e7;
-  --input: #e4e4e7;
+  /* Form-control resting border (Input/Textarea/Select/Radio/Slider/Button-outline).
+     One step darker than --border (zinc-300) so fields read clearly against white;
+     hover steps to --border-control (#9f9fa9), focus to black. */
+  --input: #d4d4d8;
   --ring: #c4c4c8;
 
   /* Dashboard chart palette (v1) */
@@ -243,7 +246,9 @@
   --info-foreground: #09090b;
 
   --border: #27272a;
-  --input: #27272a;
+  /* Form-control resting border — one step lighter than --border (zinc-700) so fields
+     read clearly against the dark surface. */
+  --input: #3f3f46;
   --ring: #71717a;
 
   /* Dashboard chart palette (dark) */

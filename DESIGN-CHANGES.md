@@ -8,6 +8,33 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-07-12 — v0.4.24
+
+### 1. Form-control resting border darkened (`--input`)
+**Suggestion:** "the input field border is a bit too light … similarly for the select … and
+even the textarea component."
+
+- All form controls resolve their resting border from `--input`, which sat at the lightest
+  neutral (`#e4e4e7` = zinc-200, same as `--border`). Bumped **`--input` → `#d4d4d8`**
+  (zinc-300) light / **`#27272a` → `#3f3f46`** (zinc-700) dark — one step more defined so
+  fields read clearly against the surface, while `--border` (dividers, card/table chrome)
+  stays at zinc-200. Progression preserved: resting `#d4d4d8` → Input hover
+  `--border-control` (#9f9fa9) → focus black.
+- One-token change, so it lands consistently on every `border-input` consumer — Input,
+  Textarea, Select (+ TableShell filter triggers), plus Radio / Slider / Button-outline —
+  no per-component drift. Verified computed border `rgb(212,212,216)` on Input, Select
+  trigger, and Textarea.
+- Files: `src/tokens.css`.
+
+### 2. Input — start/end icon usage documented in the demo
+**Suggestion:** "make sure we have the option to add icon at the start or end of the input."
+
+- No component change needed — `Input` already supports `iconLeft` / `iconRight` (start-icon
+  auto-pads `pl-9`, end-icon `pr-8`, yielding to the clear ✕ when `clearable` has text). The
+  capability just wasn't shown, so added a "With icons (start / end)" example to the docs
+  demo (search magnifier at the start, envelope at the end). Docs-only.
+- Files: `docs/.../demos/input-demo.tsx`.
+
 ## 2026-07-12 — v0.4.23
 
 ### 1. KPI hero value calmed to 24px
