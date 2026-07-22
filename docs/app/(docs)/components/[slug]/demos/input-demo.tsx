@@ -96,6 +96,38 @@ export default function Example() {
       </div>
 
       <div className="space-y-4">
+        <h3 className="font-semibold text-lg border-b border-border pb-2">With prefix / suffix</h3>
+        <ComponentPreview
+          meta={meta}
+          hideKnobs={true}
+          defaultChildren=""
+          renderPreview={() => (
+            <div className="flex w-full max-w-sm flex-col gap-4">
+              <Input label="Unit price" prefix="$" defaultValue="54.74" />
+              <Input label="Weight" suffix="kg" placeholder="0.00" />
+              <Input label="Website" prefix="https://" suffix=".com" placeholder="acme" />
+            </div>
+          )}
+          codeTemplate={() => `import { Input } from '@navanta-ai/design-system'
+
+export default function Example() {
+  return (
+    <>
+      {/* Prefix */}
+      <Input label="Unit price" prefix="$" defaultValue="54.74" />
+
+      {/* Suffix */}
+      <Input label="Weight" suffix="kg" placeholder="0.00" />
+
+      {/* Both */}
+      <Input label="Website" prefix="https://" suffix=".com" placeholder="acme" />
+    </>
+  )
+}`}
+        />
+      </div>
+
+      <div className="space-y-4">
         <h3 className="font-semibold text-lg border-b border-border pb-2">Disabled</h3>
         <ComponentPreview
           meta={meta}

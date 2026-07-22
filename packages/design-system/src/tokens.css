@@ -104,6 +104,8 @@
   --surface-raised: #f8fafc;
   --surface-sunken: var(--secondary);
   --surface-hover: var(--accent);
+  /* Subtle grey fill for disabled form controls (Figma: Surface/Grey, Neutral-50). */
+  --surface-grey: #fafafa;
   --surface-accent: color-mix(in oklab, var(--kds-color-brand-accent) 10%, var(--background));
   --surface-info: color-mix(in oklab, var(--info) 10%, var(--background));
   --surface-success-alt: color-mix(in oklab, var(--success) 12%, var(--background));
@@ -262,6 +264,8 @@
   --kds-color-brand-accent: #8c66e3;
 
   --surface-raised: #18181b;
+  /* Disabled form-control fill — subtle grey above the dark background. */
+  --surface-grey: #18181b;
   --text-neutral: #94a3b8;
   --text-heading: var(--foreground); /* lift the page-heading title for dark mode */
   --text-inverse-muted: #e2e8f0;

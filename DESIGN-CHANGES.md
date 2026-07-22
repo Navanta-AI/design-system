@@ -8,6 +8,36 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-07-13 — v0.4.25
+
+### 1. Form controls — proper disabled treatment (grey fill, not a flat fade)
+**Suggestion:** "the disabled UI does not look disabled … background color and border needs to
+be like this [Figma], even the font color." (Figma W&B-Shareable node 1793-7531.)
+
+- Disabled inputs used `opacity-50`, which just faded the whole field ~half — it didn't read
+  as disabled. Replaced across `Input` / `Textarea` / `Select` with a defined treatment from
+  Figma: **grey fill `--surface-grey` (#fafafa, new token = Figma Surface/Grey / Neutral-50),
+  border stays `--input` (#d4d4d8), text → `--muted-foreground`** (readable muted, ≈ Figma
+  Neutral-600), full opacity, `cursor-not-allowed`. Dark mode `--surface-grey` = #18181b.
+- Verified computed on the disabled Input: bg `rgb(250,250,250)`, border `rgb(212,212,216)`,
+  text `rgb(75,85,99)`, opacity 1.
+- Files: `src/tokens.css`, `src/components/{Input,Textarea,Select}.tsx`.
+
+### 2. Input — `prefix` / `suffix` inline text (Figma 1793-7531)
+**Suggestion:** "can we have the prefix and suffix part of it? make them part of test examples."
+
+- New `prefix` / `suffix` props (ReactNode) render inline text INSIDE the field — e.g.
+  `prefix="$"`, `suffix="kg"`, or `prefix="https://" suffix=".com"`. Distinct from
+  `iconLeft`/`iconRight` (absolute icon slots): when set, a **flex box owns the
+  border/fill/focus-ring** (via `focus-within`) and the input sits inside it borderless, so
+  affixes are true inline segments that shift the input — matching Figma's `$ 54.74` (prefix
+  muted `text-muted-foreground` / Neutral-600, value primary). Composes with `clearable` and
+  carries the same hover/focus/error/disabled states as the plain input.
+- Verified: wrapper border `rgb(212,212,216)`, input `border 0`, focus-within → black border
+  + ring; `$`/`kg`/`https://…​.com` all render. Demo gains a "With prefix / suffix" example;
+  registry documents prefix/suffix + icons + clearable.
+- Files: `src/components/Input.tsx`; docs: `input-demo.tsx`, `component-registry.ts`.
+
 ## 2026-07-12 — v0.4.24
 
 ### 1. Form-control resting border darkened (`--input`)

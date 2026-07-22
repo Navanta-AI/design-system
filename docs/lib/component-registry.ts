@@ -225,7 +225,22 @@ export default function Example() {
         name: 'disabled',
         type: 'boolean',
         default: 'false',
-        description: 'Prevents interaction and applies muted styling.',
+        description: 'Prevents interaction; applies a defined grey fill (--surface-grey) + muted text (not a flat opacity fade).',
+      },
+      {
+        name: 'iconLeft / iconRight',
+        type: 'ReactNode',
+        description: 'Icon rendered inside the field at the start / end (muted, ~14px). iconRight yields to the clear ✕ when clearable has a value.',
+      },
+      {
+        name: 'prefix / suffix',
+        type: 'ReactNode',
+        description: 'Inline text (or node) INSIDE the bordered field before / after the input — e.g. prefix="$", suffix="kg", or prefix="https://" + suffix=".com". Muted + non-selectable; the field owns the border and focus ring (via focus-within). Composable with clearable.',
+      },
+      {
+        name: 'clearable / onClear',
+        type: 'boolean / () => void',
+        description: 'Shows a clear ✕ button while the input has a value; onClear fires when clicked (value resets + input refocuses).',
       },
     ],
     knobs: [

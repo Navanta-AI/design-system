@@ -89,7 +89,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
               'active:ring-ring/30 active:ring-[2px]',
               !hasError &&
                 'focus:!border-black dark:focus:!border-white focus-visible:!border-black dark:focus-visible:!border-white active:!border-black dark:active:!border-white',
-              'disabled:cursor-not-allowed disabled:opacity-50',
+              // Disabled = defined grey fill + muted text (not a flat 50% fade).
+              'disabled:cursor-not-allowed disabled:bg-[var(--surface-grey,#fafafa)] disabled:text-muted-foreground disabled:placeholder:text-muted-foreground',
               hasError &&
                 'border-destructive focus:!border-destructive focus-visible:!border-destructive active:!border-destructive focus:ring-destructive/20 dark:focus:ring-destructive/40 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 active:ring-destructive/20',
               className

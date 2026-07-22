@@ -20,6 +20,11 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
   iconLeft?: React.ReactNode
   /** Icon or element rendered inside the input on the right */
   iconRight?: React.ReactNode
+  /** Inline text (or node) shown INSIDE the field before the input — e.g. "$", "https://".
+   *  Muted, non-selectable, part of the bordered box (Figma: prefix in Neutral-600). */
+  prefix?: React.ReactNode
+  /** Inline text (or node) shown INSIDE the field after the input — e.g. ".00", "kg", "@acme.com". */
+  suffix?: React.ReactNode
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -34,6 +39,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       onClear,
       iconLeft,
       iconRight,
+      prefix,
+      suffix,
       id: propId,
       value,
       defaultValue,
@@ -82,12 +89,38 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     }
 
     const showClear = clearable && currentValue.length > 0 && !disabled
-    const sizeClass =
-      size === 'sm'
-        ? 'h-7 px-2.5 text-xs'
-        : size === 'md'
-          ? 'h-8 px-3 text-sm'
-          : 'h-9 px-3 text-base md:text-sm'
+    // Split into box (height + padding) and text size so the affix path can put the box
+    // sizing on the wrapper while the input still carries its own text size.
+    const boxSize = size === 'sm' ? 'h-7 px-2.5' : size === 'md' ? 'h-8 px-3' : 'h-9 px-3'
+    const textSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base md:text-sm' : 'text-sm'
+    const sizeClass = `${boxSize} ${textSize}`
+    const hasAffix = prefix != null || suffix != null
+    const affixText = 'shrink-0 select-none text-muted-foreground [&>svg]:size-3.5'
+
+    const clearButton = showClear ? (
+      <button
+        type="button"
+        tabIndex={-1}
+        onClick={handleClear}
+        className="flex shrink-0 items-center justify-center rounded p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        aria-label="Clear input"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+    ) : null
 
     return (
       <div className="flex flex-col gap-1">
@@ -99,6 +132,48 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {label}
           </label>
         )}
+        {hasAffix ? (
+          // Affix path: a flex box OWNS the border/fill/states (via focus-within); the
+          // input sits inside it borderless with the prefix/suffix as inline segments.
+          <div
+            className={cn(
+              'flex items-center gap-1.5 rounded-md border border-input bg-background transition-[border-color,color,box-shadow]',
+              boxSize,
+              textSize,
+              'focus-within:ring-ring/50 focus-within:ring-[3px]',
+              !hasError &&
+                'hover:border-[var(--border-control,#9f9fa9)] focus-within:!border-black dark:focus-within:!border-white',
+              hasError &&
+                'border-destructive focus-within:!border-destructive focus-within:ring-destructive/20 dark:focus-within:ring-destructive/40',
+              disabled &&
+                'cursor-not-allowed bg-[var(--surface-grey,#fafafa)]',
+              className
+            )}
+          >
+            {iconLeft && <span className={affixText}>{iconLeft}</span>}
+            {prefix != null && <span className={affixText}>{prefix}</span>}
+            <input
+              id={id}
+              ref={inputRef}
+              value={isControlled ? value : internalValue}
+              onChange={handleChange}
+              disabled={disabled}
+              aria-invalid={hasError || undefined}
+              aria-describedby={displayHelper ? helperId : undefined}
+              className={cn(
+                'h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-foreground outline-none',
+                textSize,
+                'placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground',
+                'focus:ring-0 focus-visible:ring-0',
+                'disabled:cursor-not-allowed disabled:text-muted-foreground disabled:placeholder:text-muted-foreground'
+              )}
+              {...props}
+            />
+            {clearButton}
+            {suffix != null && !showClear && <span className={affixText}>{suffix}</span>}
+            {iconRight && !showClear && <span className={affixText}>{iconRight}</span>}
+          </div>
+        ) : (
         <div className="relative">
           {iconLeft && (
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground [&>svg]:size-3.5">
@@ -124,7 +199,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               !hasError &&
                 'hover:border-[var(--border-control,#9f9fa9)] focus:!border-black dark:focus:!border-white focus-visible:!border-black dark:focus-visible:!border-white active:!border-black dark:active:!border-white',
               'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
-              'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+              // Disabled = a defined grey fill + muted (readable) text, NOT a flat 50%
+              // fade. Border stays --input. (Figma: Surface/Grey #fafafa + Neutral-600 text.)
+              'disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-[var(--surface-grey,#fafafa)] disabled:text-muted-foreground disabled:placeholder:text-muted-foreground',
               hasError &&
                 'border-destructive focus:!border-destructive focus-visible:!border-destructive active:!border-destructive focus:ring-destructive/20 dark:focus:ring-destructive/40 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 active:ring-destructive/20',
               iconLeft && 'pl-9',
@@ -163,6 +240,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </span>
           )}
         </div>
+        )}
         {displayHelper && (
           <p
             id={helperId}

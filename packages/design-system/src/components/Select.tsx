@@ -279,7 +279,8 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
           'focus:border-[var(--foreground)] focus:ring-ring/50 focus:ring-[3px]',
           'focus-visible:border-[var(--foreground)] focus-visible:ring-ring/50 focus-visible:ring-[3px]',
           'active:border-[var(--foreground)] active:ring-ring/30 active:ring-[2px]',
-          'disabled:cursor-not-allowed disabled:opacity-50',
+          // Disabled = defined grey fill + muted text (not a flat 50% fade).
+          'disabled:cursor-not-allowed disabled:bg-[var(--surface-grey,#fafafa)] disabled:text-muted-foreground',
           // Selected value stays on one line and truncates with an ellipsis when the
           // trigger is too narrow — the trigger never wraps or grows. (The dropdown
           // list is where long options are shown in full / wrapped — see SelectContent.)
