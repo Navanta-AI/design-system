@@ -16,7 +16,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # 22+: the npm 10.x bundled with Node 20 hits the arborist
+          # "Cannot read properties of null (reading 'edgesOut')" bug on the
+          # lockfile-less install below — v0.4.25's publish failed on exactly
+          # that. npm 11 (Node 22+) resolves the same tree fine (verified in a
+          # clean-room repro of this workflow's install step).
+          node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@navanta-ai'
 

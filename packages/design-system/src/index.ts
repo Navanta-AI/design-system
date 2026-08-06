@@ -76,6 +76,7 @@ export {
 } from './components/Charts'
 export { Slider, type SliderProps } from './components/Slider'
 export { DatePicker, type DatePickerProps } from './components/DatePicker'
+export { DateRangePicker, type DateRangePickerProps } from './components/DateRangePicker'
 export { Dropzone, dropzoneUid, type DropzoneProps, type DropzoneFile } from './components/Dropzone'
 
 // UI Components (Navanta/Christy)
