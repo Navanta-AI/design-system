@@ -8,6 +8,64 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-08-06 — v0.4.27
+
+### 1. `DateRangePicker` — DS tokens, bounded paging, year jump
+**Suggestion:** "Can you create this as ds component in our Design system folder and push the
+design system." (Ported from the IRIS campaign-duration field, which had grown past what two
+`DatePicker`s could express.)
+
+**Landed on top of v0.4.26**, which shipped a first port of this component the same day
+(`feat/date-range-picker`, published). That version was a direct copy of the app file, so it
+carried app-only styling into the package: `--ds-text-primary` / `--ds-text-secondary` /
+`--ds-text-placeholder` / `--ds-border-default` / `--ds-border-subtle` / `--ds-surface-grey` and
+`--color-info-700` / `--color-info-50` are **not** defined in `src/tokens.css`, and the
+`type-body` / `type-body-medium` / `type-caption` classes are **not** in DS `styles.css` — so
+outside IRIS the field rendered with inherited type and unresolved colours. This release moves
+every value onto real DS tokens with hex fallbacks (`--text-primary`, `--text-secondary`,
+`--text-neutral`, `--border-default`, `--border-control`, `--surface-base`, `--surface-grey`,
+`--surface-hover`, `--info-strong`, `--info-subtle`) and DS text utilities, per
+[CLAUDE.md](./CLAUDE.md), and adds the gaps listed below (`maxDate`, floored/ceilinged month
+paging, the year jump, day `aria-label`s, the docs page).
+
+- **Two segments, one popover.** A range is picked as a whole, but the two ends aren't always
+  equally editable: a campaign that has already launched can extend its end while its start is
+  fixed. Two separate `DatePicker`s can't show that relationship, and a single merged field
+  can't show the asymmetry — hence one bracketed control holding a `[Start] ⇄ [End]` pair.
+  `startLocked` renders the start as read-only (grey `--surface-grey`, `disabled`, `aria-label`
+  "Start date, locked"), points every calendar click at the end, blocks days before the fixed
+  start, and opens the panel on the **end's** month so the user doesn't land on two months of
+  blocked days.
+- **Draft, then commit.** Selection lives in local state and only reaches `onChange` on **Done**;
+  Cancel and re-opening restore the committed value, so a half-picked range can't leak out. Done
+  stays disabled until both ends exist, with a "Pick an end date" hint beside it rather than a
+  dead button that explains nothing.
+- **Bounded paging.** `minDate` / `maxDate` mute and block out-of-range days *and* stop the month
+  carets at the first/last month holding a selectable day — paging into a fully-greyed month was
+  the main gap found in review. A left-aligned year `Select` (`yearsAhead`, default 5) makes a
+  window a year out one pick instead of twelve caret clicks; the jump is a destination and the
+  carets are a nudge, so they sit at opposite ends of the panel header rather than interleaved.
+- **Composed, not re-implemented:** `Popover` (panel, focus trap, Escape, outside-click),
+  `Select` (year), `Button` (Cancel / Done). Selection colour is info blue — endpoints
+  `--info-strong`, band `--info-subtle` — not the brand accent, which is reserved for product
+  voice. Day buttons carry a full `aria-label` ("Monday, August 10, 2026") plus `aria-pressed`,
+  since a bare "10" out of two months of context announces nothing.
+- Verified in the docs gallery (`/components/daterangepicker`): panel measures 496×343; endpoints
+  compute `rgb(0,75,113)` with the band at `rgb(240,249,255)`; Done enables only once both ends
+  are set and commits "Aug 10" / "Aug 20" to the segments (year dropped when both ends share one);
+  with `minDate` = 1 Jan 2026 the Prev caret disables at January 2026; with `startLocked` the
+  start segment is `disabled` on `#fafafa`, the panel opens on August and Aug 1–9 are blocked.
+  Package `tsc` clean (no new errors) and `npm run build` clean.
+- Files: `packages/design-system/src/components/DateRangePicker.tsx`,
+  `docs/lib/component-registry.ts`,
+  `docs/app/(docs)/components/[slug]/page.tsx`,
+  `docs/app/(docs)/components/[slug]/demos/daterangepicker-demo.tsx` (new).
+- Known gaps, deliberately not in this cut: no roving-tabindex keyboard grid (the calendar
+  is still ~60 tab stops, arrows don't move between days), no Clear action, and the panel is a
+  fixed 496px rather than collapsing to one month on narrow screens.
+
+---
+
 ## 2026-07-13 — v0.4.25
 
 ### 1. Form controls — proper disabled treatment (grey fill, not a flat fade)

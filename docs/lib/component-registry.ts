@@ -955,6 +955,32 @@ export default function Example() {
     ],
   },
   {
+    slug: 'daterangepicker',
+    name: 'Date Range Picker',
+    description:
+      'A two-segment field that picks a start and end date on a dual-month calendar. The start can be locked so only the end moves.',
+    category: 'Forms',
+    importName: 'DateRangePicker',
+    props: [
+      { name: 'startDate', type: 'string', description: 'Range start as ISO yyyy-mm-dd. An empty string shows the placeholder.' },
+      { name: 'endDate', type: 'string', description: 'Range end as ISO yyyy-mm-dd. An empty string shows the placeholder.' },
+      { name: 'onChange', type: '(startIso: string, endIso: string) => void', description: 'Called on Done with both ends as ISO yyyy-mm-dd.' },
+      { name: 'placeholder', type: 'string', description: 'Text for an empty segment. Defaults to "Start" / "End".' },
+      { name: 'startLocked', type: 'boolean', default: 'false', description: 'Fix the start and let only the end move.' },
+      { name: 'minDate', type: 'Date', description: 'Earliest selectable day. Month paging stops at its month.' },
+      { name: 'maxDate', type: 'Date', description: 'Latest selectable day. Month paging stops at its month.' },
+      { name: 'yearsAhead', type: 'number', default: '5', description: 'How many years ahead the year jump offers when maxDate does not cap it.' },
+      { name: 'align', type: "'start' | 'end'", default: "'start'", description: 'Which edge the panel anchors to.' },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'Render a read-only field with no popover.' },
+      { name: 'label', type: 'string', default: "'Select date range'", description: 'Accessible name for the panel.' },
+    ],
+    knobs: [
+      { name: 'startLocked', type: 'boolean', default: false },
+      { name: 'minDate', type: 'boolean', default: true },
+      { name: 'disabled', type: 'boolean', default: false },
+    ],
+  },
+  {
     slug: 'dropzone',
     name: 'Dropzone',
     description: 'A drag-and-drop zone for uploading files.',

@@ -40,6 +40,7 @@ const demoMap: Record<string, DemoComponent> = {
   kpi: dynamic(() => import('./demos/kpi-demo').then((m) => m.KpiDemo)),
   slider: dynamic(() => import('./demos/slider-demo').then((m) => m.SliderDemo)),
   datepicker: dynamic(() => import('./demos/datepicker-demo').then((m) => m.DatePickerDemo)),
+  daterangepicker: dynamic(() => import('./demos/daterangepicker-demo').then((m) => m.DateRangePickerDemo)),
   dropzone: dynamic(() => import('./demos/dropzone-demo').then((m) => m.DropzoneDemo)),
   'bar-chart': dynamic(() => import('./demos/bar-chart-demo').then((m) => m.BarChartDemo)),
   'line-chart': dynamic(() => import('./demos/line-chart-demo').then((m) => m.LineChartDemo)),
