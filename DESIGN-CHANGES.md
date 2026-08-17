@@ -8,6 +8,38 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-08-17 — v0.4.29
+
+### 1. `Tabs` — the `underline` indicator stops sitting under the wrong tab
+**Suggestion:** "in the campaign when we open modal the underline design on the additive
+demand is not aligned with the additive demand but after clicking again it get fixed."
+
+Two independent defects stacked up, both in how the sliding indicator was measured.
+
+- **It never re-measured when the tabs themselves changed size.** `updateIndicator` only ran
+  on `currentActive` / `variant`, so a tab that grew AFTER mount kept the old geometry. The
+  common trigger is a count badge arriving when a fetch resolves: the tabs re-render wider,
+  every tab after the first shifts right, and the underline stays where the badge-less
+  layout put it — until the next click changed `currentActive` and forced a re-measure,
+  which is exactly the "it fixes itself when I click again" symptom. Now a `ResizeObserver`
+  watches the tablist and each tab, so real layout changes drive the re-measure instead of a
+  guessed list of props.
+- **It measured the TRANSFORMED box.** `getBoundingClientRect()` inside a `Dialog` running
+  its `scale-95 → scale-100` entrance returns a box ~5% short, and those numbers were written
+  back as untransformed CSS px — so the underline settled slightly narrow and slightly left
+  even once the animation finished. Switched to `offsetLeft`/`offsetWidth`, which are
+  transform-independent and already relative to the positioned tablist.
+
+Also: the measurement moved to `useLayoutEffect`, so the indicator no longer paints one frame
+at its unset default (`left:auto; width:0`) before snapping into place; and a tab's ref is now
+DELETED on unmount, so the ref map cannot hand back a detached node (a zero-sized measurement)
+or leave the observer watching one.
+
+Only the `underline` variant was affected — `underline-pill` draws a per-button `border-b-2`
+and measures nothing.
+
+- Files: `src/components/Tabs.tsx`.
+
 ## 2026-08-17 — v0.4.28
 
 ### 1. `Input` — one clear cross, not two

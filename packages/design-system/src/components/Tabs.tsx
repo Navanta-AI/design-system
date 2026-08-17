@@ -1,5 +1,13 @@
 "use client"
-import React, { forwardRef, useState, useRef, useEffect, useCallback, useId } from 'react';
+import React, {
+  forwardRef,
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useId,
+} from 'react';
 import { cn } from '../utils/cn';
 
 /** Minimal structural type for a Phosphor-style icon component. */
@@ -71,18 +79,36 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       const el = tabRefs.current.get(currentActive);
       const list = listRef.current;
       if (el && list) {
-        const listRect = list.getBoundingClientRect();
-        const tabRect = el.getBoundingClientRect();
-        setIndicatorStyle({
-          left: tabRect.left - listRect.left,
-          width: tabRect.width,
-        });
+        // offsetLeft/offsetWidth, NOT getBoundingClientRect: the rect is the
+        // TRANSFORMED box, so measuring inside anything mid-transform — a Dialog
+        // running its `scale-95 → scale-100` entrance, say — returns a box ~5%
+        // short, and those numbers are then written back as untransformed CSS
+        // px. Offsets are transform-independent and already relative to the
+        // positioned tablist, which is the coordinate space the indicator uses.
+        setIndicatorStyle({ left: el.offsetLeft - list.offsetLeft, width: el.offsetWidth });
       }
     }, [currentActive, variant]);
 
-    useEffect(() => {
+    // Layout effect so the measurement lands in the same frame as the commit —
+    // otherwise the indicator paints once at its unset default (left:auto,
+    // width:0) and visibly snaps into place.
+    useLayoutEffect(() => {
       updateIndicator();
     }, [currentActive, updateIndicator]);
+
+    // The active tab changing is not the only thing that moves the indicator:
+    // a tab's own width changes whenever its content does, and that shifts every
+    // tab after it. The common case is a count badge arriving when a fetch
+    // resolves — the tabs re-render wider, but nothing here re-measured, so the
+    // underline kept the badge-less geometry until the next click. Observe real
+    // layout instead of trying to enumerate the props that might affect it.
+    useEffect(() => {
+      if (variant !== 'underline' || typeof ResizeObserver === 'undefined') return;
+      const observer = new ResizeObserver(() => updateIndicator());
+      if (listRef.current) observer.observe(listRef.current);
+      for (const el of tabRefs.current.values()) observer.observe(el);
+      return () => observer.disconnect();
+    }, [variant, tabs, updateIndicator]);
 
     useEffect(() => {
       window.addEventListener('resize', updateIndicator);
@@ -149,6 +175,7 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                     key={tab.id}
                     ref={(el) => {
                       if (el) tabRefs.current.set(tab.id, el);
+                      else tabRefs.current.delete(tab.id);
                     }}
                     role="tab"
                     id={`${baseId}-tab-${tab.id}`}
@@ -228,6 +255,7 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                 key={tab.id}
                 ref={(el) => {
                   if (el) tabRefs.current.set(tab.id, el);
+                  else tabRefs.current.delete(tab.id);
                 }}
                 role="tab"
                 id={`${baseId}-tab-${tab.id}`}
