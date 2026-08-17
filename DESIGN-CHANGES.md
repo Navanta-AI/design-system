@@ -8,6 +8,56 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-08-17 — v0.4.28
+
+### 1. `Input` — one clear cross, not two
+**Suggestion:** "in search bar we get 2 cross when we insert text into it … only 1 should be
+coming and only when there is text in the search box."
+
+- Every search field in the portals is `Input` + `type="search"` + `clearable`. The
+  component's own cross was already correct (`showClear = clearable && value.length > 0 &&
+  !disabled`, and the trailing magnifier swaps out for it) — the **second** cross was the
+  browser's native `::-webkit-search-cancel-button`, which nothing suppressed: the DS ships
+  no preflight, and the consuming app's Tailwind preflight resets only
+  `::-webkit-search-decoration`. Both crosses appear under the identical condition
+  (non-empty value), so they always showed together in Chrome/Safari.
+- Fixed with one shared `NATIVE_SEARCH_AFFORDANCE_RESET` class constant applied to **both**
+  input render paths (the plain path and the `prefix`/`suffix` affix path), so a
+  `type="search"` field is single-crossed however it is composed. Verified in the built
+  `dist/styles.css`: `::-webkit-search-cancel-button{display:none}`.
+- Lands everywhere at once: `TableShell`'s `FacetSearch` and `FacetMultiSelect` search,
+  `Select`'s searchable dropdown, `ColumnFilterMenu`'s option search, and every app-level
+  `Input type="search"`.
+- Files: `src/components/Input.tsx`.
+
+### 2. `TableShell` — the Customize button gets its box back
+**Suggestion:** "Customize Button in table, flex right of the table section heading is not
+correct (Box isn't appearing)."
+
+- Both Customize triggers (the `columns`-driven `Popover` trigger and the bare `onCustomize`
+  fallback) were hardcoded `variant="ghost"`, which per `buttonVariants` has no border and no
+  background — only a hover tint, so the control read as bare text. Changed both to
+  `variant="outline"`, the bordered variant.
+- The `customizeLabel` text is deliberately unchanged: at least one consumer locates the
+  button by `textContent === "Customize"` to position an adjacent action.
+- Files: `src/components/ui/TableShell.tsx`.
+
+### 3. `ColumnFilterMenu` — `sortKind` for type-correct sort wording
+**Why:** consumers had forked this component to get date/number/severity sort wording, leaving
+two divergent funnels in one app — the fork had the wording but no option search, the DS one
+had the search but always said "A → Z", so a date column's sort menu read wrong next to a
+searchable one that read right.
+
+- New optional `sortKind?: "text" | "date" | "number" | "severity"` (default `"text"`, so
+  existing behaviour is unchanged) selects the two Sort rows' labels: A → Z / Z → A,
+  Earliest → Latest, Low → High, Most → Least urgent. The DS menu now carries both features,
+  so the fork can be deleted and every funnel gets the >7-option search for free.
+- `ColumnSortKind` is exported from the package root alongside `ColumnFilterMenuProps`.
+- Files: `src/components/data-table/ColumnFilterMenu.tsx`,
+  `src/components/data-table/index.ts`, `src/index.ts`.
+
+---
+
 ## 2026-08-06 — v0.4.27
 
 ### 1. `DateRangePicker` — DS tokens, bounded paging, year jump

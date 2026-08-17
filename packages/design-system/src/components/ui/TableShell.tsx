@@ -700,7 +700,7 @@ export function TableShell({
                   <Button
                     ref={ref}
                     {...rest}
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     iconLeft={<GearSix size={16} weight="regular" />}
                   >
@@ -717,7 +717,7 @@ export function TableShell({
               />
             </Popover>
           ) : (
-            <Button variant="ghost" size="sm" iconLeft={<GearSix size={16} weight="regular" />} onClick={onCustomize}>
+            <Button variant="outline" size="sm" iconLeft={<GearSix size={16} weight="regular" />} onClick={onCustomize}>
               {customizeLabel}
             </Button>
           ))}
