@@ -8,6 +8,24 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-08-17 — v0.4.31
+
+### 1. `Tabs` — stop rebuilding the ResizeObserver every render; don't warn under SSR
+Review follow-ups to v0.4.29/30, no behaviour change intended.
+
+- The observer effect depended on the `tabs` ARRAY, which every consumer builds
+  inline (`tabs={[{ id: 'all', … }]}`), so it got a new identity each render and
+  the effect tore down and re-`observe`d the whole node set every time. Keyed on
+  the joined tab IDs instead — the thing that actually decides which nodes to
+  watch.
+- `useLayoutEffect` in a component a Next.js app server-renders emits React's
+  "useLayoutEffect does nothing on the server" warning. Added the standard
+  `useIsomorphicLayoutEffect` guard.
+
+- Files: `src/components/Tabs.tsx`.
+
+---
+
 ## 2026-08-17 — v0.4.30
 
 ### 1. `Tabs` — correct the underline's horizontal offset (fixes v0.4.29)

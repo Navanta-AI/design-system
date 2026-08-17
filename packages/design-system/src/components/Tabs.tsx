@@ -56,6 +56,11 @@ export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
  * and subtracting the ancestor's own offset there would wrongly remove the
  * ancestor's position within ITS parent.
  */
+/** `useLayoutEffect` that degrades to `useEffect` on the server, where React
+ *  warns that layout effects do nothing. */
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 const offsetLeftWithin = (el: HTMLElement, ancestor: HTMLElement): number => {
   let left = 0;
   let node: HTMLElement | null = el;
@@ -111,7 +116,7 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
     // Layout effect so the measurement lands in the same frame as the commit —
     // otherwise the indicator paints once at its unset default (left:auto,
     // width:0) and visibly snaps into place.
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       updateIndicator();
     }, [currentActive, updateIndicator]);
 
@@ -121,13 +126,17 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
     // resolves — the tabs re-render wider, but nothing here re-measured, so the
     // underline kept the badge-less geometry until the next click. Observe real
     // layout instead of trying to enumerate the props that might affect it.
+    // Keyed on the tab IDS, not the `tabs` array: every consumer builds that
+    // array inline, so depending on it would tear down and rebuild the observer
+    // on every render for a node set that almost never changes.
+    const tabIds = tabs.map((tab) => tab.id).join('\u0000');
     useEffect(() => {
       if (variant !== 'underline' || typeof ResizeObserver === 'undefined') return;
       const observer = new ResizeObserver(() => updateIndicator());
       if (listRef.current) observer.observe(listRef.current);
       for (const el of tabRefs.current.values()) observer.observe(el);
       return () => observer.disconnect();
-    }, [variant, tabs, updateIndicator]);
+    }, [variant, tabIds, updateIndicator]);
 
     useEffect(() => {
       window.addEventListener('resize', updateIndicator);
