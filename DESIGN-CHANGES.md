@@ -8,6 +8,30 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-08-18 — v0.4.32
+
+### 1. `TableShell` — the Customize trigger loses its border again
+Reported: *"for the Customize button remove the borders, hover is right, above
+table flex right of the table heading."*
+
+- v0.4.28 gave this button `variant="outline"` because the original report was
+  that the control "wasn't appearing". Seeing it boxed, the answer is that it was
+  never a missing box — it was a missing hover affordance and, on the two wb-fe
+  screens that hand-roll their own trigger, a transparent no-padding button. A
+  bordered box makes a chrome utility compete with the table's real actions.
+- Both branches (the `columns`-driven Popover trigger and the bare `onCustomize`
+  fallback) are back to `variant="ghost"`: no border, no background, hover tint
+  only — which is what makes it discoverable.
+- The placement is unchanged and already correct: the heading row is
+  `flex items-center justify-between`, so the title sits left and Customize sits
+  right, above the table.
+- The LABEL is deliberately untouched: `FloorPlanHub` locates this button by
+  `textContent === "Customize"` to position its Export button beside it.
+
+**Where:** `packages/design-system/src/components/ui/TableShell.tsx`
+
+---
+
 ## 2026-08-17 — v0.4.31
 
 ### 1. `Tabs` — stop rebuilding the ResizeObserver every render; don't warn under SSR
