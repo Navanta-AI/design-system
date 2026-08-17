@@ -16,14 +16,20 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          # 22+: the npm 10.x bundled with Node 20 hits the arborist
-          # "Cannot read properties of null (reading 'edgesOut')" bug on the
-          # lockfile-less install below — v0.4.25's publish failed on exactly
-          # that. npm 11 (Node 22+) resolves the same tree fine (verified in a
-          # clean-room repro of this workflow's install step).
           node-version: '22'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@navanta-ai'
+
+      # npm 10's arborist hits "Cannot read properties of null (reading
+      # 'edgesOut')" on the lockfile-less install below — v0.4.25 and v0.4.28
+      # both failed on exactly that. Node 22 bundles npm 10.9, NOT npm 11 (that
+      # arrives with Node 23.5+), so pinning the Node version alone never
+      # actually moved off the buggy resolver: the runs in between passed only
+      # because the freshly-resolved graph happened not to trigger it, and a
+      # registry change since was enough to bring it back. npm 11 resolves the
+      # same tree fine (verified in a clean-room repro of this install step),
+      # so ask for it explicitly instead of inferring it from the runtime.
+      - run: npm install -g npm@11
 
       - name: Verify tag matches package version
         run: |
