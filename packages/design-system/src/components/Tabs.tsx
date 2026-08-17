@@ -45,6 +45,27 @@ export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   rightSlot?: React.ReactNode;
 }
 
+/**
+ * `el`'s left edge relative to `ancestor`'s padding box, accumulated through the
+ * offset chain rather than read off `getBoundingClientRect()` — offsets ignore
+ * CSS transforms, so this stays correct inside a scaling dialog.
+ *
+ * Walking the chain (rather than `el.offsetLeft - ancestor.offsetLeft`) is what
+ * makes it right whichever element turns out to be the offset parent: when the
+ * ancestor IS the offset parent the loop runs once and yields `el.offsetLeft`,
+ * and subtracting the ancestor's own offset there would wrongly remove the
+ * ancestor's position within ITS parent.
+ */
+const offsetLeftWithin = (el: HTMLElement, ancestor: HTMLElement): number => {
+  let left = 0;
+  let node: HTMLElement | null = el;
+  while (node && node !== ancestor) {
+    left += node.offsetLeft;
+    node = node.offsetParent as HTMLElement | null;
+  }
+  return left;
+};
+
 const tabSizes = {
   sm: 'px-3 py-1.5 text-xs',
   md: 'px-4 py-2 text-sm',
@@ -79,13 +100,11 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       const el = tabRefs.current.get(currentActive);
       const list = listRef.current;
       if (el && list) {
-        // offsetLeft/offsetWidth, NOT getBoundingClientRect: the rect is the
-        // TRANSFORMED box, so measuring inside anything mid-transform — a Dialog
-        // running its `scale-95 → scale-100` entrance, say — returns a box ~5%
-        // short, and those numbers are then written back as untransformed CSS
-        // px. Offsets are transform-independent and already relative to the
-        // positioned tablist, which is the coordinate space the indicator uses.
-        setIndicatorStyle({ left: el.offsetLeft - list.offsetLeft, width: el.offsetWidth });
+        // Offsets, NOT getBoundingClientRect: the rect is the TRANSFORMED box, so
+        // measuring inside anything mid-transform — a Dialog running its
+        // `scale-95 → scale-100` entrance, say — returns a box ~5% short, and
+        // those numbers are then written back as untransformed CSS px.
+        setIndicatorStyle({ left: offsetLeftWithin(el, list), width: el.offsetWidth });
       }
     }, [currentActive, variant]);
 

@@ -8,6 +8,29 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-08-17 — v0.4.30
+
+### 1. `Tabs` — correct the underline's horizontal offset (fixes v0.4.29)
+v0.4.29 moved the measurement off `getBoundingClientRect()` (right call — the rect
+is the transformed box) but computed the position as `el.offsetLeft -
+list.offsetLeft`. The tablist is itself `position: relative`, so it IS the tabs'
+offset parent: `el.offsetLeft` is already list-relative, and subtracting the
+list's own offset removed the list's position within ITS parent — a constant
+left shift (40px on the campaign modal, whatever the surrounding padding is).
+
+Replaced with an `offsetLeftWithin(el, ancestor)` helper that accumulates
+`offsetLeft` up the offset chain and stops at the ancestor. When the ancestor is
+the offset parent the loop runs once and yields `el.offsetLeft`; when it is not,
+it still lands in the right coordinate space. Transform-independence, which is
+what v0.4.29 was after, is preserved.
+
+Caught by measuring the live indicator against its active tab rather than by
+eye: width matched to 0.1px, position was off by exactly the list's own offset.
+
+- Files: `src/components/Tabs.tsx`.
+
+---
+
 ## 2026-08-17 — v0.4.29
 
 ### 1. `Tabs` — the `underline` indicator stops sitting under the wrong tab
