@@ -1,5 +1,13 @@
 "use client"
-import React, { forwardRef, useState, useRef, useEffect, useCallback, useId } from 'react';
+import React, {
+  forwardRef,
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useId,
+} from 'react';
 import { cn } from '../utils/cn';
 
 /** Minimal structural type for a Phosphor-style icon component. */
@@ -37,6 +45,32 @@ export interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   rightSlot?: React.ReactNode;
 }
 
+/**
+ * `el`'s left edge relative to `ancestor`'s padding box, accumulated through the
+ * offset chain rather than read off `getBoundingClientRect()` — offsets ignore
+ * CSS transforms, so this stays correct inside a scaling dialog.
+ *
+ * Walking the chain (rather than `el.offsetLeft - ancestor.offsetLeft`) is what
+ * makes it right whichever element turns out to be the offset parent: when the
+ * ancestor IS the offset parent the loop runs once and yields `el.offsetLeft`,
+ * and subtracting the ancestor's own offset there would wrongly remove the
+ * ancestor's position within ITS parent.
+ */
+/** `useLayoutEffect` that degrades to `useEffect` on the server, where React
+ *  warns that layout effects do nothing. */
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+const offsetLeftWithin = (el: HTMLElement, ancestor: HTMLElement): number => {
+  let left = 0;
+  let node: HTMLElement | null = el;
+  while (node && node !== ancestor) {
+    left += node.offsetLeft;
+    node = node.offsetParent as HTMLElement | null;
+  }
+  return left;
+};
+
 const tabSizes = {
   sm: 'px-3 py-1.5 text-xs',
   md: 'px-4 py-2 text-sm',
@@ -71,18 +105,38 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       const el = tabRefs.current.get(currentActive);
       const list = listRef.current;
       if (el && list) {
-        const listRect = list.getBoundingClientRect();
-        const tabRect = el.getBoundingClientRect();
-        setIndicatorStyle({
-          left: tabRect.left - listRect.left,
-          width: tabRect.width,
-        });
+        // Offsets, NOT getBoundingClientRect: the rect is the TRANSFORMED box, so
+        // measuring inside anything mid-transform — a Dialog running its
+        // `scale-95 → scale-100` entrance, say — returns a box ~5% short, and
+        // those numbers are then written back as untransformed CSS px.
+        setIndicatorStyle({ left: offsetLeftWithin(el, list), width: el.offsetWidth });
       }
     }, [currentActive, variant]);
 
-    useEffect(() => {
+    // Layout effect so the measurement lands in the same frame as the commit —
+    // otherwise the indicator paints once at its unset default (left:auto,
+    // width:0) and visibly snaps into place.
+    useIsomorphicLayoutEffect(() => {
       updateIndicator();
     }, [currentActive, updateIndicator]);
+
+    // The active tab changing is not the only thing that moves the indicator:
+    // a tab's own width changes whenever its content does, and that shifts every
+    // tab after it. The common case is a count badge arriving when a fetch
+    // resolves — the tabs re-render wider, but nothing here re-measured, so the
+    // underline kept the badge-less geometry until the next click. Observe real
+    // layout instead of trying to enumerate the props that might affect it.
+    // Keyed on the tab IDS, not the `tabs` array: every consumer builds that
+    // array inline, so depending on it would tear down and rebuild the observer
+    // on every render for a node set that almost never changes.
+    const tabIds = tabs.map((tab) => tab.id).join('\u0000');
+    useEffect(() => {
+      if (variant !== 'underline' || typeof ResizeObserver === 'undefined') return;
+      const observer = new ResizeObserver(() => updateIndicator());
+      if (listRef.current) observer.observe(listRef.current);
+      for (const el of tabRefs.current.values()) observer.observe(el);
+      return () => observer.disconnect();
+    }, [variant, tabIds, updateIndicator]);
 
     useEffect(() => {
       window.addEventListener('resize', updateIndicator);
@@ -149,6 +203,7 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                     key={tab.id}
                     ref={(el) => {
                       if (el) tabRefs.current.set(tab.id, el);
+                      else tabRefs.current.delete(tab.id);
                     }}
                     role="tab"
                     id={`${baseId}-tab-${tab.id}`}
@@ -228,6 +283,7 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                 key={tab.id}
                 ref={(el) => {
                   if (el) tabRefs.current.set(tab.id, el);
+                  else tabRefs.current.delete(tab.id);
                 }}
                 role="tab"
                 id={`${baseId}-tab-${tab.id}`}

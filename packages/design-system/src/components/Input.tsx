@@ -27,6 +27,13 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
   suffix?: React.ReactNode
 }
 
+/** `type="search"` makes WebKit draw its own clear button, which would then sit
+ *  beside the one `clearable` renders — two crosses for one field. Suppress the
+ *  native affordances so this component's cross is the only one, on every path. */
+const NATIVE_SEARCH_AFFORDANCE_RESET =
+  '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:hidden ' +
+  '[&::-webkit-search-decoration]:appearance-none'
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
@@ -162,6 +169,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               aria-describedby={displayHelper ? helperId : undefined}
               className={cn(
                 'h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-foreground outline-none',
+                NATIVE_SEARCH_AFFORDANCE_RESET,
                 textSize,
                 'placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground',
                 'focus:ring-0 focus-visible:ring-0',
@@ -190,6 +198,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-describedby={displayHelper ? helperId : undefined}
             className={cn(
               'flex w-full min-w-0 rounded-md border border-input bg-background py-1 text-foreground transition-[border-color,color,box-shadow] outline-none',
+              NATIVE_SEARCH_AFFORDANCE_RESET,
               sizeClass,
               'file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground',
               'placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground',

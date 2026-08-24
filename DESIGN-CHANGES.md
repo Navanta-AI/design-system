@@ -8,6 +8,153 @@ user guidance / suggestions that drove each one. Newest session at the top.
 
 ---
 
+## 2026-08-18 — v0.4.32
+
+### 1. `TableShell` — the Customize trigger loses its border again
+Reported: *"for the Customize button remove the borders, hover is right, above
+table flex right of the table heading."*
+
+- v0.4.28 gave this button `variant="outline"` because the original report was
+  that the control "wasn't appearing". Seeing it boxed, the answer is that it was
+  never a missing box — it was a missing hover affordance and, on the two wb-fe
+  screens that hand-roll their own trigger, a transparent no-padding button. A
+  bordered box makes a chrome utility compete with the table's real actions.
+- Both branches (the `columns`-driven Popover trigger and the bare `onCustomize`
+  fallback) are back to `variant="ghost"`: no border, no background, hover tint
+  only — which is what makes it discoverable.
+- The placement is unchanged and already correct: the heading row is
+  `flex items-center justify-between`, so the title sits left and Customize sits
+  right, above the table.
+- The LABEL is deliberately untouched: `FloorPlanHub` locates this button by
+  `textContent === "Customize"` to position its Export button beside it.
+
+**Where:** `packages/design-system/src/components/ui/TableShell.tsx`
+
+---
+
+## 2026-08-17 — v0.4.31
+
+### 1. `Tabs` — stop rebuilding the ResizeObserver every render; don't warn under SSR
+Review follow-ups to v0.4.29/30, no behaviour change intended.
+
+- The observer effect depended on the `tabs` ARRAY, which every consumer builds
+  inline (`tabs={[{ id: 'all', … }]}`), so it got a new identity each render and
+  the effect tore down and re-`observe`d the whole node set every time. Keyed on
+  the joined tab IDs instead — the thing that actually decides which nodes to
+  watch.
+- `useLayoutEffect` in a component a Next.js app server-renders emits React's
+  "useLayoutEffect does nothing on the server" warning. Added the standard
+  `useIsomorphicLayoutEffect` guard.
+
+- Files: `src/components/Tabs.tsx`.
+
+---
+
+## 2026-08-17 — v0.4.30
+
+### 1. `Tabs` — correct the underline's horizontal offset (fixes v0.4.29)
+v0.4.29 moved the measurement off `getBoundingClientRect()` (right call — the rect
+is the transformed box) but computed the position as `el.offsetLeft -
+list.offsetLeft`. The tablist is itself `position: relative`, so it IS the tabs'
+offset parent: `el.offsetLeft` is already list-relative, and subtracting the
+list's own offset removed the list's position within ITS parent — a constant
+left shift (40px on the campaign modal, whatever the surrounding padding is).
+
+Replaced with an `offsetLeftWithin(el, ancestor)` helper that accumulates
+`offsetLeft` up the offset chain and stops at the ancestor. When the ancestor is
+the offset parent the loop runs once and yields `el.offsetLeft`; when it is not,
+it still lands in the right coordinate space. Transform-independence, which is
+what v0.4.29 was after, is preserved.
+
+Caught by measuring the live indicator against its active tab rather than by
+eye: width matched to 0.1px, position was off by exactly the list's own offset.
+
+- Files: `src/components/Tabs.tsx`.
+
+---
+
+## 2026-08-17 — v0.4.29
+
+### 1. `Tabs` — the `underline` indicator stops sitting under the wrong tab
+**Suggestion:** "in the campaign when we open modal the underline design on the additive
+demand is not aligned with the additive demand but after clicking again it get fixed."
+
+Two independent defects stacked up, both in how the sliding indicator was measured.
+
+- **It never re-measured when the tabs themselves changed size.** `updateIndicator` only ran
+  on `currentActive` / `variant`, so a tab that grew AFTER mount kept the old geometry. The
+  common trigger is a count badge arriving when a fetch resolves: the tabs re-render wider,
+  every tab after the first shifts right, and the underline stays where the badge-less
+  layout put it — until the next click changed `currentActive` and forced a re-measure,
+  which is exactly the "it fixes itself when I click again" symptom. Now a `ResizeObserver`
+  watches the tablist and each tab, so real layout changes drive the re-measure instead of a
+  guessed list of props.
+- **It measured the TRANSFORMED box.** `getBoundingClientRect()` inside a `Dialog` running
+  its `scale-95 → scale-100` entrance returns a box ~5% short, and those numbers were written
+  back as untransformed CSS px — so the underline settled slightly narrow and slightly left
+  even once the animation finished. Switched to `offsetLeft`/`offsetWidth`, which are
+  transform-independent and already relative to the positioned tablist.
+
+Also: the measurement moved to `useLayoutEffect`, so the indicator no longer paints one frame
+at its unset default (`left:auto; width:0`) before snapping into place; and a tab's ref is now
+DELETED on unmount, so the ref map cannot hand back a detached node (a zero-sized measurement)
+or leave the observer watching one.
+
+Only the `underline` variant was affected — `underline-pill` draws a per-button `border-b-2`
+and measures nothing.
+
+- Files: `src/components/Tabs.tsx`.
+
+## 2026-08-17 — v0.4.28
+
+### 1. `Input` — one clear cross, not two
+**Suggestion:** "in search bar we get 2 cross when we insert text into it … only 1 should be
+coming and only when there is text in the search box."
+
+- Every search field in the portals is `Input` + `type="search"` + `clearable`. The
+  component's own cross was already correct (`showClear = clearable && value.length > 0 &&
+  !disabled`, and the trailing magnifier swaps out for it) — the **second** cross was the
+  browser's native `::-webkit-search-cancel-button`, which nothing suppressed: the DS ships
+  no preflight, and the consuming app's Tailwind preflight resets only
+  `::-webkit-search-decoration`. Both crosses appear under the identical condition
+  (non-empty value), so they always showed together in Chrome/Safari.
+- Fixed with one shared `NATIVE_SEARCH_AFFORDANCE_RESET` class constant applied to **both**
+  input render paths (the plain path and the `prefix`/`suffix` affix path), so a
+  `type="search"` field is single-crossed however it is composed. Verified in the built
+  `dist/styles.css`: `::-webkit-search-cancel-button{display:none}`.
+- Lands everywhere at once: `TableShell`'s `FacetSearch` and `FacetMultiSelect` search,
+  `Select`'s searchable dropdown, `ColumnFilterMenu`'s option search, and every app-level
+  `Input type="search"`.
+- Files: `src/components/Input.tsx`.
+
+### 2. `TableShell` — the Customize button gets its box back
+**Suggestion:** "Customize Button in table, flex right of the table section heading is not
+correct (Box isn't appearing)."
+
+- Both Customize triggers (the `columns`-driven `Popover` trigger and the bare `onCustomize`
+  fallback) were hardcoded `variant="ghost"`, which per `buttonVariants` has no border and no
+  background — only a hover tint, so the control read as bare text. Changed both to
+  `variant="outline"`, the bordered variant.
+- The `customizeLabel` text is deliberately unchanged: at least one consumer locates the
+  button by `textContent === "Customize"` to position an adjacent action.
+- Files: `src/components/ui/TableShell.tsx`.
+
+### 3. `ColumnFilterMenu` — `sortKind` for type-correct sort wording
+**Why:** consumers had forked this component to get date/number/severity sort wording, leaving
+two divergent funnels in one app — the fork had the wording but no option search, the DS one
+had the search but always said "A → Z", so a date column's sort menu read wrong next to a
+searchable one that read right.
+
+- New optional `sortKind?: "text" | "date" | "number" | "severity"` (default `"text"`, so
+  existing behaviour is unchanged) selects the two Sort rows' labels: A → Z / Z → A,
+  Earliest → Latest, Low → High, Most → Least urgent. The DS menu now carries both features,
+  so the fork can be deleted and every funnel gets the >7-option search for free.
+- `ColumnSortKind` is exported from the package root alongside `ColumnFilterMenuProps`.
+- Files: `src/components/data-table/ColumnFilterMenu.tsx`,
+  `src/components/data-table/index.ts`, `src/index.ts`.
+
+---
+
 ## 2026-08-06 — v0.4.27
 
 ### 1. `DateRangePicker` — DS tokens, bounded paging, year jump

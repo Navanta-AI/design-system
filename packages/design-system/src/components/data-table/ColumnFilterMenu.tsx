@@ -17,6 +17,18 @@ const HOVER_BG = "var(--surface-hover, #f4f4f5)";
 const TEXT_1 = "var(--text-primary, #18181b)";
 const TEXT_2 = "var(--text-secondary, #71717a)";
 
+/** The kind of data a column holds — picks the wording of its two Sort rows.
+ *  "A → Z" only reads correctly for text; dates, amounts and severities each
+ *  need their own asc/desc phrasing. */
+export type ColumnSortKind = "text" | "date" | "number" | "severity";
+
+const SORT_LABELS: Record<ColumnSortKind, { asc: string; desc: string }> = {
+  text: { asc: "A → Z", desc: "Z → A" },
+  date: { asc: "Earliest first", desc: "Latest first" },
+  number: { asc: "Low → High", desc: "High → Low" },
+  severity: { asc: "Most urgent first", desc: "Least urgent first" },
+};
+
 export interface ColumnFilterMenuProps {
   /** Column header text shown next to the funnel (e.g. "Status"). */
   label: string;
@@ -34,6 +46,8 @@ export interface ColumnFilterMenuProps {
   onClear: () => void;
   /** Show the Sort rows. Default true. */
   sortable?: boolean;
+  /** Column data type — picks the asc/desc sort wording. Default "text". */
+  sortKind?: ColumnSortKind;
 }
 
 /**
@@ -55,7 +69,9 @@ export function ColumnFilterMenu({
   onToggle,
   onClear,
   sortable = true,
+  sortKind = "text",
 }: ColumnFilterMenuProps) {
+  const sortLabels = SORT_LABELS[sortKind];
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -190,7 +206,7 @@ export function ColumnFilterMenu({
                 >
                   <ArrowUp size={14} weight="bold" color={activeDir === "asc" ? ACCENT : TEXT_2} />
                   <span className="text-sm font-normal" style={{ color: TEXT_1 }}>
-                    A → Z
+                    {sortLabels.asc}
                   </span>
                 </button>
                 <button
@@ -204,7 +220,7 @@ export function ColumnFilterMenu({
                 >
                   <ArrowDown size={14} weight="bold" color={activeDir === "desc" ? ACCENT : TEXT_2} />
                   <span className="text-sm font-normal" style={{ color: TEXT_1 }}>
-                    Z → A
+                    {sortLabels.desc}
                   </span>
                 </button>
                 <div style={{ height: 1, background: "var(--border-default, #e4e4e7)", margin: "4px 8px" }} />

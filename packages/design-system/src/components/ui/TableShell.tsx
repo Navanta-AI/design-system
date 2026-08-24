@@ -700,6 +700,10 @@ export function TableShell({
                   <Button
                     ref={ref}
                     {...rest}
+                    /* Borderless: the heading row is chrome, not a call to action,
+                       so Customize reads as a utility next to the title rather than
+                       a second button competing with the table's own actions. The
+                       hover tint is what makes it discoverable. */
                     variant="ghost"
                     size="sm"
                     iconLeft={<GearSix size={16} weight="regular" />}
@@ -717,6 +721,8 @@ export function TableShell({
               />
             </Popover>
           ) : (
+            /* Same borderless treatment as the `columns` branch above — the two
+               render the same control and must not read as different affordances. */
             <Button variant="ghost" size="sm" iconLeft={<GearSix size={16} weight="regular" />} onClick={onCustomize}>
               {customizeLabel}
             </Button>
