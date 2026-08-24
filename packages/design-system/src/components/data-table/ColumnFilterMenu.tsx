@@ -19,10 +19,21 @@ const TEXT_2 = "var(--text-secondary, #71717a)";
 
 /** The kind of data a column holds — picks the wording of its two Sort rows.
  *  "A → Z" only reads correctly for text; dates, amounts and severities each
- *  need their own asc/desc phrasing. */
+ *  need their own asc/desc phrasing.
+ *
+ *  These are the GENERIC kinds. A column whose values carry a domain vocabulary
+ *  of their own — an aging tier, a lifecycle stage, a grade — borrows the closest
+ *  kind and overrides the wording with {@link ColumnFilterMenuProps.sortLabels},
+ *  rather than this union growing a member per consuming app's domain. */
 export type ColumnSortKind = "text" | "date" | "number" | "severity";
 
-const SORT_LABELS: Record<ColumnSortKind, { asc: string; desc: string }> = {
+/** The asc/desc wording for one column. */
+export interface ColumnSortLabels {
+  asc: string;
+  desc: string;
+}
+
+const SORT_LABELS: Record<ColumnSortKind, ColumnSortLabels> = {
   text: { asc: "A → Z", desc: "Z → A" },
   date: { asc: "Earliest first", desc: "Latest first" },
   number: { asc: "Low → High", desc: "High → Low" },
@@ -48,6 +59,18 @@ export interface ColumnFilterMenuProps {
   sortable?: boolean;
   /** Column data type — picks the asc/desc sort wording. Default "text". */
   sortKind?: ColumnSortKind;
+  /**
+   * Override the sort-row wording, for a column whose values speak a vocabulary
+   * none of the `sortKind` presets says correctly — an aging tier sorts
+   * "Obsolescence first", not "Most urgent first". Give one side or both; whatever
+   * is omitted falls back to the `sortKind` label, so a caller can rename just the
+   * direction that reads wrong.
+   *
+   * The DIRECTIONS still mean what they always mean: the `asc` label sits on the
+   * row that fires `onSort("asc")`. Only the words change — never use this to
+   * swap them, or the arrow beside the label will contradict it.
+   */
+  sortLabels?: Partial<ColumnSortLabels>;
 }
 
 /**
@@ -70,8 +93,11 @@ export function ColumnFilterMenu({
   onClear,
   sortable = true,
   sortKind = "text",
+  sortLabels: sortLabelsOverride,
 }: ColumnFilterMenuProps) {
-  const sortLabels = SORT_LABELS[sortKind];
+  // Preset first, caller's words on top — so an override may replace one side
+  // and leave the other reading as its kind.
+  const sortLabels = { ...SORT_LABELS[sortKind], ...sortLabelsOverride };
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);

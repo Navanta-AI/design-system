@@ -54,6 +54,7 @@ export type {
   DataTableProps,
   ColumnFilterMenuProps,
   ColumnSortKind,
+  ColumnSortLabels,
   Column as DataTableColumn,
   SlotColumn as DataTableSlotColumn,
   SelectionConfig as DataTableSelection,
